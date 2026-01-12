@@ -1,0 +1,45 @@
+﻿
+> gearbox-fintech-rebuilt@0.0.1 server
+> tsx src/server/index.ts
+
+node.exe : 
+C:\projects\Gearbox Fintech\r
+ebuilt\src\lib\notifications\
+sms.ts:1
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (C:\proj  
+  ects\Gea...ations\sms.ts   
+ :1:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+import { Twilio } from 
+'twilio';
+         ^
+SyntaxError: The requested 
+module 'twilio' does not 
+provide an export named 
+'Twilio'
+    at #asyncInstantiate (nod
+e:internal/modules/esm/module
+_job:302:21)
+    at async ModuleJob.run (n
+ode:internal/modules/esm/modu
+le_job:405:5)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:660:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:101:5)
+
+Node.js v24.12.0

@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Spotify / Dark Premium Palette (using oklch for better vibrancy) */
+    --background: 15% 0.005 285;
+    --foreground: 98% 0.005 65;
+    
+    --card: 18% 0.006 285;
+    --card-foreground: 98% 0.005 65;
+ 
+    --popover: 18% 0.006 285;
+    --popover-foreground: 98% 0.005 65;
+ 
+    --primary: 65% 0.25 150; /* Vibrant Emerald/Green for that Spotify feel */
+    --primary-foreground: 10% 0.02 150;
+ 
+    --secondary: 25% 0.01 285;
+    --secondary-foreground: 98% 0.005 65;
+ 
+    --muted: 22% 0.01 285;
+    --muted-foreground: 70% 0.01 285;
+ 
+    --accent: 65% 0.25 150;
+    --accent-foreground: 10% 0.02 150;
+ 
+    --destructive: 55% 0.2 25;
+    --destructive-foreground: 98% 0 0;
+ 
+    --border: 22% 0.01 285;
+    --input: 22% 0.01 285;
+    --ring: 65% 0.25 150;
+ 
+    --radius: 1.5rem; /* More modern, rounder corners */
+  }
+
+  .dark {
+    /* Already dark by default now, but can adjust if specific dark class is used */
+    --background: 10% 0.005 285;
+    --card: 14% 0.006 285;
+    --border: 18% 0.01 285;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/30;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-card/60 backdrop-blur-2xl border border-white/5;
+  }
+  
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-3xl border border-white/10;
+  }
+
+  .premium-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-white/20;
+}

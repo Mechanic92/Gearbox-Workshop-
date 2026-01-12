@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gearbox Booking Widget - Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .demo-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+    .demo-header h1 {
+      font-size: 36px;
+      margin: 0 0 16px 0;
+    }
+    .demo-header p {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    .demo-code {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      overflow-x: auto;
+    }
+    .demo-code pre {
+      margin: 0;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .demo-code .comment {
+      color: #9ca3af;
+    }
+    .demo-code .tag {
+      color: #60a5fa;
+    }
+    .demo-code .attr {
+      color: #fbbf24;
+    }
+    .demo-code .value {
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>🚗 Gearbox Booking Widget</h1>
+      <p>Embed this widget on your workshop website to accept 24/7 online bookings</p>
+    </div>
+
+    <div class="demo-code">
+      <pre><span class="comment">&lt;!-- Add this to your website where you want the booking form to appear --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="value">"gearbox-booking"</span><span class="tag">&gt;&lt;/div&gt;</span>
+<span class="tag">&lt;script</span> 
+  <span class="attr">src</span>=<span class="value">"http://localhost:5173/widget.js"</span>
+  <span class="attr">data-shop-id</span>=<span class="value">"1"</span>
+  <span class="attr">data-api-url</span>=<span class="value">"http://localhost:3000/api/trpc"</span>
+  <span class="attr">data-primary-color</span>=<span class="value">"#2563eb"</span>
+<span class="tag">&gt;&lt;/script&gt;</span></pre>
+    </div>
+
+    <!-- Widget will render here -->
+    <div id="gearbox-booking"></div>
+  </div>
+
+  <!-- Load the widget -->
+  <script type="module">
+    import BookingWidget from './BookingWidget.tsx';
+    import { createRoot } from 'react-dom/client';
+    import React from 'react';
+
+    const container = document.getElementById('gearbox-booking');
+    const root = createRoot(container);
+    root.render(
+      React.createElement(BookingWidget, {
+        shopId: '1',
+        apiUrl: 'http://localhost:3000/api/trpc',
+        primaryColor: '#2563eb',
+      })
+    );
+  </script>
+</body>
+</html>

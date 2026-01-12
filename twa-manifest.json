@@ -1,0 +1,54 @@
+{
+  "packageId": "nz.gearbox.workshop",
+  "host": "https://gearbox-workshop.fly.dev",
+  "name": "Gearbox Workshop",
+  "launcherName": "Gearbox",
+  "display": "standalone",
+  "themeColor": "#7c3aed",
+  "navigationColor": "#050505",
+  "navigationColorDark": "#050505",
+  "navigationDividerColor": "#050505",
+  "navigationDividerColorDark": "#050505",
+  "backgroundColor": "#050505",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://gearbox-workshop.fly.dev/icons/icon-512x512.png",
+  "maskableIconUrl": "https://gearbox-workshop.fly.dev/icons/icon-512x512.png",
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "shortName": "Dashboard",
+      "url": "/trades/dashboard",
+      "icons": [
+        {
+          "src": "https://gearbox-workshop.fly.dev/icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "New Job",
+      "shortName": "New Job",
+      "url": "/trades/jobs/new",
+      "icons": [
+        {
+          "src": "https://gearbox-workshop.fly.dev/icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "signing": {
+    "keystore": "./gearbox-keystore.jks",
+    "keystorePassword": "gearbox2026",
+    "alias": "gearbox",
+    "aliasPassword": "gearbox2026"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": false,
+  "isChromeOSOnly": false,
+  "orientation": "portrait",
+  "fingerprints": []
+}

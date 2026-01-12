@@ -1,0 +1,7 @@
+﻿
+> gearbox-fintech-rebuilt@0.0.1 build
+> tsc && vite build
+
+src/server/routers.ts(635,11): error TS2322: Type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }[]' is not assignable to type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }[]'.
+  Type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }' is not assignable to type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }'.
+    Property 'category' is optional in type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }' but required in type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }'.

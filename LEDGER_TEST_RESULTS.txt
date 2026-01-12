@@ -1,0 +1,58 @@
+======================================================================
+ONBOARDING LEDGER CONFIG TEST
+======================================================================
+
+Step 1: Organization Setup
+----------------------------------------------------------------------
+✓ Using existing organization: Demo Auto Workshop (ID: 1)
+
+Step 2: Create Ledger (GST Disabled)
+----------------------------------------------------------------------
+✓ Created ledger ID: 9
+  Name: Test Ledger No GST 1767700816715
+  Type: trades
+  GST Registered: false ✓
+  GST Basis: payments (default) ✓
+  GST Frequency: two_monthly (default) ✓
+  AIM Enabled: false ✓
+
+Step 3: Create Ledger (GST Enabled - Invoice Basis)
+----------------------------------------------------------------------
+✓ Created ledger ID: 10
+  Name: Test Ledger GST Invoice 1767700816726
+  Type: trades
+  GST Registered: true ✓
+  GST Basis: invoice ✓
+  GST Frequency: monthly ✓
+  AIM Enabled: true ✓
+
+Step 4: Create Ledger (GST Enabled - Payments Basis)
+----------------------------------------------------------------------
+✓ Created ledger ID: 11
+  Name: Test Ledger GST Payments 1767700816736
+  Type: trades
+  GST Registered: true ✓
+  GST Basis: payments ✓
+  GST Frequency: six_monthly ✓
+  AIM Enabled: false ✓
+
+Step 5: Access Control Verification
+----------------------------------------------------------------------
+✓ Can query ledgers by organization
+  Found 10 ledgers for org 1
+  Owner (user 1) has access: ✓
+
+======================================================================
+TEST SUMMARY
+======================================================================
+✅ ALL TESTS PASSED
+
+Onboarding ledger configuration is working correctly:
+  • Organizations can be created
+  • Ledgers can be created with various GST configurations
+  • GST defaults (payments basis, two_monthly) are applied correctly
+  • Explicit GST settings are persisted correctly
+  • AIM flag is stored correctly
+  • Access control is functioning
+
+======================================================================

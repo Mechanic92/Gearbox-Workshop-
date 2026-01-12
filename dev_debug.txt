@@ -1,0 +1,64 @@
+﻿
+> gearbox-fintech-rebuilt@0.0.1 dev
+> vite
+
+Port 5173 is in use, trying another one...
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m354[22m[2m[0m ms[22m
+
+  [32mÔ×£[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+[2m  [32mÔ×£[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[32m  Ô×£[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[1m[33mwarn[39m[22m - 
+The class `ease-[cubic-bezier
+(0.23,1,0.32,1)]` is 
+ambiguous and matches 
+multiple utilities.
+[1m[33mwarn[39m[22m - If 
+this is content and not a 
+class, replace it with `ease-
+&lsqb;cubic-bezier(0.23,1,0.3
+2,1)&rsqb;` to silence this 
+warning.
+[2m01:09:46[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:09:49[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:09:51[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:10:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:08[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:17[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:27[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:49[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:10:59[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Navigation.tsx, /src/index.css[22m
+[2m01:11:09[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:18:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/BookingCalendar.tsx, /src/index.css[22m
+[2m03:04:13[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m03:04:13[22m [36m[1m[vite][22m[39m server restarted.
+
+  [32mÔ×£[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+  [32mÔ×£[39m  [1mNetwork[22m: [36mhttp://192.168.1.6:[1m5174[22m/[39m
+[2m03:14:33[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m03:14:34[22m [36m[1m[vite][22m[39m server restarted.
+
+  [32mÔ×£[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+  [32mÔ×£[39m  [1mNetwork[22m: [36mhttp://192.168.1.6:[1m5174[22m/[39m
+[2m03:17:59[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m03:17:59[22m [36m[1m[vite][22m[39m server restarted.
+[2m01:11:44[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+Re-optimizing dependencies because lockfile has changed
+[2m01:11:44[22m [36m[1m[vite][22m[39m server restarted.

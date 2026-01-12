@@ -1,0 +1,42 @@
+{
+  "appId": "com.gearbox.workshop",
+  "productName": "Gearbox Workshop",
+  "copyright": "Copyright © 2026 Gearbox",
+  "directories": {
+    "output": "release",
+    "buildResources": "build"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "package.json",
+    "node_modules/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "src/server",
+      "to": "server",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "artifactName": "${productName}-Setup-${version}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Gearbox Workshop",
+    "installerIcon": null,
+    "uninstallerIcon": null,
+    "installerHeaderIcon": null
+  },
+  "publish": null
+}

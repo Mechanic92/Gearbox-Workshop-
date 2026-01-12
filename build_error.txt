@@ -1,0 +1,13 @@
+﻿
+> gearbox-fintech-rebuilt@0.0.1 build
+> tsc && vite build
+
+src/lib/schema.ts(553,48): error TS2339: Property 'customerId' does not exist on type 'SQLiteTableWithColumns<{ name: "vehicles"; schema: undefined; columns: { id: SQLiteColumn<{ name: "id"; tableName: "vehicles"; dataType: "number"; columnType: "SQLiteInteger"; data: number; driverParam: number; notNull: true; hasDefault: true; enumValues: undefined; baseColumn: never; }, object>; ... 13 more ...; up...'.
+src/pages/JobDetail.tsx(474,18): error TS2304: Cannot find name 'Badge'.
+src/pages/JobDetail.tsx(476,19): error TS2304: Cannot find name 'Badge'.
+src/pages/TradesDashboard.tsx(47,12): error TS2304: Cannot find name 'Zap'.
+src/pages/TradesDashboard.tsx(123,22): error TS2304: Cannot find name 'Zap'.
+src/pages/TradesDashboard.tsx(184,46): error TS2552: Cannot find name 'ArrowRight'. Did you mean 'ArrowUpRight'?
+src/server/routers.ts(635,11): error TS2322: Type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }[]' is not assignable to type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }[]'.
+  Type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }' is not assignable to type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }'.
+    Property 'category' is optional in type '{ status?: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; category?: string; component?: string; mediaKeys?: string[]; }' but required in type '{ category: string; component: string; status: "green" | "red" | "amber"; comment?: string; recommendedAction?: string; estimatedCost?: number; mediaKeys?: string[]; }'.

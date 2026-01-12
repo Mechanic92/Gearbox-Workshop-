@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gearbox - Modern Workshop Management Software for NZ Auto Workshops</title>
+    <meta name="description" content="Transform your workshop with Gearbox - the modern management platform with digital inspections, Xero sync, and customer portal. Trusted by NZ workshops. Start free trial.">
+    <meta name="keywords" content="workshop software nz, auto workshop management, digital vehicle inspection, xero integration, workshop management system">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Gearbox - Workshop Management Software NZ">
+    <meta property="og:description" content="Modern workshop management with digital inspections, Xero sync, and customer portal.">
+    <meta property="og:image" content="/images/hero-dashboard.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gearbox - Workshop Management Software NZ">
+    <meta name="twitter:description" content="Modern workshop management with digital inspections, Xero sync, and customer portal.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10b981',
+                        'primary-dark': '#059669',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-black tracking-tighter">⚙️ Gearbox</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="hover:text-emerald-300 transition">Features</a>
+                    <a href="#pricing" class="hover:text-emerald-300 transition">Pricing</a>
+                    <a href="#testimonials" class="hover:text-emerald-300 transition">Testimonials</a>
+                    <a href="/app/login" class="hover:text-emerald-300 transition">Login</a>
+                    <a href="/app/signup" class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-2 rounded-lg font-bold hover:shadow-lg transition">
+                        Start Free Trial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center space-y-8">
+                <div class="inline-block">
+                    <span class="bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-full text-sm font-medium">
+                        🇳🇿 Made for NZ Workshops
+                    </span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-tight">
+                    Run Your Workshop<br/>
+                    <span class="gradient-text">Like It's 2026</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+                    Modern workshop management with digital inspections, Xero sync, and a customer portal your clients will love.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="/app/signup" class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl transition transform hover:scale-105">
+                        Start 14-Day Free Trial
+                    </a>
+                    <a href="#demo" class="glass px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/20 transition">
+                        Watch Demo
+                    </a>
+                </div>
+                <p class="text-sm text-gray-400">No credit card required • Cancel anytime</p>
+            </div>
+            
+            <!-- Hero Image/Screenshot -->
+            <div class="mt-16 animate-float">
+                <div class="glass rounded-2xl p-4 shadow-2xl">
+                    <img src="/images/hero-dashboard.png" alt="Gearbox Dashboard" class="rounded-lg w-full" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="py-12 px-4 border-y border-white/10">
+        <div class="max-w-7xl mx-auto">
+            <p class="text-center text-gray-400 mb-8">Trusted by workshops across New Zealand</p>
+            <div class="flex flex-wrap justify-center items-center gap-12 opacity-60">
+                <span class="text-2xl font-bold">Auckland Auto</span>
+                <span class="text-2xl font-bold">Wellington Motors</span>
+                <span class="text-2xl font-bold">Christchurch Garage</span>
+                <span class="text-2xl font-bold">Mobile Mechanics NZ</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+                    Everything You Need to<br/>
+                    <span class="gradient-text">Grow Your Workshop</span>
+                </h2>
+                <p class="text-xl text-gray-300">Built for modern workshops who value customer experience</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 - DVI -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <img src="/images/feature-dvi.png" alt="Digital Vehicle Inspection" class="rounded-lg mb-4 w-full h-48 object-cover" />
+                    <h3 class="text-2xl font-bold mb-3">Digital Vehicle Inspections</h3>
+                    <p class="text-gray-300">Capture photos and videos on mobile. Share with customers for instant approval. Build trust and increase upsells by 40%.</p>
+                </div>
+
+                <!-- Feature 2 - Xero -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <img src="/images/feature-xero.png" alt="Xero Integration" class="rounded-lg mb-4 w-full h-48 object-cover" />
+                    <h3 class="text-2xl font-bold mb-3">Xero Integration</h3>
+                    <p class="text-gray-300">Automatic sync of invoices, payments, and customers. Save 20+ hours per month on bookkeeping.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <div class="text-4xl mb-4">🌐</div>
+                    <h3 class="text-2xl font-bold mb-3">Customer Portal</h3>
+                    <p class="text-gray-300">Let customers book online, view service history, approve quotes, and pay invoices. 24/7 self-service.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <div class="text-4xl mb-4">📱</div>
+                    <h3 class="text-2xl font-bold mb-3">Mobile App for Techs</h3>
+                    <p class="text-gray-300">Technicians work from their phones. Scan QR codes, update job status, capture DVIs. Works offline.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-2xl font-bold mb-3">Advanced Reporting</h3>
+                    <p class="text-gray-300">Track revenue, profit margins, technician performance, and customer trends. Make data-driven decisions.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="glass p-8 rounded-2xl hover:bg-white/20 transition">
+                    <div class="text-4xl mb-4">📦</div>
+                    <h3 class="text-2xl font-bold mb-3">Inventory Management</h3>
+                    <p class="text-gray-300">Track parts, set reorder points, manage suppliers. Never run out of stock again.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-20 px-4 bg-black/30">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black tracking-tighter text-center mb-16">
+                Loved by <span class="gradient-text">Workshop Owners</span>
+            </h2>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"Gearbox transformed how we work. The DVI feature alone increased our upsells by 35%. Customers love the transparency."</p>
+                    <p class="font-bold">Mike Thompson</p>
+                    <p class="text-sm text-gray-400">Owner, Auckland Auto Repair</p>
+                </div>
+
+                <div class="glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"The Xero integration saves us hours every week. Everything syncs automatically. Best investment we've made."</p>
+                    <p class="font-bold">Sarah Chen</p>
+                    <p class="text-sm text-gray-400">Manager, Wellington Motors</p>
+                </div>
+
+                <div class="glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"Our customers can book online now. We get bookings at midnight! The mobile app is perfect for our technicians."</p>
+                    <p class="font-bold">James Wilson</p>
+                    <p class="text-sm text-gray-400">Owner, Mobile Mechanics Christchurch</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Teaser -->
+    <section id="pricing" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+                Simple, Transparent <span class="gradient-text">Pricing</span>
+            </h2>
+            <p class="text-xl text-gray-300 mb-12">Choose the plan that fits your workshop</p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter -->
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-2">Starter</h3>
+                    <div class="text-4xl font-black mb-4">$29<span class="text-lg text-gray-400">/mo</span></div>
+                    <p class="text-gray-300 mb-6">Perfect for small workshops</p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Up to 2 users</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>50 jobs/month</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Digital inspections</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>5GB storage</span>
+                        </li>
+                    </ul>
+                    <a href="/app/signup?tier=starter" class="block w-full bg-white/10 hover:bg-white/20 py-3 rounded-lg font-bold transition">
+                        Start Free Trial
+                    </a>
+                </div>
+
+                <!-- Professional -->
+                <div class="glass p-8 rounded-2xl border-2 border-emerald-500 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-1 rounded-full text-sm font-bold">
+                        MOST POPULAR
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Professional</h3>
+                    <div class="text-4xl font-black mb-4">$69<span class="text-lg text-gray-400">/mo</span></div>
+                    <p class="text-gray-300 mb-6">For growing workshops</p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Up to 10 users</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Unlimited jobs</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Xero integration</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Advanced reporting</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>50GB storage</span>
+                        </li>
+                    </ul>
+                    <a href="/app/signup?tier=professional" class="block w-full bg-gradient-to-r from-emerald-500 to-emerald-600 py-3 rounded-lg font-bold hover:shadow-lg transition">
+                        Start Free Trial
+                    </a>
+                </div>
+
+                <!-- Enterprise -->
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                    <div class="text-4xl font-black mb-4">$99<span class="text-lg text-gray-400">/mo</span></div>
+                    <p class="text-gray-300 mb-6">Multi-location operations</p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Unlimited users</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Up to 5 locations</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>API access</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>Dedicated support</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span>200GB storage</span>
+                        </li>
+                    </ul>
+                    <a href="/app/signup?tier=enterprise" class="block w-full bg-white/10 hover:bg-white/20 py-3 rounded-lg font-bold transition">
+                        Start Free Trial
+                    </a>
+                </div>
+            </div>
+
+            <p class="mt-8 text-gray-400">All plans include 14-day free trial • No credit card required</p>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center glass p-12 rounded-2xl">
+            <h2 class="text-4xl md:text-5xl font-black tracking-tighter mb-6">
+                Ready to Transform<br/>
+                <span class="gradient-text">Your Workshop?</span>
+            </h2>
+            <p class="text-xl text-gray-300 mb-8">Join 50+ NZ workshops already using Gearbox</p>
+            <a href="/app/signup" class="inline-block bg-gradient-to-r from-emerald-500 to-emerald-600 px-12 py-4 rounded-lg font-bold text-xl hover:shadow-2xl transition transform hover:scale-105">
+                Start Your Free Trial
+            </a>
+            <p class="mt-4 text-sm text-gray-400">14 days free • No credit card required • Cancel anytime</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="font-bold text-lg mb-4">⚙️ Gearbox</h4>
+                    <p class="text-gray-400 text-sm">Modern workshop management for NZ auto workshops.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#features" class="hover:text-white">Features</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
+                        <li><a href="/demo" class="hover:text-white">Demo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="/about" class="hover:text-white">About</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact</a></li>
+                        <li><a href="/blog" class="hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="/privacy" class="hover:text-white">Privacy</a></li>
+                        <li><a href="/terms" class="hover:text-white">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 Gearbox. Made with ❤️ in New Zealand.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Analytics -->
+    <script>
+        // Add Google Analytics or your preferred analytics here
+    </script>
+</body>
+</html>

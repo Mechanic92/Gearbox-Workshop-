@@ -1,0 +1,4211 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "id": "4de121b9-ce26-4793-8248-25b121de2462",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "accounting_integrations": {
+      "name": "accounting_integrations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "accessToken": {
+          "name": "accessToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "refreshToken": {
+          "name": "refreshToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tokenExpiresAt": {
+          "name": "tokenExpiresAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tenantId": {
+          "name": "tenantId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organizationName": {
+          "name": "organizationName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "lastSyncAt": {
+          "name": "lastSyncAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "accounting_integration_ledger_idx": {
+          "name": "accounting_integration_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "accounting_integrations_ledgerId_ledgers_id_fk": {
+          "name": "accounting_integrations_ledgerId_ledgers_id_fk",
+          "tableFrom": "accounting_integrations",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "accounting_sync_log": {
+      "name": "accounting_sync_log",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "integrationId": {
+          "name": "integrationId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entityType": {
+          "name": "entityType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entityId": {
+          "name": "entityId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "externalId": {
+          "name": "externalId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "syncDirection": {
+          "name": "syncDirection",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "errorMessage": {
+          "name": "errorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "accounting_sync_integration_idx": {
+          "name": "accounting_sync_integration_idx",
+          "columns": [
+            "integrationId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "accounting_sync_log_integrationId_accounting_integrations_id_fk": {
+          "name": "accounting_sync_log_integrationId_accounting_integrations_id_fk",
+          "tableFrom": "accounting_sync_log",
+          "tableTo": "accounting_integrations",
+          "columnsFrom": [
+            "integrationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "billing_history": {
+      "name": "billing_history",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripeInvoiceId": {
+          "name": "stripeInvoiceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'nzd'"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invoiceUrl": {
+          "name": "invoiceUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paidAt": {
+          "name": "paidAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "billing_history_stripeInvoiceId_unique": {
+          "name": "billing_history_stripeInvoiceId_unique",
+          "columns": [
+            "stripeInvoiceId"
+          ],
+          "isUnique": true
+        },
+        "billing_org_idx": {
+          "name": "billing_org_idx",
+          "columns": [
+            "organizationId"
+          ],
+          "isUnique": false
+        },
+        "billing_stripe_invoice_idx": {
+          "name": "billing_stripe_invoice_idx",
+          "columns": [
+            "stripeInvoiceId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "billing_history_organizationId_organizations_id_fk": {
+          "name": "billing_history_organizationId_organizations_id_fk",
+          "tableFrom": "billing_history",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organizationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "bookings": {
+      "name": "bookings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "serviceId": {
+          "name": "serviceId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "scheduledDate": {
+          "name": "scheduledDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerEmail": {
+          "name": "customerEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerPhone": {
+          "name": "customerPhone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vehicleInfo": {
+          "name": "vehicleInfo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "booking_ledger_idx": {
+          "name": "booking_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "booking_customer_idx": {
+          "name": "booking_customer_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "booking_date_idx": {
+          "name": "booking_date_idx",
+          "columns": [
+            "scheduledDate"
+          ],
+          "isUnique": false
+        },
+        "booking_status_idx": {
+          "name": "booking_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "bookings_ledgerId_ledgers_id_fk": {
+          "name": "bookings_ledgerId_ledgers_id_fk",
+          "tableFrom": "bookings",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bookings_customerId_customers_id_fk": {
+          "name": "bookings_customerId_customers_id_fk",
+          "tableFrom": "bookings",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bookings_serviceId_services_id_fk": {
+          "name": "bookings_serviceId_services_id_fk",
+          "tableFrom": "bookings",
+          "tableTo": "services",
+          "columnsFrom": [
+            "serviceId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "customers": {
+      "name": "customers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mobile": {
+          "name": "mobile",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "postcode": {
+          "name": "postcode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "customer_ledger_idx": {
+          "name": "customer_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "customer_name_idx": {
+          "name": "customer_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "customer_email_idx": {
+          "name": "customer_email_idx",
+          "columns": [
+            "email"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "customers_ledgerId_ledgers_id_fk": {
+          "name": "customers_ledgerId_ledgers_id_fk",
+          "tableFrom": "customers",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_comment_templates": {
+      "name": "dvi_comment_templates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "sectionId": {
+          "name": "sectionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_comment_section_idx": {
+          "name": "dvi_comment_section_idx",
+          "columns": [
+            "sectionId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_comment_templates_sectionId_dvi_sections_id_fk": {
+          "name": "dvi_comment_templates_sectionId_dvi_sections_id_fk",
+          "tableFrom": "dvi_comment_templates",
+          "tableTo": "dvi_sections",
+          "columnsFrom": [
+            "sectionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_images": {
+      "name": "dvi_images",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "itemId": {
+          "name": "itemId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "imageKey": {
+          "name": "imageKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "caption": {
+          "name": "caption",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "uploadedAt": {
+          "name": "uploadedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_image_item_idx": {
+          "name": "dvi_image_item_idx",
+          "columns": [
+            "itemId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_images_itemId_dvi_items_id_fk": {
+          "name": "dvi_images_itemId_dvi_items_id_fk",
+          "tableFrom": "dvi_images",
+          "tableTo": "dvi_items",
+          "columnsFrom": [
+            "itemId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_inspections": {
+      "name": "dvi_inspections",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vehicleId": {
+          "name": "vehicleId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inspectionNumber": {
+          "name": "inspectionNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'in_progress'"
+        },
+        "shareToken": {
+          "name": "shareToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "shareExpiryDate": {
+          "name": "shareExpiryDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "completedAt": {
+          "name": "completedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_inspection_ledger_idx": {
+          "name": "dvi_inspection_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "dvi_inspection_job_idx": {
+          "name": "dvi_inspection_job_idx",
+          "columns": [
+            "jobId"
+          ],
+          "isUnique": false
+        },
+        "dvi_inspection_vehicle_idx": {
+          "name": "dvi_inspection_vehicle_idx",
+          "columns": [
+            "vehicleId"
+          ],
+          "isUnique": false
+        },
+        "dvi_inspection_number_idx": {
+          "name": "dvi_inspection_number_idx",
+          "columns": [
+            "inspectionNumber"
+          ],
+          "isUnique": false
+        },
+        "dvi_inspection_token_idx": {
+          "name": "dvi_inspection_token_idx",
+          "columns": [
+            "shareToken"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_inspections_ledgerId_ledgers_id_fk": {
+          "name": "dvi_inspections_ledgerId_ledgers_id_fk",
+          "tableFrom": "dvi_inspections",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "dvi_inspections_jobId_jobs_id_fk": {
+          "name": "dvi_inspections_jobId_jobs_id_fk",
+          "tableFrom": "dvi_inspections",
+          "tableTo": "jobs",
+          "columnsFrom": [
+            "jobId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "dvi_inspections_vehicleId_vehicles_id_fk": {
+          "name": "dvi_inspections_vehicleId_vehicles_id_fk",
+          "tableFrom": "dvi_inspections",
+          "tableTo": "vehicles",
+          "columnsFrom": [
+            "vehicleId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "dvi_inspections_templateId_dvi_templates_id_fk": {
+          "name": "dvi_inspections_templateId_dvi_templates_id_fk",
+          "tableFrom": "dvi_inspections",
+          "tableTo": "dvi_templates",
+          "columnsFrom": [
+            "templateId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_items": {
+      "name": "dvi_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "inspectionId": {
+          "name": "inspectionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sectionId": {
+          "name": "sectionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "itemName": {
+          "name": "itemName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "recommendedAction": {
+          "name": "recommendedAction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "estimatedCost": {
+          "name": "estimatedCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_item_inspection_idx": {
+          "name": "dvi_item_inspection_idx",
+          "columns": [
+            "inspectionId"
+          ],
+          "isUnique": false
+        },
+        "dvi_item_section_idx": {
+          "name": "dvi_item_section_idx",
+          "columns": [
+            "sectionId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_items_inspectionId_dvi_inspections_id_fk": {
+          "name": "dvi_items_inspectionId_dvi_inspections_id_fk",
+          "tableFrom": "dvi_items",
+          "tableTo": "dvi_inspections",
+          "columnsFrom": [
+            "inspectionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "dvi_items_sectionId_dvi_sections_id_fk": {
+          "name": "dvi_items_sectionId_dvi_sections_id_fk",
+          "tableFrom": "dvi_items",
+          "tableTo": "dvi_sections",
+          "columnsFrom": [
+            "sectionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_sections": {
+      "name": "dvi_sections",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_section_template_idx": {
+          "name": "dvi_section_template_idx",
+          "columns": [
+            "templateId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_sections_templateId_dvi_templates_id_fk": {
+          "name": "dvi_sections_templateId_dvi_templates_id_fk",
+          "tableFrom": "dvi_sections",
+          "tableTo": "dvi_templates",
+          "columnsFrom": [
+            "templateId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "dvi_templates": {
+      "name": "dvi_templates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active": {
+          "name": "active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "dvi_template_ledger_idx": {
+          "name": "dvi_template_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "dvi_templates_ledgerId_ledgers_id_fk": {
+          "name": "dvi_templates_ledgerId_ledgers_id_fk",
+          "tableFrom": "dvi_templates",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "invoice_settings": {
+      "name": "invoice_settings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "companyName": {
+          "name": "companyName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "companyLogo": {
+          "name": "companyLogo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "companyAddress": {
+          "name": "companyAddress",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "companyPhone": {
+          "name": "companyPhone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "companyEmail": {
+          "name": "companyEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bankAccountName": {
+          "name": "bankAccountName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bankAccountNumber": {
+          "name": "bankAccountNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bankAccountSuffix": {
+          "name": "bankAccountSuffix",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentTermsDays": {
+          "name": "paymentTermsDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 30
+        },
+        "invoiceFooter": {
+          "name": "invoiceFooter",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "invoice_settings_ledgerId_unique": {
+          "name": "invoice_settings_ledgerId_unique",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": true
+        },
+        "invoice_settings_ledger_idx": {
+          "name": "invoice_settings_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "invoice_settings_ledgerId_ledgers_id_fk": {
+          "name": "invoice_settings_ledgerId_ledgers_id_fk",
+          "tableFrom": "invoice_settings",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "invoices": {
+      "name": "invoices",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invoiceNumber": {
+          "name": "invoiceNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invoiceDate": {
+          "name": "invoiceDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dueDate": {
+          "name": "dueDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subtotal": {
+          "name": "subtotal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "gstAmount": {
+          "name": "gstAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalAmount": {
+          "name": "totalAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "paidDate": {
+          "name": "paidDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "invoice_job_idx": {
+          "name": "invoice_job_idx",
+          "columns": [
+            "jobId"
+          ],
+          "isUnique": false
+        },
+        "invoice_number_idx": {
+          "name": "invoice_number_idx",
+          "columns": [
+            "invoiceNumber"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "invoices_jobId_jobs_id_fk": {
+          "name": "invoices_jobId_jobs_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "jobs",
+          "columnsFrom": [
+            "jobId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "invoices_extended": {
+      "name": "invoices_extended",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "invoiceId": {
+          "name": "invoiceId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customBrandingApplied": {
+          "name": "customBrandingApplied",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "emailSentDate": {
+          "name": "emailSentDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "emailSentTo": {
+          "name": "emailSentTo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentReceivedDate": {
+          "name": "paymentReceivedDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentMethod": {
+          "name": "paymentMethod",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "reminderSentCount": {
+          "name": "reminderSentCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "lastReminderSentDate": {
+          "name": "lastReminderSentDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "invoices_extended_invoiceId_unique": {
+          "name": "invoices_extended_invoiceId_unique",
+          "columns": [
+            "invoiceId"
+          ],
+          "isUnique": true
+        },
+        "invoice_extended_idx": {
+          "name": "invoice_extended_idx",
+          "columns": [
+            "invoiceId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "invoices_extended_invoiceId_invoices_id_fk": {
+          "name": "invoices_extended_invoiceId_invoices_id_fk",
+          "tableFrom": "invoices_extended",
+          "tableTo": "invoices",
+          "columnsFrom": [
+            "invoiceId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "jobCosts": {
+      "name": "jobCosts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitPrice": {
+          "name": "unitPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalCost": {
+          "name": "totalCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "supplierInvoiceNumber": {
+          "name": "supplierInvoiceNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "supplierName": {
+          "name": "supplierName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "job_cost_job_idx": {
+          "name": "job_cost_job_idx",
+          "columns": [
+            "jobId"
+          ],
+          "isUnique": false
+        },
+        "job_cost_type_idx": {
+          "name": "job_cost_type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "jobCosts_jobId_jobs_id_fk": {
+          "name": "jobCosts_jobId_jobs_id_fk",
+          "tableFrom": "jobCosts",
+          "tableTo": "jobs",
+          "columnsFrom": [
+            "jobId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "job_parts": {
+      "name": "job_parts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partId": {
+          "name": "partId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitCost": {
+          "name": "unitCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitPrice": {
+          "name": "unitPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalCost": {
+          "name": "totalCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalPrice": {
+          "name": "totalPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "job_part_job_idx": {
+          "name": "job_part_job_idx",
+          "columns": [
+            "jobId"
+          ],
+          "isUnique": false
+        },
+        "job_part_part_idx": {
+          "name": "job_part_part_idx",
+          "columns": [
+            "partId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "job_parts_jobId_jobs_id_fk": {
+          "name": "job_parts_jobId_jobs_id_fk",
+          "tableFrom": "job_parts",
+          "tableTo": "jobs",
+          "columnsFrom": [
+            "jobId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "job_parts_partId_parts_id_fk": {
+          "name": "job_parts_partId_parts_id_fk",
+          "tableFrom": "job_parts",
+          "tableTo": "parts",
+          "columnsFrom": [
+            "partId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "jobs": {
+      "name": "jobs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vehicleId": {
+          "name": "vehicleId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "jobNumber": {
+          "name": "jobNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'quoted'"
+        },
+        "quotedPrice": {
+          "name": "quotedPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "finalPrice": {
+          "name": "finalPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerPhone": {
+          "name": "customerPhone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerEmail": {
+          "name": "customerEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "startedAt": {
+          "name": "startedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completedAt": {
+          "name": "completedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "job_ledger_idx": {
+          "name": "job_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "job_number_idx": {
+          "name": "job_number_idx",
+          "columns": [
+            "jobNumber"
+          ],
+          "isUnique": false
+        },
+        "job_status_idx": {
+          "name": "job_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "jobs_ledgerId_ledgers_id_fk": {
+          "name": "jobs_ledgerId_ledgers_id_fk",
+          "tableFrom": "jobs",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "jobs_customerId_customers_id_fk": {
+          "name": "jobs_customerId_customers_id_fk",
+          "tableFrom": "jobs",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "jobs_vehicleId_vehicles_id_fk": {
+          "name": "jobs_vehicleId_vehicles_id_fk",
+          "tableFrom": "jobs",
+          "tableTo": "vehicles",
+          "columnsFrom": [
+            "vehicleId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ledgerAccess": {
+      "name": "ledgerAccess",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "ledger_user_idx": {
+          "name": "ledger_user_idx",
+          "columns": [
+            "ledgerId",
+            "userId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "ledgerAccess_ledgerId_ledgers_id_fk": {
+          "name": "ledgerAccess_ledgerId_ledgers_id_fk",
+          "tableFrom": "ledgerAccess",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ledgerAccess_userId_users_id_fk": {
+          "name": "ledgerAccess_userId_users_id_fk",
+          "tableFrom": "ledgerAccess",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ledgers": {
+      "name": "ledgers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "gstRegistered": {
+          "name": "gstRegistered",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "gstBasis": {
+          "name": "gstBasis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'payments'"
+        },
+        "gstFilingFrequency": {
+          "name": "gstFilingFrequency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'two_monthly'"
+        },
+        "aimEnabled": {
+          "name": "aimEnabled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "ledger_org_idx": {
+          "name": "ledger_org_idx",
+          "columns": [
+            "organizationId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "ledgers_organizationId_organizations_id_fk": {
+          "name": "ledgers_organizationId_organizations_id_fk",
+          "tableFrom": "ledgers",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organizationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "organizations": {
+      "name": "organizations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ownerId": {
+          "name": "ownerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subscriptionTier": {
+          "name": "subscriptionTier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'starter'"
+        },
+        "subscriptionStatus": {
+          "name": "subscriptionStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "org_owner_idx": {
+          "name": "org_owner_idx",
+          "columns": [
+            "ownerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "organizations_ownerId_users_id_fk": {
+          "name": "organizations_ownerId_users_id_fk",
+          "tableFrom": "organizations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "ownerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "part_categories": {
+      "name": "part_categories",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "parentId": {
+          "name": "parentId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "part_category_ledger_idx": {
+          "name": "part_category_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "part_categories_ledgerId_ledgers_id_fk": {
+          "name": "part_categories_ledgerId_ledgers_id_fk",
+          "tableFrom": "part_categories",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "part_categories_parentId_part_categories_id_fk": {
+          "name": "part_categories_parentId_part_categories_id_fk",
+          "tableFrom": "part_categories",
+          "tableTo": "part_categories",
+          "columnsFrom": [
+            "parentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "parts": {
+      "name": "parts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partNumber": {
+          "name": "partNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "categoryId": {
+          "name": "categoryId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "supplierId": {
+          "name": "supplierId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "costPrice": {
+          "name": "costPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sellPrice": {
+          "name": "sellPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stockQuantity": {
+          "name": "stockQuantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "minStockLevel": {
+          "name": "minStockLevel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "maxStockLevel": {
+          "name": "maxStockLevel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'each'"
+        },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "barcode": {
+          "name": "barcode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "part_ledger_idx": {
+          "name": "part_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "part_number_idx": {
+          "name": "part_number_idx",
+          "columns": [
+            "partNumber"
+          ],
+          "isUnique": false
+        },
+        "part_category_idx": {
+          "name": "part_category_idx",
+          "columns": [
+            "categoryId"
+          ],
+          "isUnique": false
+        },
+        "part_supplier_idx": {
+          "name": "part_supplier_idx",
+          "columns": [
+            "supplierId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "parts_ledgerId_ledgers_id_fk": {
+          "name": "parts_ledgerId_ledgers_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "parts_categoryId_part_categories_id_fk": {
+          "name": "parts_categoryId_part_categories_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "part_categories",
+          "columnsFrom": [
+            "categoryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "parts_supplierId_suppliers_id_fk": {
+          "name": "parts_supplierId_suppliers_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "suppliers",
+          "columnsFrom": [
+            "supplierId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "purchase_order_items": {
+      "name": "purchase_order_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "purchaseOrderId": {
+          "name": "purchaseOrderId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partId": {
+          "name": "partId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitCost": {
+          "name": "unitCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalCost": {
+          "name": "totalCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "receivedQuantity": {
+          "name": "receivedQuantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "po_item_po_idx": {
+          "name": "po_item_po_idx",
+          "columns": [
+            "purchaseOrderId"
+          ],
+          "isUnique": false
+        },
+        "po_item_part_idx": {
+          "name": "po_item_part_idx",
+          "columns": [
+            "partId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "purchase_order_items_purchaseOrderId_purchase_orders_id_fk": {
+          "name": "purchase_order_items_purchaseOrderId_purchase_orders_id_fk",
+          "tableFrom": "purchase_order_items",
+          "tableTo": "purchase_orders",
+          "columnsFrom": [
+            "purchaseOrderId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "purchase_order_items_partId_parts_id_fk": {
+          "name": "purchase_order_items_partId_parts_id_fk",
+          "tableFrom": "purchase_order_items",
+          "tableTo": "parts",
+          "columnsFrom": [
+            "partId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "purchase_orders": {
+      "name": "purchase_orders",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "supplierId": {
+          "name": "supplierId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "poNumber": {
+          "name": "poNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "orderDate": {
+          "name": "orderDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expectedDeliveryDate": {
+          "name": "expectedDeliveryDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "actualDeliveryDate": {
+          "name": "actualDeliveryDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "subtotal": {
+          "name": "subtotal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "gstAmount": {
+          "name": "gstAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalAmount": {
+          "name": "totalAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "po_ledger_idx": {
+          "name": "po_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "po_supplier_idx": {
+          "name": "po_supplier_idx",
+          "columns": [
+            "supplierId"
+          ],
+          "isUnique": false
+        },
+        "po_number_idx": {
+          "name": "po_number_idx",
+          "columns": [
+            "poNumber"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "purchase_orders_ledgerId_ledgers_id_fk": {
+          "name": "purchase_orders_ledgerId_ledgers_id_fk",
+          "tableFrom": "purchase_orders",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "purchase_orders_supplierId_suppliers_id_fk": {
+          "name": "purchase_orders_supplierId_suppliers_id_fk",
+          "tableFrom": "purchase_orders",
+          "tableTo": "suppliers",
+          "columnsFrom": [
+            "supplierId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "purchase_orders_createdBy_users_id_fk": {
+          "name": "purchase_orders_createdBy_users_id_fk",
+          "tableFrom": "purchase_orders",
+          "tableTo": "users",
+          "columnsFrom": [
+            "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "quote_items": {
+      "name": "quote_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "quoteId": {
+          "name": "quoteId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitPrice": {
+          "name": "unitPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalPrice": {
+          "name": "totalPrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "itemType": {
+          "name": "itemType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "quote_item_idx": {
+          "name": "quote_item_idx",
+          "columns": [
+            "quoteId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "quote_items_quoteId_quotes_id_fk": {
+          "name": "quote_items_quoteId_quotes_id_fk",
+          "tableFrom": "quote_items",
+          "tableTo": "quotes",
+          "columnsFrom": [
+            "quoteId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "quotes": {
+      "name": "quotes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bookingId": {
+          "name": "bookingId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "jobId": {
+          "name": "jobId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quoteNumber": {
+          "name": "quoteNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subtotal": {
+          "name": "subtotal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "gstAmount": {
+          "name": "gstAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalAmount": {
+          "name": "totalAmount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "expiryDate": {
+          "name": "expiryDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "approvedDate": {
+          "name": "approvedDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "quote_ledger_idx": {
+          "name": "quote_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "quote_booking_idx": {
+          "name": "quote_booking_idx",
+          "columns": [
+            "bookingId"
+          ],
+          "isUnique": false
+        },
+        "quote_job_idx": {
+          "name": "quote_job_idx",
+          "columns": [
+            "jobId"
+          ],
+          "isUnique": false
+        },
+        "quote_customer_idx": {
+          "name": "quote_customer_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "quote_number_idx": {
+          "name": "quote_number_idx",
+          "columns": [
+            "quoteNumber"
+          ],
+          "isUnique": false
+        },
+        "quote_status_idx": {
+          "name": "quote_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "quotes_ledgerId_ledgers_id_fk": {
+          "name": "quotes_ledgerId_ledgers_id_fk",
+          "tableFrom": "quotes",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "quotes_bookingId_bookings_id_fk": {
+          "name": "quotes_bookingId_bookings_id_fk",
+          "tableFrom": "quotes",
+          "tableTo": "bookings",
+          "columnsFrom": [
+            "bookingId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "quotes_jobId_jobs_id_fk": {
+          "name": "quotes_jobId_jobs_id_fk",
+          "tableFrom": "quotes",
+          "tableTo": "jobs",
+          "columnsFrom": [
+            "jobId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "quotes_customerId_customers_id_fk": {
+          "name": "quotes_customerId_customers_id_fk",
+          "tableFrom": "quotes",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "services": {
+      "name": "services",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "basePrice": {
+          "name": "basePrice",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "estimatedDuration": {
+          "name": "estimatedDuration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "active": {
+          "name": "active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "service_ledger_idx": {
+          "name": "service_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "services_ledgerId_ledgers_id_fk": {
+          "name": "services_ledgerId_ledgers_id_fk",
+          "tableFrom": "services",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "stock_movements": {
+      "name": "stock_movements",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partId": {
+          "name": "partId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "movementType": {
+          "name": "movementType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unitCost": {
+          "name": "unitCost",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "referenceType": {
+          "name": "referenceType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "referenceId": {
+          "name": "referenceId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "stock_movement_ledger_idx": {
+          "name": "stock_movement_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "stock_movement_part_idx": {
+          "name": "stock_movement_part_idx",
+          "columns": [
+            "partId"
+          ],
+          "isUnique": false
+        },
+        "stock_movement_created_idx": {
+          "name": "stock_movement_created_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "stock_movements_ledgerId_ledgers_id_fk": {
+          "name": "stock_movements_ledgerId_ledgers_id_fk",
+          "tableFrom": "stock_movements",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stock_movements_partId_parts_id_fk": {
+          "name": "stock_movements_partId_parts_id_fk",
+          "tableFrom": "stock_movements",
+          "tableTo": "parts",
+          "columnsFrom": [
+            "partId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stock_movements_createdBy_users_id_fk": {
+          "name": "stock_movements_createdBy_users_id_fk",
+          "tableFrom": "stock_movements",
+          "tableTo": "users",
+          "columnsFrom": [
+            "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "subscription_plans": {
+      "name": "subscription_plans",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "tier": {
+          "name": "tier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripePriceIdMonthly": {
+          "name": "stripePriceIdMonthly",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripePriceIdYearly": {
+          "name": "stripePriceIdYearly",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priceMonthly": {
+          "name": "priceMonthly",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priceYearly": {
+          "name": "priceYearly",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'nzd'"
+        },
+        "maxUsers": {
+          "name": "maxUsers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "maxJobsPerMonth": {
+          "name": "maxJobsPerMonth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "maxStorageMb": {
+          "name": "maxStorageMb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "features": {
+          "name": "features",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "active": {
+          "name": "active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "subscription_plans_tier_unique": {
+          "name": "subscription_plans_tier_unique",
+          "columns": [
+            "tier"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "subscription_usage": {
+      "name": "subscription_usage",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billingPeriodStart": {
+          "name": "billingPeriodStart",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billingPeriodEnd": {
+          "name": "billingPeriodEnd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "jobsCreated": {
+          "name": "jobsCreated",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "storageUsedMb": {
+          "name": "storageUsedMb",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "activeUsers": {
+          "name": "activeUsers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "apiCalls": {
+          "name": "apiCalls",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "usage_org_idx": {
+          "name": "usage_org_idx",
+          "columns": [
+            "organizationId"
+          ],
+          "isUnique": false
+        },
+        "usage_period_idx": {
+          "name": "usage_period_idx",
+          "columns": [
+            "billingPeriodStart",
+            "billingPeriodEnd"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "subscription_usage_organizationId_organizations_id_fk": {
+          "name": "subscription_usage_organizationId_organizations_id_fk",
+          "tableFrom": "subscription_usage",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organizationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "subscriptions": {
+      "name": "subscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripeCustomerId": {
+          "name": "stripeCustomerId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripeSubscriptionId": {
+          "name": "stripeSubscriptionId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripePriceId": {
+          "name": "stripePriceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currentPeriodStart": {
+          "name": "currentPeriodStart",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currentPeriodEnd": {
+          "name": "currentPeriodEnd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cancelAtPeriodEnd": {
+          "name": "cancelAtPeriodEnd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "trialEnd": {
+          "name": "trialEnd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "subscriptions_organizationId_unique": {
+          "name": "subscriptions_organizationId_unique",
+          "columns": [
+            "organizationId"
+          ],
+          "isUnique": true
+        },
+        "subscriptions_stripeSubscriptionId_unique": {
+          "name": "subscriptions_stripeSubscriptionId_unique",
+          "columns": [
+            "stripeSubscriptionId"
+          ],
+          "isUnique": true
+        },
+        "subscription_org_idx": {
+          "name": "subscription_org_idx",
+          "columns": [
+            "organizationId"
+          ],
+          "isUnique": false
+        },
+        "subscription_stripe_sub_idx": {
+          "name": "subscription_stripe_sub_idx",
+          "columns": [
+            "stripeSubscriptionId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "subscriptions_organizationId_organizations_id_fk": {
+          "name": "subscriptions_organizationId_organizations_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organizationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "suppliers": {
+      "name": "suppliers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "contactPerson": {
+          "name": "contactPerson",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accountNumber": {
+          "name": "accountNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentTerms": {
+          "name": "paymentTerms",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "supplier_ledger_idx": {
+          "name": "supplier_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "suppliers_ledgerId_ledgers_id_fk": {
+          "name": "suppliers_ledgerId_ledgers_id_fk",
+          "tableFrom": "suppliers",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "openId": {
+          "name": "openId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "loginMethod": {
+          "name": "loginMethod",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "lastSignedIn": {
+          "name": "lastSignedIn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "users_openId_unique": {
+          "name": "users_openId_unique",
+          "columns": [
+            "openId"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "vehicles": {
+      "name": "vehicles",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "ledgerId": {
+          "name": "ledgerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "licensePlate": {
+          "name": "licensePlate",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vin": {
+          "name": "vin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "make": {
+          "name": "make",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "year": {
+          "name": "year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "wofExpiry": {
+          "name": "wofExpiry",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "regoExpiry": {
+          "name": "regoExpiry",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerPhone": {
+          "name": "customerPhone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerEmail": {
+          "name": "customerEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(strftime('%s', 'now') as integer))"
+        }
+      },
+      "indexes": {
+        "vehicle_ledger_idx": {
+          "name": "vehicle_ledger_idx",
+          "columns": [
+            "ledgerId"
+          ],
+          "isUnique": false
+        },
+        "vehicle_plate_idx": {
+          "name": "vehicle_plate_idx",
+          "columns": [
+            "licensePlate"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "vehicles_ledgerId_ledgers_id_fk": {
+          "name": "vehicles_ledgerId_ledgers_id_fk",
+          "tableFrom": "vehicles",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledgerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "vehicles_customerId_customers_id_fk": {
+          "name": "vehicles_customerId_customers_id_fk",
+          "tableFrom": "vehicles",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
