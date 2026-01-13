@@ -2,7 +2,7 @@ import { createClient } from "@libsql/client";
 
 /**
  * Initialize the database with all required tables
- * This runs on server startup to ensure tables exist
+ * Column names must match Drizzle schema exactly (camelCase)
  */
 export async function initializeDatabase() {
   const client = createClient({ 
@@ -12,71 +12,73 @@ export async function initializeDatabase() {
 
   console.log("🔄 Initializing database...");
 
-  const tables = `
-    -- Organizations
-    CREATE TABLE IF NOT EXISTS organizations (
+  // Execute statements one by one to handle errors gracefully
+  const statements = [
+    // Users table
+    `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      slug TEXT UNIQUE NOT NULL,
-      owner_id INTEGER,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
-
-    -- Users
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
+      openId TEXT UNIQUE NOT NULL,
       name TEXT,
-      password_hash TEXT,
+      email TEXT,
+      loginMethod TEXT,
       role TEXT DEFAULT 'user',
-      organization_id INTEGER REFERENCES organizations(id),
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      lastSignedIn INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Ledgers
-    CREATE TABLE IF NOT EXISTS ledgers (
+    // Organizations table
+    `CREATE TABLE IF NOT EXISTS organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      organization_id INTEGER NOT NULL REFERENCES organizations(id),
+      ownerId INTEGER NOT NULL,
       name TEXT NOT NULL,
-      code TEXT,
-      currency TEXT DEFAULT 'NZD',
-      tax_number TEXT,
-      is_gst_registered INTEGER DEFAULT 0,
-      gst_basis TEXT DEFAULT 'invoice',
-      financial_year_end TEXT DEFAULT '03-31',
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      subscriptionTier TEXT DEFAULT 'starter',
+      subscriptionStatus TEXT DEFAULT 'active',
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Ledger Access
-    CREATE TABLE IF NOT EXISTS ledger_access (
+    // Ledgers table
+    `CREATE TABLE IF NOT EXISTS ledgers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      user_id INTEGER NOT NULL REFERENCES users(id),
-      role TEXT DEFAULT 'viewer',
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      organizationId INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      gstRegistered INTEGER DEFAULT 0,
+      gstBasis TEXT DEFAULT 'payments',
+      gstFilingFrequency TEXT DEFAULT 'two_monthly',
+      aimEnabled INTEGER DEFAULT 0,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Customers
-    CREATE TABLE IF NOT EXISTS customers (
+    // Ledger Access
+    `CREATE TABLE IF NOT EXISTS ledgerAccess (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
+      ledgerId INTEGER NOT NULL,
+      userId INTEGER NOT NULL,
+      role TEXT DEFAULT 'owner',
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
+
+    // Customers
+    `CREATE TABLE IF NOT EXISTS customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ledgerId INTEGER NOT NULL,
       name TEXT NOT NULL,
       email TEXT,
       phone TEXT,
       address TEXT,
       notes TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Vehicles
-    CREATE TABLE IF NOT EXISTS vehicles (
+    // Vehicles
+    `CREATE TABLE IF NOT EXISTS vehicles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      customer_id INTEGER REFERENCES customers(id),
+      ledgerId INTEGER NOT NULL,
+      customerId INTEGER,
       registration TEXT NOT NULL,
       make TEXT,
       model TEXT,
@@ -85,226 +87,225 @@ export async function initializeDatabase() {
       color TEXT,
       odometer INTEGER,
       notes TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Jobs
-    CREATE TABLE IF NOT EXISTS jobs (
+    // Jobs
+    `CREATE TABLE IF NOT EXISTS jobs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      job_number TEXT NOT NULL,
-      customer_id INTEGER REFERENCES customers(id),
-      vehicle_id INTEGER REFERENCES vehicles(id),
+      ledgerId INTEGER NOT NULL,
+      jobNumber TEXT NOT NULL,
+      customerId INTEGER,
+      vehicleId INTEGER,
       description TEXT,
       status TEXT DEFAULT 'quoted',
-      quoted_price REAL,
-      customer_name TEXT,
-      customer_phone TEXT,
-      customer_email TEXT,
-      vehicle_registration TEXT,
-      vehicle_make TEXT,
-      vehicle_model TEXT,
-      assigned_technician_id INTEGER,
-      scheduled_date INTEGER,
-      completed_date INTEGER,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      quotedPrice REAL,
+      customerName TEXT,
+      customerPhone TEXT,
+      customerEmail TEXT,
+      vehicleRegistration TEXT,
+      vehicleMake TEXT,
+      vehicleModel TEXT,
+      assignedTechnicianId INTEGER,
+      scheduledDate INTEGER,
+      completedDate INTEGER,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Job Costs
-    CREATE TABLE IF NOT EXISTS job_costs (
+    // Job Costs
+    `CREATE TABLE IF NOT EXISTS jobCosts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      job_id INTEGER NOT NULL REFERENCES jobs(id),
+      jobId INTEGER NOT NULL,
       type TEXT NOT NULL,
       description TEXT,
       quantity REAL DEFAULT 1,
-      unit_price REAL DEFAULT 0,
-      total_cost REAL DEFAULT 0,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      unitPrice REAL DEFAULT 0,
+      totalCost REAL DEFAULT 0,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Invoices
-    CREATE TABLE IF NOT EXISTS invoices (
+    // Invoices
+    `CREATE TABLE IF NOT EXISTS invoices (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      job_id INTEGER REFERENCES jobs(id),
-      customer_id INTEGER REFERENCES customers(id),
-      invoice_number TEXT NOT NULL,
+      ledgerId INTEGER NOT NULL,
+      jobId INTEGER,
+      customerId INTEGER,
+      invoiceNumber TEXT NOT NULL,
       status TEXT DEFAULT 'draft',
       subtotal REAL DEFAULT 0,
-      tax_amount REAL DEFAULT 0,
+      taxAmount REAL DEFAULT 0,
       total REAL DEFAULT 0,
-      due_date INTEGER,
-      paid_date INTEGER,
+      dueDate INTEGER,
+      paidDate INTEGER,
       notes TEXT,
-      xero_invoice_id TEXT,
-      stripe_payment_intent_id TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      xeroInvoiceId TEXT,
+      stripePaymentIntentId TEXT,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- DVI Inspections
-    CREATE TABLE IF NOT EXISTS dvi_inspections (
+    // DVI Inspections
+    `CREATE TABLE IF NOT EXISTS dviInspections (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      job_id INTEGER REFERENCES jobs(id),
-      vehicle_id INTEGER REFERENCES vehicles(id),
-      inspection_number TEXT NOT NULL,
+      ledgerId INTEGER NOT NULL,
+      jobId INTEGER,
+      vehicleId INTEGER,
+      inspectionNumber TEXT NOT NULL,
       status TEXT DEFAULT 'draft',
-      technician_id INTEGER,
-      share_token TEXT,
-      customer_approved INTEGER DEFAULT 0,
-      customer_approved_at INTEGER,
-      total_estimated_cost REAL DEFAULT 0,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      technicianId INTEGER,
+      shareToken TEXT,
+      customerApproved INTEGER DEFAULT 0,
+      customerApprovedAt INTEGER,
+      totalEstimatedCost REAL DEFAULT 0,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- DVI Sections
-    CREATE TABLE IF NOT EXISTS dvi_sections (
+    // DVI Sections
+    `CREATE TABLE IF NOT EXISTS dviSections (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      sort_order INTEGER DEFAULT 0
-    );
+      sortOrder INTEGER DEFAULT 0
+    )`,
 
-    -- DVI Items
-    CREATE TABLE IF NOT EXISTS dvi_items (
+    // DVI Items
+    `CREATE TABLE IF NOT EXISTS dviItems (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      inspection_id INTEGER NOT NULL REFERENCES dvi_inspections(id) ON DELETE CASCADE,
-      section_id INTEGER NOT NULL REFERENCES dvi_sections(id),
-      item_name TEXT NOT NULL,
+      inspectionId INTEGER NOT NULL,
+      sectionId INTEGER NOT NULL,
+      itemName TEXT NOT NULL,
       component TEXT,
       condition TEXT,
       status TEXT NOT NULL,
       comment TEXT,
       notes TEXT,
-      recommended_action TEXT,
-      estimated_cost REAL,
-      customer_approved INTEGER DEFAULT 0,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      recommendedAction TEXT,
+      estimatedCost REAL,
+      customerApproved INTEGER DEFAULT 0,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- DVI Media
-    CREATE TABLE IF NOT EXISTS dvi_media (
+    // DVI Media
+    `CREATE TABLE IF NOT EXISTS dviMedia (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      item_id INTEGER NOT NULL REFERENCES dvi_items(id) ON DELETE CASCADE,
+      itemId INTEGER NOT NULL,
       type TEXT DEFAULT 'image',
-      file_path TEXT,
-      image_url TEXT,
-      thumbnail_url TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      filePath TEXT,
+      imageUrl TEXT,
+      thumbnailUrl TEXT,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Bookings
-    CREATE TABLE IF NOT EXISTS bookings (
+    // Bookings
+    `CREATE TABLE IF NOT EXISTS bookings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      customer_id INTEGER REFERENCES customers(id),
-      vehicle_id INTEGER REFERENCES vehicles(id),
-      service_type TEXT,
-      scheduled_start INTEGER NOT NULL,
-      scheduled_end INTEGER,
-      bay_id INTEGER,
+      ledgerId INTEGER NOT NULL,
+      customerId INTEGER,
+      vehicleId INTEGER,
+      serviceType TEXT,
+      scheduledStart INTEGER NOT NULL,
+      scheduledEnd INTEGER,
+      bayId INTEGER,
       status TEXT DEFAULT 'pending',
       notes TEXT,
-      customer_name TEXT,
-      customer_email TEXT,
-      customer_phone TEXT,
-      vehicle_registration TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      customerName TEXT,
+      customerEmail TEXT,
+      customerPhone TEXT,
+      vehicleRegistration TEXT,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Quotes
-    CREATE TABLE IF NOT EXISTS quotes (
+    // Quotes
+    `CREATE TABLE IF NOT EXISTS quotes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
-      customer_id INTEGER REFERENCES customers(id),
-      vehicle_id INTEGER REFERENCES vehicles(id),
-      quote_number TEXT NOT NULL,
+      ledgerId INTEGER NOT NULL,
+      customerId INTEGER,
+      vehicleId INTEGER,
+      quoteNumber TEXT NOT NULL,
       status TEXT DEFAULT 'draft',
       subtotal REAL DEFAULT 0,
-      tax_amount REAL DEFAULT 0,
+      taxAmount REAL DEFAULT 0,
       total REAL DEFAULT 0,
-      valid_until INTEGER,
+      validUntil INTEGER,
       notes TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Inventory Parts
-    CREATE TABLE IF NOT EXISTS inventory_parts (
+    // Inventory Parts
+    `CREATE TABLE IF NOT EXISTS inventoryParts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
+      ledgerId INTEGER NOT NULL,
       sku TEXT,
       name TEXT NOT NULL,
       description TEXT,
       category TEXT,
       supplier TEXT,
-      cost_price REAL DEFAULT 0,
-      sell_price REAL DEFAULT 0,
-      quantity_in_stock INTEGER DEFAULT 0,
-      reorder_level INTEGER DEFAULT 5,
+      costPrice REAL DEFAULT 0,
+      sellPrice REAL DEFAULT 0,
+      quantityInStock INTEGER DEFAULT 0,
+      reorderLevel INTEGER DEFAULT 5,
       location TEXT,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Accounting Integrations
-    CREATE TABLE IF NOT EXISTS accounting_integrations (
+    // Accounting Integrations
+    `CREATE TABLE IF NOT EXISTS accountingIntegrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledger_id INTEGER NOT NULL REFERENCES ledgers(id),
+      ledgerId INTEGER NOT NULL,
       provider TEXT NOT NULL,
-      access_token_encrypted TEXT,
-      refresh_token_encrypted TEXT,
-      token_expires_at INTEGER,
-      tenant_id TEXT,
-      connected_at INTEGER,
-      last_sync_at INTEGER,
-      sync_status TEXT DEFAULT 'idle',
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      accessTokenEncrypted TEXT,
+      refreshTokenEncrypted TEXT,
+      tokenExpiresAt INTEGER,
+      tenantId TEXT,
+      connectedAt INTEGER,
+      lastSyncAt INTEGER,
+      syncStatus TEXT DEFAULT 'idle',
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Subscriptions
-    CREATE TABLE IF NOT EXISTS subscriptions (
+    // Subscriptions
+    `CREATE TABLE IF NOT EXISTS subscriptions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      organization_id INTEGER NOT NULL REFERENCES organizations(id),
-      stripe_customer_id TEXT,
-      stripe_subscription_id TEXT,
-      stripe_price_id TEXT,
+      organizationId INTEGER NOT NULL,
+      stripeCustomerId TEXT,
+      stripeSubscriptionId TEXT,
+      stripePriceId TEXT,
       status TEXT DEFAULT 'trialing',
       tier TEXT DEFAULT 'starter',
-      current_period_start INTEGER,
-      current_period_end INTEGER,
-      cancel_at_period_end INTEGER DEFAULT 0,
-      trial_end INTEGER,
-      created_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updated_at INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    );
+      currentPeriodStart INTEGER,
+      currentPeriodEnd INTEGER,
+      cancelAtPeriodEnd INTEGER DEFAULT 0,
+      trialEnd INTEGER,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
 
-    -- Insert default DVI sections
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (1, 'Exterior', 1);
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (2, 'Under Hood', 2);
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (3, 'Under Vehicle', 3);
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (4, 'Interior', 4);
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (5, 'Brakes', 5);
-    INSERT OR IGNORE INTO dvi_sections (id, name, sort_order) VALUES (6, 'Tires & Wheels', 6);
-  `;
+    // Default DVI sections
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (1, 'Exterior', 1)`,
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (2, 'Under Hood', 2)`,
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (3, 'Under Vehicle', 3)`,
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (4, 'Interior', 4)`,
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (5, 'Brakes', 5)`,
+    `INSERT OR IGNORE INTO dviSections (id, name, sortOrder) VALUES (6, 'Tires & Wheels', 6)`,
 
-  // Execute each statement separately
-  const statements = tables.split(';').filter(s => s.trim());
+    // Create a default demo user so ledger creation works
+    `INSERT OR IGNORE INTO users (id, openId, name, email, role) VALUES (1, 'demo-user', 'Demo User', 'demo@gearbox.co.nz', 'admin')`
+  ];
+
   for (const stmt of statements) {
-    if (stmt.trim()) {
-      try {
-        await client.execute(stmt);
-      } catch (err: any) {
-        // Ignore "table already exists" errors
-        if (!err.message?.includes('already exists')) {
-          console.error(`SQL Error: ${err.message}`);
-        }
+    try {
+      await client.execute(stmt);
+    } catch (err: any) {
+      // Ignore "already exists" errors
+      if (!err.message?.includes('already exists') && !err.message?.includes('UNIQUE constraint')) {
+        console.error(`SQL Error: ${err.message}`);
       }
     }
   }
