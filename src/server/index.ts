@@ -8,6 +8,7 @@ import { createContext } from './trpc';
 import { handleStripeWebhook } from '../lib/payments';
 import { handleSubscriptionWebhook } from '../lib/stripe-subscriptions';
 import { handleXeroWebhook } from '../lib/integrations/xero-client';
+import { initializeDatabase } from '../lib/db-init';
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -89,6 +90,17 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-app.listen(port, host, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+// Initialize database and start server
+async function startServer() {
+  try {
+    await initializeDatabase();
+    app.listen(port, host, () => {
+      console.log(`Server listening at http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
