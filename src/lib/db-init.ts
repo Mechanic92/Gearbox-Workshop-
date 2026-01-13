@@ -2,7 +2,7 @@ import { createClient } from "@libsql/client";
 
 /**
  * Initialize the database with all required tables
- * Column names must match Drizzle schema exactly (camelCase)
+ * Column names must EXACTLY match Drizzle schema (src/lib/schema.ts)
  */
 export async function initializeDatabase() {
   const client = createClient({ 
@@ -12,9 +12,8 @@ export async function initializeDatabase() {
 
   console.log("🔄 Initializing database...");
 
-  // Execute statements one by one to handle errors gracefully
   const statements = [
-    // Users table
+    // Users table (matches schema.ts lines 8-18)
     `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       openId TEXT UNIQUE NOT NULL,
@@ -27,7 +26,7 @@ export async function initializeDatabase() {
       lastSignedIn INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Organizations table
+    // Organizations table (matches schema.ts lines 20-30)
     `CREATE TABLE IF NOT EXISTS organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ownerId INTEGER NOT NULL,
@@ -38,7 +37,7 @@ export async function initializeDatabase() {
       updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Ledgers table
+    // Ledgers table (matches schema.ts lines 36-49)
     `CREATE TABLE IF NOT EXISTS ledgers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       organizationId INTEGER NOT NULL,
@@ -52,7 +51,7 @@ export async function initializeDatabase() {
       updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Ledger Access
+    // Ledger Access (matches schema.ts lines 51-58)
     `CREATE TABLE IF NOT EXISTS ledgerAccess (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ledgerId INTEGER NOT NULL,
@@ -61,69 +60,76 @@ export async function initializeDatabase() {
       createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Customers
+    // Vehicles table (matches schema.ts lines 65-85) - NOTE: uses licensePlate not registration
+    `CREATE TABLE IF NOT EXISTS vehicles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ledgerId INTEGER NOT NULL,
+      customerId INTEGER,
+      licensePlate TEXT NOT NULL,
+      vin TEXT,
+      make TEXT,
+      model TEXT,
+      year INTEGER,
+      wofExpiry INTEGER,
+      regoExpiry INTEGER,
+      customerName TEXT,
+      customerPhone TEXT,
+      customerEmail TEXT,
+      notes TEXT,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+    )`,
+
+    // Customers table (matches schema.ts lines 91-108)
     `CREATE TABLE IF NOT EXISTS customers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ledgerId INTEGER NOT NULL,
       name TEXT NOT NULL,
       email TEXT,
       phone TEXT,
+      mobile TEXT,
       address TEXT,
+      city TEXT,
+      postcode TEXT,
       notes TEXT,
       createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
       updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Vehicles
-    `CREATE TABLE IF NOT EXISTS vehicles (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ledgerId INTEGER NOT NULL,
-      customerId INTEGER,
-      registration TEXT NOT NULL,
-      make TEXT,
-      model TEXT,
-      year INTEGER,
-      vin TEXT,
-      color TEXT,
-      odometer INTEGER,
-      notes TEXT,
-      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
-      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
-    )`,
-
-    // Jobs
+    // Jobs table (matches schema.ts lines 114-136) - includes finalPrice, startedAt, completedAt
     `CREATE TABLE IF NOT EXISTS jobs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ledgerId INTEGER NOT NULL,
-      jobNumber TEXT NOT NULL,
       customerId INTEGER,
       vehicleId INTEGER,
-      description TEXT,
+      jobNumber TEXT NOT NULL,
+      description TEXT NOT NULL,
       status TEXT DEFAULT 'quoted',
-      quotedPrice REAL,
+      quotedPrice REAL NOT NULL,
+      finalPrice REAL,
       customerName TEXT,
       customerPhone TEXT,
       customerEmail TEXT,
-      vehicleRegistration TEXT,
-      vehicleMake TEXT,
-      vehicleModel TEXT,
-      assignedTechnicianId INTEGER,
-      scheduledDate INTEGER,
-      completedDate INTEGER,
+      startedAt INTEGER,
+      completedAt INTEGER,
+      notes TEXT,
       createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
       updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
-    // Job Costs
+    // Job Costs table (matches schema.ts lines 138-150)
     `CREATE TABLE IF NOT EXISTS jobCosts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       jobId INTEGER NOT NULL,
       type TEXT NOT NULL,
-      description TEXT,
-      quantity REAL DEFAULT 1,
-      unitPrice REAL DEFAULT 0,
-      totalCost REAL DEFAULT 0,
-      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
+      description TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      unitPrice REAL NOT NULL,
+      totalCost REAL NOT NULL,
+      supplierInvoiceNumber TEXT,
+      supplierName TEXT,
+      createdAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer)),
+      updatedAt INTEGER DEFAULT (cast(strftime('%s', 'now') as integer))
     )`,
 
     // Invoices
@@ -303,7 +309,6 @@ export async function initializeDatabase() {
     try {
       await client.execute(stmt);
     } catch (err: any) {
-      // Ignore "already exists" errors
       if (!err.message?.includes('already exists') && !err.message?.includes('UNIQUE constraint')) {
         console.error(`SQL Error: ${err.message}`);
       }
