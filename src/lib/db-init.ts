@@ -12,34 +12,36 @@ export async function initializeDatabase() {
 
   console.log("🔄 Initializing database...");
 
-  // Drop existing tables to ensure fresh schema (needed for ephemeral Render deploys)
-  const dropStatements = [
-    'DROP TABLE IF EXISTS dviMedia',
-    'DROP TABLE IF EXISTS dviItems', 
-    'DROP TABLE IF EXISTS dviSections',
-    'DROP TABLE IF EXISTS dviInspections',
-    'DROP TABLE IF EXISTS jobCosts',
-    'DROP TABLE IF EXISTS invoices',
-    'DROP TABLE IF EXISTS jobs',
-    'DROP TABLE IF EXISTS bookings',
-    'DROP TABLE IF EXISTS quotes',
-    'DROP TABLE IF EXISTS vehicles',
-    'DROP TABLE IF EXISTS customers',
-    'DROP TABLE IF EXISTS inventoryParts',
-    'DROP TABLE IF EXISTS accountingIntegrations',
-    'DROP TABLE IF EXISTS subscriptions',
-    'DROP TABLE IF EXISTS ledgerAccess',
-    'DROP TABLE IF EXISTS ledgers',
-    'DROP TABLE IF EXISTS organizations',
-    'DROP TABLE IF EXISTS users'
-  ];
+  // Only drop tables if explicitly requested (useful for fixing schema issues)
+  if (process.env.DB_FORCE_RESET === 'true') {
+    const dropStatements = [
+      'DROP TABLE IF EXISTS dviMedia',
+      'DROP TABLE IF EXISTS dviItems', 
+      'DROP TABLE IF EXISTS dviSections',
+      'DROP TABLE IF EXISTS dviInspections',
+      'DROP TABLE IF EXISTS jobCosts',
+      'DROP TABLE IF EXISTS invoices',
+      'DROP TABLE IF EXISTS jobs',
+      'DROP TABLE IF EXISTS bookings',
+      'DROP TABLE IF EXISTS quotes',
+      'DROP TABLE IF EXISTS vehicles',
+      'DROP TABLE IF EXISTS customers',
+      'DROP TABLE IF EXISTS inventoryParts',
+      'DROP TABLE IF EXISTS accountingIntegrations',
+      'DROP TABLE IF EXISTS subscriptions',
+      'DROP TABLE IF EXISTS ledgerAccess',
+      'DROP TABLE IF EXISTS ledgers',
+      'DROP TABLE IF EXISTS organizations',
+      'DROP TABLE IF EXISTS users'
+    ];
 
-  console.log("🗑️ Dropping old tables...");
-  for (const stmt of dropStatements) {
-    try {
-      await client.execute(stmt);
-    } catch (err: any) {
-      // Ignore errors on drop
+    console.log("🗑️ DB_FORCE_RESET=true - Dropping all tables...");
+    for (const stmt of dropStatements) {
+      try {
+        await client.execute(stmt);
+      } catch (err: any) {
+        // Ignore errors on drop
+      }
     }
   }
 

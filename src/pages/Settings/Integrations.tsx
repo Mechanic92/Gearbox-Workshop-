@@ -141,9 +141,9 @@ export default function IntegrationsPage() {
                       variant="outline"
                       className="w-full font-bold"
                       onClick={() => disconnectXeroMutation.mutate({ ledgerId: activeLedgerId! })}
-                      disabled={disconnectXeroMutation.isPending}
+                      disabled={disconnectXeroMutation.isLoading}
                     >
-                      {disconnectXeroMutation.isPending ? (
+                      {disconnectXeroMutation.isLoading ? (
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
                         <XCircle className="w-4 h-4 mr-2" />

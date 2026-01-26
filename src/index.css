@@ -7,33 +7,34 @@
 @layer base {
   :root {
     /* Spotify / Dark Premium Palette (using oklch for better vibrancy) */
-    --background: 15% 0.005 285;
-    --foreground: 98% 0.005 65;
+    /* Standard HSL for maximum compatibility */
+    --background: 220 15% 5%;
+    --foreground: 210 20% 98%;
     
-    --card: 18% 0.006 285;
-    --card-foreground: 98% 0.005 65;
+    --card: 220 15% 8%;
+    --card-foreground: 210 20% 98%;
  
-    --popover: 18% 0.006 285;
-    --popover-foreground: 98% 0.005 65;
+    --popover: 220 15% 8%;
+    --popover-foreground: 210 20% 98%;
  
-    --primary: 65% 0.25 150; /* Vibrant Emerald/Green for that Spotify feel */
-    --primary-foreground: 10% 0.02 150;
+    --primary: 150 100% 40%; /* Vibrant Emerald */
+    --primary-foreground: 150 100% 5%;
  
-    --secondary: 25% 0.01 285;
-    --secondary-foreground: 98% 0.005 65;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 210 20% 98%;
  
-    --muted: 22% 0.01 285;
-    --muted-foreground: 70% 0.01 285;
+    --muted: 220 15% 15%;
+    --muted-foreground: 215 15% 65%;
  
-    --accent: 65% 0.25 150;
-    --accent-foreground: 10% 0.02 150;
+    --accent: 150 100% 40%;
+    --accent-foreground: 150 100% 5%;
  
-    --destructive: 55% 0.2 25;
-    --destructive-foreground: 98% 0 0;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
  
-    --border: 22% 0.01 285;
-    --input: 22% 0.01 285;
-    --ring: 65% 0.25 150;
+    --border: 220 15% 15%;
+    --input: 220 15% 15%;
+    --ring: 150 100% 40%;
  
     --radius: 1.5rem; /* More modern, rounder corners */
   }

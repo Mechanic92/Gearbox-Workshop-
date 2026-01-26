@@ -358,6 +358,8 @@ export const invoiceSettings = sqliteTable("invoice_settings", {
   bankAccountSuffix: text("bankAccountSuffix"),
   paymentTermsDays: integer("paymentTermsDays").default(30).notNull(),
   invoiceFooter: text("invoiceFooter"),
+  bayCount: integer("bayCount").default(2).notNull(),
+  businessHours: text("businessHours"), // JSON configuration
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
 }, (table) => ({

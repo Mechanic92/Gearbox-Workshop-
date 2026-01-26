@@ -1,15 +1,16 @@
+import { trpc } from "@/lib/trpc";
+
 export const useAuth = () => {
+  const { data: user, isLoading, refetch } = trpc.auth.me.useQuery();
+
   return {
-    user: {
-      id: 1,
-      name: "Demo User",
-      role: "owner" as const,
-      email: "demo@example.com",
-      loginMethod: "manus"
-    },
-    isLoading: false,
+    user: user || null,
+    isLoading,
     logout: async () => {
-      console.log("Logout mock called");
-    }
+      localStorage.removeItem("gearbox_user_id");
+      localStorage.removeItem("gearbox_active_ledger_id");
+      window.location.href = "/";
+    },
+    refetch,
   };
 };

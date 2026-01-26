@@ -24,6 +24,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { useLedger } from '@/contexts/LedgerContext';
 import { cn } from '@/lib/utils';
 
 /**
@@ -32,6 +35,13 @@ import { cn } from '@/lib/utils';
  */
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { activeLedgerId } = useLedger();
+  const { data: ledger } = trpc.ledger.get.useQuery(
+    { id: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#050505] font-sans selection:bg-blue-200 antialiased pb-32">
       
@@ -44,8 +54,8 @@ export default function Dashboard() {
                    <Zap className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black tracking-tighter leading-none">GEARBOX <span className="text-blue-600 italic">2025</span></h1>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mt-1">Global Workshop Intelligence</p>
+                  <h1 className="text-xl font-black tracking-tighter leading-none">{ledger?.name?.toUpperCase() || "GEARBOX"} <span className="text-blue-600 italic">2026</span></h1>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mt-1">{user?.name || "System"} // Workshop Intelligence</p>
                 </div>
              </div>
              <div className="hidden lg:flex items-center bg-neutral-100 dark:bg-neutral-900 rounded-2xl px-4 py-2 border border-transparent focus-within:border-blue-500/50 transition-all w-96">

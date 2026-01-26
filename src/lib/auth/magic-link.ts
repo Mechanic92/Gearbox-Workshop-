@@ -33,7 +33,8 @@ export async function sendMagicLink(params: {
   });
   */
 
-  const magicLink = `https://gearbox.app/auth/callback?token=${token}`;
+  const baseUrl = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const magicLink = `${baseUrl}/auth/callback?token=${token}`;
 
   if (params.email) {
     await sendEmail(params.email, {

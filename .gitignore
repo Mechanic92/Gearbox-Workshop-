@@ -44,3 +44,5 @@ local.db
 .cache/
 .temp/
 tmp/
+Gearbox-Workshop-Portable.zip
+release/

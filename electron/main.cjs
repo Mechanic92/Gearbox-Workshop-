@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, shell } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
+const isDev = !app.isPackaged;
 const { spawn } = require('child_process');
 
 let mainWindow;
@@ -108,32 +108,48 @@ function createTray() {
 }
 
 function startBackend() {
-  // Dev: you run backend yourself via npm run server
   if (isDev) return;
 
-  // Production: run TS server via tsx CLI so we don’t need a separate backend build pipeline
-  const asarRoot = path.join(process.resourcesPath, 'app.asar');
-  const tsxCli = path.join(asarRoot, 'node_modules', 'tsx', 'dist', 'cli.mjs');
-  const serverEntry = path.join(asarRoot, 'src', 'server', 'index.ts');
+  const logFile = path.join(app.getPath('userData'), 'server-debug.log');
+  const fs = require('fs');
 
-  backendProcess = spawn(process.execPath, [tsxCli, serverEntry], {
-    stdio: 'inherit',
-    env: {
+  // Use the bundled server in production
+  const serverEntry = path.join(app.getAppPath(), 'electron', 'server.cjs');
+  
+  fs.writeFileSync(logFile, `Starting backend from: ${serverEntry}\n`);
+
+  const env = {
       ...process.env,
       NODE_ENV: 'production',
-      // Single-port app in production: serve UI + API from :5173
       PORT: '5173',
       HOST: '0.0.0.0',
+      DIST_PATH: path.join(app.getAppPath(), 'dist'),
+      PUBLIC_PATH: path.join(app.getAppPath(), 'public-site'),
       DATABASE_URL: `file:${path.join(app.getPath('userData'), 'local.db')}`,
-    },
+      ELECTRON_RUN_AS_NODE: '1',
+  };
+
+  fs.appendFileSync(logFile, `ENV: ${JSON.stringify(env, null, 2)}\n`);
+
+  backendProcess = spawn(process.execPath, [serverEntry], {
+    stdio: ['ignore', 'pipe', 'pipe'], // Capture stdio
+    env: env
+  });
+
+  backendProcess.stdout.on('data', (data) => {
+    fs.appendFileSync(logFile, `[STDOUT] ${data}`);
+  });
+
+  backendProcess.stderr.on('data', (data) => {
+    fs.appendFileSync(logFile, `[STDERR] ${data}`);
   });
 
   backendProcess.on('error', (err) => {
-    console.error('Backend process error:', err);
+    fs.appendFileSync(logFile, `[ERROR] ${err.message}\n`);
   });
 
   backendProcess.on('exit', (code) => {
-    console.log(`Backend process exited with code ${code}`);
+    fs.appendFileSync(logFile, `[EXIT] Backend process exited with code ${code}\n`);
   });
 }
 

@@ -14,8 +14,7 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '0.0.0.0';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let isReady = false;
 
 app.use(cors());
 
@@ -56,6 +55,11 @@ app.post('/api/webhooks/xero', express.raw({ type: 'application/json' }), async 
 // Regular JSON parsing for other routes
 app.use(express.json());
 
+app.get('/healthz', (req, res) => {
+  if (!isReady) return res.status(503).json({ status: 'starting' });
+  return res.json({ status: 'ok' });
+});
+
 app.use(
   '/api/trpc',
   createExpressMiddleware({
@@ -65,8 +69,8 @@ app.use(
 );
 
 // Serve static assets
-const distPath = path.resolve(__dirname, '../../dist');
-const publicPath = path.resolve(__dirname, '../../public-site');
+const distPath = process.env.DIST_PATH || path.resolve(process.cwd(), 'dist');
+const publicPath = process.env.PUBLIC_PATH || path.resolve(process.cwd(), 'public-site');
 
 if (process.env.NODE_ENV === 'production') {
   // 1. Serve marketing site at root
@@ -94,6 +98,7 @@ if (process.env.NODE_ENV === 'production') {
 async function startServer() {
   try {
     await initializeDatabase();
+    isReady = true;
     app.listen(port, host, () => {
       console.log(`Server listening at http://localhost:${port}`);
     });

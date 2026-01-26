@@ -378,3 +378,25 @@ export async function completeDviInspection(id: number, shareToken?: string) {
         completedAt: new Date() 
     }).where(eq(schema.dviInspections.id, id));
 }
+// ============================================================================
+// SETTINGS
+// ============================================================================
+
+export async function getInvoiceSettings(ledgerId: number) {
+  return db.query.invoiceSettings.findFirst({
+    where: eq(schema.invoiceSettings.ledgerId, ledgerId)
+  });
+}
+
+export async function updateInvoiceSettings(ledgerId: number, input: any) {
+  const existing = await getInvoiceSettings(ledgerId);
+  if (existing) {
+    await db.update(schema.invoiceSettings)
+        .set({ ...input, updatedAt: new Date() })
+        .where(eq(schema.invoiceSettings.ledgerId, ledgerId));
+    return existing.id;
+  } else {
+    const result = await db.insert(schema.invoiceSettings).values({ ...input, ledgerId }).returning({ id: schema.invoiceSettings.id });
+    return result[0].id;
+  }
+}

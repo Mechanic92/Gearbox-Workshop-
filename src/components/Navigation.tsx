@@ -17,7 +17,7 @@ export default function Navigation() {
   });
   const [location, navigate] = useLocation();
   const { activeLedgerId, activeLedgerType } = useLedger();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     localStorage.setItem("sidebar_collapsed", String(isCollapsed));
@@ -160,7 +160,10 @@ export default function Navigation() {
                 <p className="text-xs font-black truncate uppercase tracking-tight">{user?.name || "Operator"}</p>
                 <p className="text-[9px] text-white/30 truncate uppercase tracking-widest font-bold">Admin Privileges</p>
               </div>
-              <button className="p-2 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+              <button 
+                onClick={logout}
+                className="p-2 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+              >
                 <LogOut size={18} />
               </button>
             </>

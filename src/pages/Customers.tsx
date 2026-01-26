@@ -302,9 +302,9 @@ export default function Customers() {
             <Button
               className="flex-[2] h-12 shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs"
               onClick={handleAddCustomer}
-              disabled={createCustomerMutation.isPending || !name.trim()}
+              disabled={createCustomerMutation.isLoading || !name.trim()}
             >
-              {createCustomerMutation.isPending ? <Loader2 className="animate-spin" /> : "Authorize Registration"}
+              {createCustomerMutation.isLoading ? <Loader2 className="animate-spin" /> : "Authorize Registration"}
             </Button>
           </DialogFooter>
         </DialogContent>

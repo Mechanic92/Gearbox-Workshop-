@@ -17,8 +17,13 @@ export default function JobsList() {
   const { activeLedgerId } = useLedger();
   const [searchQuery, setSearchQuery] = useState("");
 
+  if (!activeLedgerId) {
+    navigate("/setup/ledger");
+    return null;
+  }
+
   const { data: jobs = [], isLoading } = trpc.job.list.useQuery(
-    { ledgerId: activeLedgerId || 0 },
+    { ledgerId: activeLedgerId },
     { enabled: !!activeLedgerId }
   );
 
@@ -180,7 +185,7 @@ export default function JobsList() {
                           </div>
                           <div className="text-3xl font-black text-white flex items-center gap-2">
                             <DollarSign size={24} className="text-primary" />
-                            {job.quotedPrice?.toFixed(2) || "0.00"}
+                            {(parseFloat(job.quotedPrice as any) || 0).toFixed(2)}
                           </div>
                         </div>
 

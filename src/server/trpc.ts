@@ -2,15 +2,27 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
 
 import superjson from 'superjson';
+import * as db from '../lib/db';
 
-export const createContext = ({ req, res }: CreateExpressContextOptions) => {
-  // Mock auth for "rebuild" demo - assume User 1 (Admin) is logged in if ANY header is present, or just always for dev convenience?
-  // User asked to "works outside manus". Simplest is auto-login or mock.
-  // I'll return a fixed user for now to allow testing without Implementing OAuth.
+export const createContext = async ({ req, res }: CreateExpressContextOptions) => {
+  const userId = req.headers['x-user-id'];
+  
+  let user = null;
+  if (userId && typeof userId === 'string') {
+    const id = parseInt(userId, 10);
+    // In a real app we would verify a JWT
+    const dbUser = await db.db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, id)
+    });
+    if (dbUser) {
+        user = { id: dbUser.id, role: dbUser.role as any, email: dbUser.email || '' };
+    }
+  }
+
   return {
     req,
     res,
-    user: { id: 1, role: 'owner', email: 'owner@example.com' }, // Mock user
+    user,
   };
 };
 

@@ -37,6 +37,11 @@ export default function NewJob() {
   const { activeLedgerId } = useLedger();
   const [, setLocation] = useLocation();
 
+  if (!activeLedgerId) {
+    setLocation("/setup/ledger");
+    return null;
+  }
+
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [jobNumber, setJobNumber] = useState(`JOB-${Math.floor(Math.random() * 9000) + 1000}`);
   const [description, setDescription] = useState("");
@@ -121,9 +126,9 @@ export default function NewJob() {
           <Button 
             className="shadow-lg shadow-primary/20 font-black text-xs uppercase h-10 px-8"
             onClick={handleSubmit}
-            disabled={createJobMutation.isPending || !jobNumber.trim() || !description.trim()}
+            disabled={createJobMutation.isLoading || !jobNumber.trim() || !description.trim()}
           >
-            {createJobMutation.isPending ? <Loader2 className="animate-spin" /> : <><Zap className="w-4 h-4 mr-2" /> Activate Job</>}
+            {createJobMutation.isLoading ? <Loader2 className="animate-spin" /> : <><Zap className="w-4 h-4 mr-2" /> Activate Job</>}
           </Button>
         </div>
       </div>
@@ -291,7 +296,7 @@ export default function NewJob() {
                     size="lg" 
                     className="w-full h-16 rounded-[2rem] shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs"
                     onClick={handleSubmit}
-                    disabled={createJobMutation.isPending || !jobNumber.trim() || !description.trim()}
+                    disabled={createJobMutation.isLoading || !jobNumber.trim() || !description.trim()}
                 >
                     Initialize Service Loop
                 </Button>

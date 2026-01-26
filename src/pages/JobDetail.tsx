@@ -37,10 +37,16 @@ export default function JobDetail() {
   const [, setLocation] = useLocation();
   const [addCostOpen, setAddCostOpen] = useState(false);
 
-  const { data, isLoading, refetch } = trpc.job.getWithCosts.useQuery(
+  const { data, isLoading, refetch, error } = trpc.job.getWithCosts.useQuery(
     { id: jobId! },
     { enabled: !!jobId }
   );
+
+  if (error) {
+    toast.error("Job not found or access denied");
+    setLocation("/trades/dashboard");
+    return null;
+  }
 
   const addCostMutation = trpc.jobCost.create.useMutation({
     onSuccess: () => {

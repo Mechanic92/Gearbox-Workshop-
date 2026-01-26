@@ -1,0 +1,8 @@
+node_modules/
+release/
+dist-electron/
+Gearbox-Workshop-Portable.zip
+*.log
+*.db
+*.sqlite
+.git/

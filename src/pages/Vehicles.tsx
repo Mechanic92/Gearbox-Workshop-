@@ -27,6 +27,11 @@ import { Badge } from "@/components/ui/badge";
 export default function Vehicles() {
   const { activeLedgerId } = useLedger();
   const [, setLocation] = useLocation();
+
+  if (!activeLedgerId) {
+    setLocation("/setup/ledger");
+    return null;
+  }
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Form state
@@ -313,9 +318,9 @@ export default function Vehicles() {
             <Button
               className="flex-[2] h-12 shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs"
               onClick={handleSubmit}
-              disabled={createVehicleMutation.isPending || !licensePlate.trim()}
+              disabled={createVehicleMutation.isLoading || !licensePlate.trim()}
             >
-              {createVehicleMutation.isPending ? <Loader2 className="animate-spin" /> : "Commit Registration"}
+              {createVehicleMutation.isLoading ? <Loader2 className="animate-spin" /> : "Commit Registration"}
             </Button>
           </DialogFooter>
         </DialogContent>

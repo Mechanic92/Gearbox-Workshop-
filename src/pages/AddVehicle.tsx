@@ -248,9 +248,9 @@ export default function AddVehicle() {
               <Button
                 onClick={handleAddVehicle}
                 className="w-full h-12 text-base"
-                disabled={createVehicleMutation.isPending}
+                disabled={createVehicleMutation.isLoading}
               >
-                {createVehicleMutation.isPending ? "Adding Vehicle..." : "Add Vehicle"}
+                {createVehicleMutation.isLoading ? "Adding Vehicle..." : "Add Vehicle"}
               </Button>
             </div>
           </CardContent>

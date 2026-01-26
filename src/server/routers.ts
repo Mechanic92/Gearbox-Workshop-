@@ -39,6 +39,42 @@ export const appRouter = router({
     }),
   }),
 
+  settings: router({
+    getInvoice: protectedProcedure
+      .input(z.object({ ledgerId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        return db.getInvoiceSettings(input.ledgerId);
+      }),
+
+    updateInvoice: protectedProcedure
+      .input(z.object({
+        ledgerId: z.number(),
+        companyName: z.string(),
+        companyLogo: z.string().optional(),
+        companyAddress: z.string().optional(),
+        companyPhone: z.string().optional(),
+        companyEmail: z.string().optional(),
+        bankAccountName: z.string().optional(),
+        bankAccountNumber: z.string().optional(),
+        bankAccountSuffix: z.string().optional(),
+        paymentTermsDays: z.number().default(30),
+        invoiceFooter: z.string().optional(),
+        bayCount: z.number().optional(),
+        businessHours: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const { ledgerId, ...data } = input;
+        await db.updateInvoiceSettings(ledgerId, data);
+        return { success: true };
+      }),
+  }),
+
   // ============================================================================
   // ORGANIZATION MANAGEMENT
   // ============================================================================
@@ -126,6 +162,24 @@ export const appRouter = router({
         }
 
         return ledger;
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        gstRegistered: z.boolean().optional(),
+        gstBasis: z.enum(["payments", "invoice"]).optional(),
+        gstFilingFrequency: z.enum(["monthly", "two_monthly", "six_monthly"]).optional(),
+        aimEnabled: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.id);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const { id, ...data } = input;
+        await db.db.update(db.schema.ledgers).set(data).where(db.eq(db.schema.ledgers.id, id));
+        return { success: true };
       }),
   }),
 
@@ -602,6 +656,52 @@ export const appRouter = router({
 
         await db.updateQuoteStatus(input.id, input.status);
         return { success: true };
+      }),
+
+    convertToJob: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const quote = await db.getQuoteById(input.id);
+        if (!quote) throw new TRPCError({ code: "NOT_FOUND" });
+
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, quote.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        if (quote.jobId) return { jobId: quote.jobId };
+
+        // 1. Create a job from the quote
+        const [job] = await db.db.insert(schema.jobs).values({
+          ledgerId: quote.ledgerId,
+          customerId: quote.customerId,
+          jobNumber: `JOB-Q-${quote.quoteNumber}`,
+          description: `Converted from Quote ${quote.quoteNumber}`,
+          status: "in_progress",
+          quotedPrice: quote.totalAmount.toString(),
+          customerName: quote.customer?.name,
+          customerEmail: quote.customer?.email,
+          customerPhone: quote.customer?.phone,
+        }).returning();
+
+        // 2. Add items to job costs
+        if (quote.items && quote.items.length) {
+          for (const item of quote.items) {
+            await db.db.insert(schema.jobCosts).values({
+              jobId: job.id,
+              type: "parts", // Defaulting to parts for quote items unless specified
+              description: item.description,
+              quantity: item.quantity.toString(),
+              unitPrice: item.unitPrice.toString(),
+              totalCost: item.totalPrice.toString(),
+            });
+          }
+        }
+
+        // 3. Link quote to job and set status to approved
+        await db.db.update(schema.quotes)
+          .set({ jobId: job.id, status: "approved", approvedDate: new Date() })
+          .where(eq(schema.quotes.id, input.id));
+
+        return { jobId: job.id };
       }),
   }),
 

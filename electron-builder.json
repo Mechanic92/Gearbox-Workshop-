@@ -3,21 +3,14 @@
   "productName": "Gearbox Workshop",
   "copyright": "Copyright © 2026 Gearbox",
   "directories": {
-    "output": "release",
+    "output": "dist-electron",
     "buildResources": "build"
   },
   "files": [
     "dist/**/*",
     "electron/**/*",
     "package.json",
-    "node_modules/**/*"
-  ],
-  "extraResources": [
-    {
-      "from": "src/server",
-      "to": "server",
-      "filter": ["**/*"]
-    }
+    "!**/node_modules/**/*"
   ],
   "win": {
     "target": [
@@ -33,10 +26,9 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Gearbox Workshop",
-    "installerIcon": null,
-    "uninstallerIcon": null,
-    "installerHeaderIcon": null
+    "shortcutName": "Gearbox Workshop"
   },
-  "publish": null
+  "publish": null,
+  "npmRebuild": false,
+  "nodeGypRebuild": false
 }

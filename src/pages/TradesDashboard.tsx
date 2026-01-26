@@ -17,8 +17,26 @@ import { cn } from "@/lib/utils";
 export default function TradesDashboard() {
   const { user } = useAuth();
   const { activeLedgerId, activeLedgerType } = useLedger();
+  const { data: ledger } = trpc.ledger.get.useQuery(
+    { id: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
   const [, setLocation] = useLocation();
   const [ledgerSwitcherOpen, setLedgerSwitcherOpen] = useState(false);
+
+  // Wait for ledger context to initialize from localStorage
+  if (activeLedgerId === null || activeLedgerType === null) {
+    // Not loaded yet - show loading
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background space-y-6">
+        <div className="relative">
+          <div className="w-24 h-24 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
+          <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary w-8 h-8 fill-primary" />
+        </div>
+        <p className="text-sm font-black text-muted-foreground animate-pulse tracking-[0.4em] uppercase">Loading Dashboard...</p>
+      </div>
+    );
+  }
 
   if (activeLedgerType !== "trades") {
     setLocation("/setup/ledger");
@@ -57,14 +75,14 @@ export default function TradesDashboard() {
       <header className="sticky top-0 z-30 glass shadow-2xl">
         <div className="container py-6 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-                <LayoutGrid size={28} />
+            <div className="w-14 h-14 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] group hover:scale-110 transition-transform">
+                <Zap size={28} className="fill-current" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tighter uppercase italic leading-none">Command Center</h1>
+              <h1 className="text-3xl font-black tracking-tighter uppercase italic leading-none">{ledger?.name?.toUpperCase() || "COMMAND CENTER"}</h1>
               <div className="flex items-center gap-2 mt-2">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_oklch(var(--primary))]" />
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Live Connection: {user?.name}</p>
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">GEARBOX 2026 // {user?.name}</p>
               </div>
             </div>
           </div>

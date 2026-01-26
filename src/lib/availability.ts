@@ -96,12 +96,27 @@ export async function calculateAvailability(
     date,
     serviceType,
     serviceDuration,
-    bayCount = DEFAULT_BAY_COUNT,
     bufferTime = DEFAULT_BUFFER_TIME,
   } = params;
 
-  const dayName = getDayName(date);
-  const businessHours = DEFAULT_BUSINESS_HOURS[dayName];
+  // Fetch ledger settings
+  const settings = await db.query.invoiceSettings.findFirst({
+    where: eq(schema.invoiceSettings.ledgerId, ledgerId)
+  });
+
+  const bayCount = settings?.bayCount ?? DEFAULT_BAY_COUNT;
+  const businessHoursJson = settings?.businessHours;
+  let customBusinessHours: BusinessHours | null = null;
+  
+  if (businessHoursJson) {
+    try {
+      customBusinessHours = JSON.parse(businessHoursJson);
+    } catch (e) {
+      console.error("Failed to parse business hours", e);
+    }
+  }
+
+  const businessHours = customBusinessHours?.[getDayName(date)] || DEFAULT_BUSINESS_HOURS[getDayName(date)];
 
   // If closed on this day
   if (!businessHours) {
