@@ -48,10 +48,10 @@ export default function PublicBooking() {
   const createBookingMutation = trpc.public.createBooking.useMutation({
     onSuccess: () => {
       setStep(3);
-      toast.success("Protocol Accepted. Your service window is secured.");
+      toast.success("Booking confirmed! We'll see you soon.");
     },
     onError: (err) => {
-        toast.error(err.message || "Failed to finalize reservation");
+        toast.error(err.message || "Failed to confirm booking");
     }
   });
 
@@ -60,7 +60,7 @@ export default function PublicBooking() {
 
   const handleNext = () => {
       if (step === 1 && (!selectedDate || !selectedTime || !formData.serviceType)) {
-          toast.error("Please complete the temporal configuration");
+          toast.error("Please select a service, date, and time");
           return;
       }
       setStep(step + 1);
@@ -75,7 +75,7 @@ export default function PublicBooking() {
       return (
           <div className="min-h-screen flex flex-col items-center justify-center bg-[#070708] space-y-6">
               <div className="w-16 h-16 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Synchronizing with Workshop Node...</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Loading Workshop Details...</p>
           </div>
       );
   }
@@ -93,17 +93,17 @@ export default function PublicBooking() {
                       <CheckCircle2 className="text-primary w-16 h-16" strokeWidth={3} />
                   </div>
                   <div className="space-y-4">
-                      <h2 className="text-5xl font-black tracking-tighter text-white uppercase italic leading-none">Security Cleared.</h2>
-                      <p className="text-white/40 font-bold uppercase tracking-[0.2em] text-xs">Your Reservation is Synchronized</p>
+                      <h2 className="text-5xl font-black tracking-tighter text-white uppercase italic leading-none">Confirmed.</h2>
+                      <p className="text-white/40 font-bold uppercase tracking-[0.2em] text-xs">Your booking is all set</p>
                   </div>
                   <p className="text-white/60 font-medium leading-relaxed">
-                      Protocol successful. {shopInfo?.name} has received your reservation for {format(selectedDate!, "MMMM do")} at {selectedTime}. A secure confirmation has been dispatched to your mobile endpoint.
+                      Thank you! {shopInfo?.name} has received your booking for {format(selectedDate!, "MMMM do")} at {selectedTime}. We've sent a confirmation to your phone.
                   </p>
                   <Button 
                     className="w-full h-16 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all duration-500"
                     onClick={() => window.location.reload()}
                   >
-                      Return to Origin
+                      Finish
                   </Button>
               </Card>
           </div>
@@ -127,14 +127,14 @@ export default function PublicBooking() {
             <div>
               <h1 className="text-xl font-black tracking-tighter uppercase italic leading-none">{shopInfo?.name || 'GEARBOX'}</h1>
               <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] mt-1.5 flex items-center gap-1.5">
-                  <ShieldCheck size={10} /> Secure Booking Portal
+                  <ShieldCheck size={10} /> Secure Booking
               </p>
             </div>
           </div>
           <div className="hidden md:flex items-center gap-8">
               {[
-                  { id: 1, label: "Tuning" },
-                  { id: 2, label: "Identity" }
+                  { id: 1, label: "Select Service" },
+                  { id: 2, label: "Your Details" }
               ].map(s => (
                   <div key={s.id} className={cn("flex items-center gap-3 transition-opacity", step !== s.id && "opacity-30")}>
                       <span className="text-[10px] font-black uppercase tracking-widest leading-none">{s.label}</span>
@@ -153,16 +153,16 @@ export default function PublicBooking() {
                     <div className="space-y-12">
                         <section className="space-y-4">
                             <h2 className="text-6xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.85]">
-                                Configure <span className="text-primary">Performance.</span>
+                                Book Your <span className="text-primary">Service.</span>
                             </h2>
                             <p className="text-white/40 font-bold uppercase tracking-[0.3em] text-sm max-w-2xl">
-                                Select your operational window and service classification to initialize the reservation sequence.
+                                Select your service type and choose a time that works for you.
                             </p>
                         </section>
 
                         <div className="space-y-8">
                              <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Service Classification</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Choose Service</Label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {(shopInfo?.services || []).map(s => (
                                         <button 
@@ -183,7 +183,7 @@ export default function PublicBooking() {
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Temporal Horizon</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Select Date</Label>
                                 <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide">
                                     {nextDays.map(day => {
                                         const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -208,7 +208,7 @@ export default function PublicBooking() {
 
                             {selectedDate && (
                                 <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Operational Windows (Available)</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Available Times</Label>
                                     {availabilityLoading ? (
                                         <div className="grid grid-cols-4 gap-4">
                                             {[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-2xl animate-pulse" />)}
@@ -229,20 +229,20 @@ export default function PublicBooking() {
                                                     {time}
                                                 </button>
                                             ))}
-                                            {availability?.slots.length === 0 && <p className="col-span-full py-8 text-center text-red-400 font-bold uppercase tracking-widest text-xs border border-dashed border-red-400/20 rounded-3xl">No operational capacity for selected date</p>}
+                                            {availability?.slots.length === 0 && <p className="col-span-full py-8 text-center text-red-400 font-bold uppercase tracking-widest text-xs border border-dashed border-red-400/20 rounded-3xl">No availability for selected date</p>}
                                         </div>
                                     )}
                                 </div>
                             )}
 
                             <div className="pt-12">
-                                <Button 
-                                    className="h-24 w-full md:w-80 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic group"
-                                    onClick={handleNext}
-                                    disabled={!selectedDate || !selectedTime || !formData.serviceType}
-                                >
-                                    Proceed to Identity <ChevronRight className="ml-3 group-hover:translate-x-2 transition-transform" strokeWidth={3} />
-                                </Button>
+                                    <Button 
+                                        className="h-24 w-full md:w-80 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic group"
+                                        onClick={handleNext}
+                                        disabled={!selectedDate || !selectedTime || !formData.serviceType}
+                                    >
+                                        Next Step <ChevronRight className="ml-3 group-hover:translate-x-2 transition-transform" strokeWidth={3} />
+                                    </Button>
                             </div>
                         </div>
                     </div>
@@ -250,16 +250,16 @@ export default function PublicBooking() {
                     <div className="space-y-12 max-w-xl">
                         <section className="space-y-4">
                             <h2 className="text-6xl lg:text-8xl font-black tracking-tighter uppercase italic leading-[0.85]">
-                                Secure <span className="text-primary">Identity.</span>
+                                Your <span className="text-primary">Details.</span>
                             </h2>
                             <p className="text-white/40 font-bold uppercase tracking-[0.3em] text-sm">
-                                Provide your security credentials to synchronize this reservation with the workshop mainframe.
+                                Please provide your contact information to confirm your booking.
                             </p>
                         </section>
 
                         <div className="space-y-8 pt-8">
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Full Legal Name</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Full Name</Label>
                                 <Input 
                                     className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="e.g. Marcus Aurelius"
@@ -270,7 +270,7 @@ export default function PublicBooking() {
 
                             <div className="grid md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Digital Mail</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Email Address</Label>
                                     <Input 
                                         className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                         placeholder="user@cyber.net"
@@ -280,7 +280,7 @@ export default function PublicBooking() {
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Mobile Endpoint</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Phone Number</Label>
                                     <Input 
                                         className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                         placeholder="+64 2X XXX XXXX"
@@ -291,7 +291,7 @@ export default function PublicBooking() {
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Vehicle Unit Identifier (Plate)</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Vehicle Plate (Registration)</Label>
                                 <Input 
                                     className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20 text-3xl text-center"
                                     placeholder="XYZ123"
@@ -323,7 +323,7 @@ export default function PublicBooking() {
                                     })}
                                     disabled={createBookingMutation.isLoading || !formData.name || !formData.email || !formData.phone}
                                 >
-                                    {createBookingMutation.isLoading ? <Loader2 className="animate-spin" /> : "Commit Reservation"}
+                                    {createBookingMutation.isLoading ? <Loader2 className="animate-spin" /> : "Confirm Booking"}
                                 </Button>
                             </div>
                         </div>
@@ -340,15 +340,15 @@ export default function PublicBooking() {
                             <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary">
                                 <Zap size={24} fill="currentColor" />
                             </div>
-                            <h3 className="text-xl font-black tracking-tighter uppercase italic italic">Reservation Intel</h3>
+                                <h3 className="text-xl font-black tracking-tighter uppercase italic italic">Booking Summary</h3>
                         </div>
 
                         <div className="space-y-6">
                             {[
-                                { label: "Performance Unit", val: formData.serviceType || "Unconfigured", icon: Zap },
-                                { label: "Temporal Window", val: selectedDate ? format(selectedDate, "dd MMM yyyy") : "Pending", icon: Calendar },
-                                { label: "Maturity Time", val: selectedTime || "Pending", icon: Clock },
-                                { label: "Asset Module", val: formData.rego || "Unknown", icon: Car },
+                                { label: "Service Type", val: formData.serviceType || "Pending", icon: Zap },
+                                { label: "Date", val: selectedDate ? format(selectedDate, "dd MMM yyyy") : "Pending", icon: Calendar },
+                                { label: "Time", val: selectedTime || "Pending", icon: Clock },
+                                { label: "Vehicle Plate", val: formData.rego || "Pending", icon: Car },
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-6 group">
                                     <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 group-hover:text-primary transition-colors">
