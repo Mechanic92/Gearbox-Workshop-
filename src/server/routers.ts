@@ -9,6 +9,10 @@ import { publicRouter } from "./routers/public";
 import { xeroRouter } from "./routers/integrations/xero";
 import { billingRouter } from "./routers/billing";
 import { getUploadPresignedUrl, getDownloadPresignedUrl } from "../lib/storage";
+import { generateDVIReportPDF, generateInvoicePDF, generateQuotePDF } from "./pdfGenerator";
+import { sendEmail } from "../lib/notifications/email";
+import * as schema from "../lib/schema";
+import { eq } from "drizzle-orm";
 
 // Mocks
 const COOKIE_NAME = "session";
@@ -274,7 +278,7 @@ export const appRouter = router({
         vehicleId: z.number().optional(),
         jobNumber: z.string().optional(),
         description: z.string(),
-        status: z.enum(["quoted", "in_progress", "completed", "cancelled"]).default("in_progress"),
+        status: z.enum(["NEW", "IN_PROGRESS", "WAITING_APPROVAL", "COMPLETED", "CLOSED"]).default("NEW"),
         quotedPrice: z.union([z.number(), z.string()]).default(0),
         customerName: z.string().optional(),
         customerPhone: z.string().optional(),
@@ -315,7 +319,7 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
-        status: z.enum(["quoted", "in_progress", "completed", "cancelled"]).optional(),
+        status: z.enum(["NEW", "IN_PROGRESS", "WAITING_APPROVAL", "COMPLETED", "CLOSED"]).optional(),
         description: z.string().optional(),
         quotedPrice: z.union([z.number(), z.string()]).optional(),
       }))
@@ -790,10 +794,45 @@ export const appRouter = router({
     generateDviReport: protectedProcedure
       .input(z.object({ dviId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        // const { generateDVIReportPDF } = await import("./pdfGenerator");
-        // Mock PDF for now or copy file later
+        const inspection = await db.getDviInspectionById(input.dviId);
+        if (!inspection) throw new TRPCError({ code: "NOT_FOUND" });
+        
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, inspection.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const job = await db.getJobById(inspection.jobId!);
+        const settings = await db.getInvoiceSettings(inspection.ledgerId) || { companyName: "Gearbox Workshop" };
+
+        // Map items to DVIReportData format
+        const items = await db.db.query.dviItems.findMany({
+            where: (i, { eq }) => eq(i.inspectionId, inspection.id)
+        });
+
+        const comments: Record<string, string> = {};
+        let status: "green" | "amber" | "red" = "green";
+        
+        items.forEach(item => {
+            comments[item.component] = item.comment || "";
+            if (item.status === 'red') status = 'red';
+            else if (item.status === 'amber' && status !== 'red') status = 'amber';
+        });
+
+        const pdfBuffer = generateDVIReportPDF({
+            dviId: inspection.id,
+            jobId: inspection.jobId!,
+            vehicleInfo: job?.vehicle?.licensePlate || "Unknown",
+            inspectionDate: inspection.createdAt,
+            technician: "Technician",
+            comments,
+            status,
+            companyName: settings.companyName,
+            companyPhone: settings.companyPhone || "",
+            companyEmail: settings.companyEmail || "",
+            images: [],
+        });
+
         return {
-          pdf: "MOCK_BASE64_PDF",
+          pdf: pdfBuffer.toString("base64"),
           filename: `DVI-Report-${input.dviId}.pdf`,
         };
       }),
@@ -801,9 +840,38 @@ export const appRouter = router({
     generateQuote: protectedProcedure
       .input(z.object({ quoteId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        // const { generateQuotePDF } = await import("./pdfGenerator");
+        const quote: any = await db.getQuoteById(input.quoteId);
+        if (!quote) throw new TRPCError({ code: "NOT_FOUND" });
+
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, quote.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const settings = await db.getInvoiceSettings(quote.ledgerId) || { companyName: "Gearbox Workshop" };
+
+        const pdfBuffer = generateQuotePDF({
+            quoteId: quote.id,
+            quoteNumber: quote.quoteNumber,
+            customerName: quote.customer?.name || "Customer",
+            customerEmail: quote.customer?.email || "",
+            vehicleInfo: quote.vehicleInfo || "Unknown",
+            createdDate: quote.createdAt,
+            expiryDate: quote.expiryDate,
+            items: (quote.items || []).map((item: any) => ({
+                description: item.description,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                total: item.totalPrice,
+            })),
+            subtotal: quote.subtotal,
+            gstAmount: quote.gstAmount,
+            totalAmount: quote.totalAmount,
+            companyName: settings.companyName,
+            companyPhone: settings.companyPhone || "",
+            companyEmail: settings.companyEmail || "",
+        });
+
         return {
-          pdf: "MOCK_BASE64_PDF",
+          pdf: pdfBuffer.toString("base64"),
           filename: `Quote-${input.quoteId}.pdf`,
         };
       }),
@@ -811,11 +879,93 @@ export const appRouter = router({
     generateInvoice: protectedProcedure
       .input(z.object({ invoiceId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        // const { generateInvoicePDF } = await import("./pdfGenerator");
+        const invoice: any = await db.getInvoiceById(input.invoiceId);
+        if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
+
+        const hasAccess = await db.verifyLedgerAccess(ctx.user.id, invoice.ledgerId);
+        if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const settings = await db.getInvoiceSettings(invoice.ledgerId) || { companyName: "Gearbox Workshop" };
+
+        const pdfBuffer = generateInvoicePDF({
+            invoiceId: invoice.id,
+            invoiceNumber: invoice.invoiceNumber,
+            customerName: invoice.customer?.name || "Customer",
+            customerEmail: invoice.customer?.email || "",
+            customerAddress: invoice.customer?.address || "",
+            jobNumber: invoice.job?.jobNumber || "",
+            jobDescription: invoice.job?.description || "",
+            invoiceDate: invoice.invoiceDate,
+            dueDate: invoice.dueDate,
+            items: (invoice.items || []).map((item: any) => ({
+                description: item.description,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                total: item.total,
+            })),
+            subtotal: invoice.subtotal,
+            gstAmount: invoice.gstAmount,
+            totalAmount: invoice.totalAmount,
+            companyName: settings.companyName,
+            companyPhone: settings.companyPhone || "",
+            companyEmail: settings.companyEmail || "",
+            companyAddress: settings.companyAddress || "",
+            bankDetails: {
+                accountName: settings.bankAccountName || "",
+                accountNumber: `${settings.bankAccountNumber}-${settings.bankAccountSuffix}`,
+                bankName: "Bank",
+            }
+        });
+
         return {
-          pdf: "MOCK_BASE64_PDF",
+          pdf: pdfBuffer.toString("base64"),
           filename: `Invoice-${input.invoiceId}.pdf`,
         };
+      }),
+
+    sendInvoice: protectedProcedure
+      .input(z.object({ invoiceId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const invoice: any = await db.getInvoiceById(input.invoiceId);
+        if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
+
+        const settings = await db.getInvoiceSettings(invoice.ledgerId) || { companyName: "Gearbox Workshop" };
+        
+        await sendEmail(invoice.customer?.email || "", {
+            type: "invoice_ready",
+            variables: {
+                customerName: invoice.customer?.name || "Customer",
+                invoiceNumber: invoice.invoiceNumber,
+                amount: `$${invoice.totalAmount.toFixed(2)}`,
+                dueDate: format(invoice.dueDate, "dd/MM/yyyy"),
+                shopName: settings.companyName,
+                link: `${process.env.APP_BASE_URL}/portal/invoices/${invoice.id}`,
+            }
+        });
+
+        return { success: true };
+      }),
+
+    sendDVI: protectedProcedure
+      .input(z.object({ dviId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const inspection = await db.getDviInspectionById(input.dviId);
+        if (!inspection) throw new TRPCError({ code: "NOT_FOUND" });
+
+        const job: any = await db.getJobById(inspection.jobId!);
+        const settings = await db.getInvoiceSettings(inspection.ledgerId) || { companyName: "Gearbox Workshop" };
+
+        await sendEmail(job.customer?.email || "", {
+            type: "dvi_ready",
+            variables: {
+                customerName: job.customer?.name || "Customer",
+                vehicleRego: job.vehicle?.licensePlate || "Unknown",
+                shopName: settings.companyName,
+                link: `${process.env.APP_BASE_URL}/dvi-report/${inspection.shareToken}`,
+            }
+        });
+
+        return { success: true };
       }),
   }),
 
@@ -837,6 +987,83 @@ export const appRouter = router({
         const url = await getDownloadPresignedUrl(input.key);
         return { url };
       }),
+  }),
+
+  // ============================================================================
+  // VEHICLE SPEC & MARKUP ENGINE
+  // ============================================================================
+
+  vehicleSpec: router({
+    list: publicProcedure.query(async () => {
+        return db.db.query.vehicleSpecs.findMany();
+    }),
+    getFitment: publicProcedure
+        .input(z.object({ specId: z.number() }))
+        .query(async ({ input }) => {
+            return db.db.query.vehiclePartFitment.findMany({
+                where: (f, { eq }) => eq(f.specId, input.specId)
+            });
+        }),
+  }),
+
+  markup: router({
+    list: protectedProcedure
+        .input(z.object({ ledgerId: z.number() }))
+        .query(async ({ ctx, input }) => {
+            const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+            if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+            return db.db.query.markupRules.findMany({
+                where: (r, { eq }) => eq(r.ledgerId, input.ledgerId)
+            });
+        }),
+    update: protectedProcedure
+        .input(z.object({ 
+            ledgerId: z.number(), 
+            rules: z.array(z.object({
+                minCost: z.number(),
+                maxCost: z.number(),
+                markupPercent: z.number()
+            }))
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+            if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+            // Clear and replace rules
+            await db.db.delete(db.schema.markupRules).where(db.eq(db.schema.markupRules.ledgerId, input.ledgerId));
+            for (const rule of input.rules) {
+                await db.db.insert(db.schema.markupRules).values({
+                    ledgerId: input.ledgerId,
+                    ...rule
+                });
+            }
+            return { success: true };
+        }),
+  }),
+
+  fleet: router({
+    list: protectedProcedure
+        .input(z.object({ ledgerId: z.number() }))
+        .query(async ({ ctx, input }) => {
+            const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+            if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+            return db.db.query.fleets.findMany({
+                where: (f, { eq }) => eq(f.ledgerId, input.ledgerId)
+            });
+        }),
+    create: protectedProcedure
+        .input(z.object({
+            ledgerId: z.number(),
+            name: z.string(),
+            contactEmail: z.string().email().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const hasAccess = await db.verifyLedgerAccess(ctx.user.id, input.ledgerId);
+            if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
+
+            const [fleet] = await db.db.insert(db.schema.fleets).values(input).returning();
+            return fleet;
+        }),
   }),
 });
 export type AppRouter = typeof appRouter;

@@ -118,6 +118,32 @@ export default function GenerateInvoice() {
     });
   };
 
+  const getPdfMutation = trpc.pdf.generateInvoice.useMutation();
+  const sendInvoiceMutation = trpc.pdf.sendInvoice.useMutation();
+
+  const handleDownloadPDF = async (invoiceId: number) => {
+    try {
+        const { pdf, filename } = await getPdfMutation.mutateAsync({ invoiceId });
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${pdf}`;
+        link.download = filename;
+        link.click();
+    } catch (e) {
+        toast.error("Failed to generate PDF");
+    }
+  };
+
+  const handleDispatch = async (invoiceId: number) => {
+    try {
+        await sendInvoiceMutation.mutateAsync({ invoiceId });
+        toast.success("Invoice dispatched to client endpoint");
+    } catch (e) {
+        toast.error("Dispatch failed");
+    }
+  };
+
+  const currentCreatedInvoiceId = generateInvoiceMutation.data?.id;
+
   if (isLoading) return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -312,11 +338,21 @@ export default function GenerateInvoice() {
                         {generateInvoiceMutation.isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-5 h-5 mr-3" /> Execute & Transmit</>}
                     </Button>
                     <div className="flex gap-4">
-                        <Button variant="outline" className="flex-1 h-14 rounded-2xl border-2 font-black tracking-widest uppercase text-[9px]">
-                            <Download className="w-4 h-4 mr-2" /> PDF Local
+                        <Button 
+                            variant="outline" 
+                            className="flex-1 h-14 rounded-2xl border-2 font-black tracking-widest uppercase text-[9px]"
+                            onClick={() => currentCreatedInvoiceId && handleDownloadPDF(currentCreatedInvoiceId)}
+                            disabled={!currentCreatedInvoiceId || getPdfMutation.isLoading}
+                        >
+                            {getPdfMutation.isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Download className="w-4 h-4 mr-2" /> PDF Local</>}
                         </Button>
-                        <Button variant="outline" className="flex-1 h-14 rounded-2xl border-2 font-black tracking-widest uppercase text-[9px]">
-                            <Mail className="w-4 h-4 mr-2" /> Dispatch
+                        <Button 
+                            variant="outline" 
+                            className="flex-1 h-14 rounded-2xl border-2 font-black tracking-widest uppercase text-[9px]"
+                            onClick={() => currentCreatedInvoiceId && handleDispatch(currentCreatedInvoiceId)}
+                            disabled={!currentCreatedInvoiceId || sendInvoiceMutation.isLoading}
+                        >
+                            {sendInvoiceMutation.isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Mail className="w-4 h-4 mr-2" /> Dispatch</>}
                         </Button>
                     </div>
                 </div>

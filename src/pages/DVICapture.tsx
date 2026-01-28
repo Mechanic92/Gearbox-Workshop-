@@ -103,6 +103,7 @@ export default function DVICapture() {
 
   const getUploadUrl = trpc.storage.getUploadUrl.useMutation();
   const createDvi = trpc.dvi.create.useMutation();
+  const sendDviMutation = trpc.pdf.sendDVI.useMutation();
 
   const submitInspection = async () => {
     if (items.length === 0) {
@@ -153,6 +154,15 @@ export default function DVICapture() {
         items: itemsToSubmit
       });
       
+      // 3. Dispatch email to customer
+      try {
+        await sendDviMutation.mutateAsync({ dviId: result.id });
+        toast.success("DVI dispatched to client");
+      } catch (e) {
+        console.error("Email dispatch failed:", e);
+        toast.error("Inspection saved, but email failed to send.");
+      }
+
       toast.success("Inspection submitted successfully!");
       setLocation(`/trades/jobs/${jobId}`);
     } catch (err) {
@@ -280,7 +290,7 @@ export default function DVICapture() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Component</label>
                   <input 
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="e.g. Front Brake Pads"
                     value={newItem.component || ''}
                     onPointerDown={stopFieldEvent}
@@ -315,7 +325,7 @@ export default function DVICapture() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Findings & Notes</label>
                 <textarea 
-                  className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm h-24 focus:ring-2 ring-blue-500 transition-all"
+                  className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white h-24 focus:ring-2 ring-blue-500 transition-all"
                   placeholder="Describe what you see..."
                   value={newItem.notes || ''}
                   onPointerDown={stopFieldEvent}
@@ -328,7 +338,7 @@ export default function DVICapture() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Recommendation</label>
                   <input 
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="e.g. Replace immediately"
                     value={newItem.recommendation || ''}
                     onPointerDown={stopFieldEvent}
@@ -340,7 +350,7 @@ export default function DVICapture() {
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Est. Cost ($)</label>
                   <input 
                     type="number"
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="0.00"
                     value={newItem.estimatedCost || ''}
                     onPointerDown={stopFieldEvent}

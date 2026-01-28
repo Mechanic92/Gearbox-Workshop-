@@ -45,3 +45,26 @@ export const protectedProcedure = t.procedure.use(async (opts) => {
     },
   });
 });
+
+export const ownerProcedure = protectedProcedure.use(async (opts) => {
+    if (opts.ctx.user.role !== 'owner' && opts.ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Owner access required' });
+    }
+    return opts.next();
+});
+
+export const managerProcedure = protectedProcedure.use(async (opts) => {
+    const roles: string[] = ['owner', 'admin', 'manager'];
+    if (!roles.includes(opts.ctx.user.role)) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Manager access required' });
+    }
+    return opts.next();
+});
+
+export const technicianProcedure = protectedProcedure.use(async (opts) => {
+    const roles: string[] = ['owner', 'admin', 'manager', 'technician'];
+    if (!roles.includes(opts.ctx.user.role)) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Technician access required' });
+    }
+    return opts.next();
+});

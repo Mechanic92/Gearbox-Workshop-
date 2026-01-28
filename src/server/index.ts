@@ -9,6 +9,7 @@ import { handleStripeWebhook } from '../lib/payments';
 import { handleSubscriptionWebhook } from '../lib/stripe-subscriptions';
 import { handleXeroWebhook } from '../lib/integrations/xero-client';
 import { initializeDatabase } from '../lib/db-init';
+import { handlePublicIngestion } from './ingestion';
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -51,6 +52,8 @@ app.post('/api/webhooks/xero', express.raw({ type: 'application/json' }), async 
     res.status(401).send(`Webhook Error: ${err.message}`);
   }
 });
+
+app.post('/api/public/bookings/ingest', handlePublicIngestion);
 
 // Regular JSON parsing for other routes
 app.use(express.json());

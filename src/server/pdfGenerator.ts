@@ -16,6 +16,27 @@ export interface DVIReportData {
   companyEmail: string;
 }
 
+export interface PPIData {
+  inspectionId: number;
+  vehicleInfo: {
+    make: string;
+    model: string;
+    year: number;
+    plate: string;
+    vin?: string;
+  };
+  inspectorName: string;
+  inspectionDate: Date;
+  items: Array<{
+    label: string;
+    status: "green" | "amber" | "red";
+    comment?: string;
+  }>;
+  overallNotes?: string;
+  companyName: string;
+  companyLogo?: string;
+}
+
 export interface QuoteData {
   quoteId: number;
   quoteNumber: string;
@@ -369,6 +390,105 @@ export function generateInvoicePDF(data: InvoiceData): Buffer {
     const termsWrapped = doc.splitTextToSize(data.paymentTerms, 170);
     doc.text(termsWrapped, 20, yPosition);
   }
+
+  return Buffer.from(doc.output("arraybuffer"));
+}
+
+export function generatePPIReportPDF(data: PPIData): Buffer {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let yPosition = 20;
+
+  // Header
+  doc.setFontSize(22);
+  doc.setTextColor(30, 41, 59); // Slate 800
+  doc.text("PRE-PURCHASE INSPECTION", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 15;
+
+  // Vehicle Info Box
+  doc.setFillColor(241, 245, 249); // Slate 100
+  doc.rect(20, yPosition, pageWidth - 40, 35, "F");
+  
+  doc.setFontSize(10);
+  doc.setTextColor(71, 85, 105); // Slate 600
+  doc.text("VEHICLE INFORMATION", 25, yPosition + 7);
+  
+  doc.setFontSize(14);
+  doc.setTextColor(15, 23, 42); // Slate 900
+  doc.setFont(undefined as any, "bold");
+  doc.text(`${data.vehicleInfo.year} ${data.vehicleInfo.make} ${data.vehicleInfo.model}`, 25, yPosition + 17);
+  
+  doc.setFontSize(10);
+  doc.setFont(undefined as any, "normal");
+  doc.text(`Plate: ${data.vehicleInfo.plate}`, 25, yPosition + 27);
+  if (data.vehicleInfo.vin) {
+      doc.text(`VIN: ${data.vehicleInfo.vin}`, pageWidth / 2, yPosition + 27);
+  }
+  yPosition += 45;
+
+  // Inspection Details
+  doc.setFontSize(9);
+  doc.text(`Inspector: ${data.inspectorName}`, 20, yPosition);
+  doc.text(`Date: ${format(data.inspectionDate, "PPP")}`, pageWidth - 20, yPosition, { align: "right" });
+  yPosition += 10;
+
+  // Items List
+  data.items.forEach((item, index) => {
+    if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+    }
+
+    // Status Indicator
+    const colors: Record<string, number[]> = {
+        green: [34, 197, 94],
+        amber: [234, 179, 8],
+        red: [239, 68, 68]
+    };
+    const color = colors[item.status];
+    doc.setFillColor(color[0], color[1], color[2]);
+    doc.circle(23, yPosition - 1, 2, "F");
+
+    doc.setFontSize(10);
+    doc.setFont(undefined as any, "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text(item.label, 30, yPosition);
+    
+    yPosition += 5;
+    if (item.comment) {
+        doc.setFont(undefined as any, "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(71, 85, 105);
+        const wrapped = doc.splitTextToSize(item.comment, pageWidth - 50);
+        doc.text(wrapped, 30, yPosition);
+        yPosition += (wrapped.length * 4) + 5;
+    } else {
+        yPosition += 3;
+    }
+  });
+
+  // Overall Notes
+  if (data.overallNotes) {
+    if (yPosition > 240) {
+        doc.addPage();
+        yPosition = 20;
+    }
+    yPosition += 10;
+    doc.setFontSize(11);
+    doc.setFont(undefined as any, "bold");
+    doc.text("OVERALL ASSESSMENT", 20, yPosition);
+    yPosition += 7;
+    doc.setFont(undefined as any, "normal");
+    doc.setFontSize(10);
+    const wrappedNotes = doc.splitTextToSize(data.overallNotes, pageWidth - 40);
+    doc.text(wrappedNotes, 20, yPosition);
+  }
+
+  // Branding
+  const pageHeight = doc.internal.pageSize.getHeight();
+  doc.setFontSize(8);
+  doc.setTextColor(148, 163, 184); // Slate 400
+  doc.text(`© ${new Date().getFullYear()} ${data.companyName} - Powered by Gearbox OS`, pageWidth / 2, pageHeight - 10, { align: "center" });
 
   return Buffer.from(doc.output("arraybuffer"));
 }

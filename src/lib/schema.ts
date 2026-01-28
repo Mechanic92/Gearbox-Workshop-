@@ -11,11 +11,27 @@ export const users = sqliteTable("users", {
   name: text("name"),
   email: text("email"),
   loginMethod: text("loginMethod"),
-  role: text("role", { enum: ["user", "admin"] }).default("user").notNull(), // Enum emulated
+  role: text("role", { enum: ["owner", "manager", "technician", "admin", "user"] }).default("user").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(), 
   lastSignedIn: integer("lastSignedIn", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
 });
+
+export const auditLogs = sqliteTable("audit_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  userId: integer("userId").references(() => users.id),
+  action: text("action").notNull(),
+  entityType: text("entityType").notNull(),
+  entityId: integer("entityId"),
+  metadata: text("metadata"), // JSON string
+  ipAddress: text("ipAddress"),
+  userAgent: text("userAgent"),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  ledgerIdx: index("audit_ledger_idx").on(table.ledgerId),
+  userIdx: index("audit_user_idx").on(table.userId),
+}));
 
 export const organizations = sqliteTable("organizations", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -52,7 +68,7 @@ export const ledgerAccess = sqliteTable("ledgerAccess", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
   userId: integer("userId").notNull().references(() => users.id),
-  role: text("role", { enum: ["owner", "admin", "user", "viewer"] }).default("user").notNull(),
+  role: text("role", { enum: ["owner", "manager", "technician", "admin", "viewer"] }).default("technician").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
 }, (table) => ({
   ledgerUserIdx: index("ledger_user_idx").on(table.ledgerId, table.userId),
@@ -118,12 +134,13 @@ export const jobs = sqliteTable("jobs", {
   vehicleId: integer("vehicleId").references(() => vehicles.id),
   jobNumber: text("jobNumber").notNull(),
   description: text("description").notNull(),
-  status: text("status", { enum: ["quoted", "in_progress", "completed", "cancelled"] }).default("quoted").notNull(),
+  status: text("status", { enum: ["NEW", "IN_PROGRESS", "WAITING_APPROVAL", "COMPLETED", "CLOSED"] }).default("NEW").notNull(),
   quotedPrice: real("quotedPrice").notNull(),
   finalPrice: real("finalPrice"),
   customerName: text("customerName"),
   customerPhone: text("customerPhone"),
   customerEmail: text("customerEmail"),
+  approvalLinkToken: text("approvalLinkToken"),
   startedAt: integer("startedAt", { mode: "timestamp" }),
   completedAt: integer("completedAt", { mode: "timestamp" }),
   notes: text("notes"),
@@ -420,6 +437,74 @@ export const accountingSyncLog = sqliteTable("accounting_sync_log", {
 // INVENTORY MANAGEMENT
 // ============================================================================
 
+export const markupRules = sqliteTable("markup_rules", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  minCost: real("minCost").notNull(),
+  maxCost: real("maxCost").notNull(),
+  markupPercent: real("markupPercent").notNull(),
+  isActive: integer("isActive", { mode: "boolean" }).default(true).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+});
+
+export const vehicleSpecs = sqliteTable("vehicle_specs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  make: text("make").notNull(),
+  model: text("model").notNull(),
+  yearFrom: integer("yearFrom").notNull(),
+  yearTo: integer("yearTo").notNull(),
+  fuelType: text("fuelType"),
+  ccMin: integer("ccMin"),
+  ccMax: integer("ccMax"),
+  oilCapacityL: real("oilCapacityL"),
+  oilSpec: text("oilSpec"),
+  filterType: text("filterType"),
+  notes: text("notes"),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  makeModelIdx: index("spec_make_model_idx").on(table.make, table.model),
+}));
+
+export const vehiclePartFitment = sqliteTable("vehicle_part_fitment", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  specId: integer("specId").notNull().references(() => vehicleSpecs.id),
+  partType: text("partType").notNull(), // oil_filter, brake_pads_front, etc
+  supplierSku: text("supplierSku").notNull(),
+  tradeCost: real("tradeCost").notNull(),
+  sellPrice: real("sellPrice").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  specIdx: index("fitment_spec_idx").on(table.specId),
+}));
+
+export const fleets = sqliteTable("fleets", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  name: text("name").notNull(),
+  contactEmail: text("contactEmail"),
+  billingInterval: text("billingInterval", { enum: ["monthly", "quarterly", "consolidated"] }).default("monthly"),
+  discountRate: real("discountRate").default(0),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  ledgerIdx: index("fleet_ledger_idx").on(table.ledgerId),
+}));
+
+export const checklistTemplates = sqliteTable("checklist_templates", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  name: text("name").notNull(), // Basic Service, PPI, etc
+  description: text("description"),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+});
+
+export const checklistItems = sqliteTable("checklist_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  templateId: integer("templateId").notNull().references(() => checklistTemplates.id),
+  label: text("label").notNull(),
+  order: integer("order").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+});
+
 export const suppliers = sqliteTable("suppliers", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
@@ -429,6 +514,7 @@ export const suppliers = sqliteTable("suppliers", {
   phone: text("phone"),
   address: text("address"),
   accountNumber: text("accountNumber"),
+  tradeAccountRef: text("tradeAccountRef"),
   paymentTerms: text("paymentTerms"),
   notes: text("notes"),
   isActive: integer("isActive", { mode: "boolean" }).default(true).notNull(),
@@ -467,6 +553,7 @@ export const parts = sqliteTable("parts", {
   barcode: text("barcode"),
   imageUrl: text("imageUrl"),
   isActive: integer("isActive", { mode: "boolean" }).default(true).notNull(),
+  markupRuleId: integer("markupRuleId").references(() => markupRules.id),
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
 }, (table) => ({
@@ -474,6 +561,7 @@ export const parts = sqliteTable("parts", {
   partNumberIdx: index("part_number_idx").on(table.partNumber),
   categoryIdx: index("part_category_idx").on(table.categoryId),
   supplierIdx: index("part_supplier_idx").on(table.supplierId),
+  markupIdx: index("part_markup_idx").on(table.markupRuleId),
 }));
 
 export const stockMovements = sqliteTable("stock_movements", {
