@@ -2,6 +2,7 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from './schema';
 import { eq, and, like, desc, sql } from "drizzle-orm";
+import crypto from "node:crypto";
 
 // Initialize LibSQL with remote support if DATABASE_URL is provided
 const client = createClient({ 

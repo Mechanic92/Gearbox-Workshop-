@@ -11,6 +11,7 @@ import { billingRouter } from "./routers/billing";
 import { getUploadPresignedUrl, getDownloadPresignedUrl } from "../lib/storage";
 import { generateDVIReportPDF, generateInvoicePDF, generateQuotePDF } from "./pdfGenerator";
 import { sendEmail } from "../lib/notifications/email";
+import { eventBus, EVENTS } from "../lib/events";
 import * as schema from "../lib/schema";
 import { eq } from "drizzle-orm";
 
@@ -292,6 +293,17 @@ export const appRouter = router({
           ...input,
           quotedPrice: typeof input.quotedPrice === 'string' ? parseFloat(input.quotedPrice) : input.quotedPrice,
         });
+
+        // Emit job created event
+        eventBus.emit(EVENTS.JOB_STATUS_CHANGED, {
+          jobId,
+          ledgerId: input.ledgerId,
+          oldStatus: 'NONE',
+          newStatus: input.status,
+          customerId: input.customerId,
+          jobNumber: input.jobNumber || `JOB-${jobId}`,
+        });
+
         return { id: jobId };
       }),
 
@@ -334,6 +346,19 @@ export const appRouter = router({
           ...input,
           quotedPrice: typeof input.quotedPrice === 'string' ? parseFloat(input.quotedPrice) : input.quotedPrice,
         });
+
+        // Emit job status changed event if status was updated
+        if (input.status && input.status !== job.status) {
+          eventBus.emit(EVENTS.JOB_STATUS_CHANGED, {
+            jobId: job.id,
+            ledgerId: job.ledgerId,
+            oldStatus: job.status,
+            newStatus: input.status,
+            customerId: job.customerId,
+            jobNumber: job.jobNumber,
+          });
+        }
+
         return { success: true };
       }),
 
@@ -520,6 +545,16 @@ export const appRouter = router({
         if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
 
         const invoiceId = await db.createInvoice(input);
+
+        // Emit invoice created event
+        eventBus.emit(EVENTS.INVOICE_CREATED, {
+          invoiceId,
+          ledgerId: input.ledgerId,
+          customerId: input.customerId,
+          amount: input.totalAmount,
+          dueDate: input.dueDate,
+        });
+
         return { id: invoiceId };
       }),
 
@@ -568,6 +603,19 @@ export const appRouter = router({
         if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN" });
 
         const bookingId = await db.createBooking(input);
+
+        // Emit booking confirmed event
+        eventBus.emit(EVENTS.BOOKING_CONFIRMED, {
+          bookingId,
+          ledgerId: input.ledgerId,
+          customerId: input.customerId,
+          serviceId: parseInt(input.serviceType) || 0, // Assuming serviceType might be ID or name
+          scheduledDate: input.bookingDate,
+          customerEmail: input.customerEmail,
+          customerName: input.customerName,
+          vehicleInfo: input.vehicleInfo,
+        });
+
         return { id: bookingId };
       }),
 
@@ -679,7 +727,7 @@ export const appRouter = router({
           customerId: quote.customerId,
           jobNumber: `JOB-Q-${quote.quoteNumber}`,
           description: `Converted from Quote ${quote.quoteNumber}`,
-          status: "in_progress",
+          status: "IN_PROGRESS",
           quotedPrice: quote.totalAmount.toString(),
           customerName: quote.customer?.name,
           customerEmail: quote.customer?.email,
