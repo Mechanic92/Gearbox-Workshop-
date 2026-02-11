@@ -370,14 +370,26 @@ export const publicRouter = t.router({
       // Get invoice details
       const invoice = await db.query.invoices.findFirst({ where: eq(schema.invoices.id, input.invoiceId) });
       if (!invoice) throw new Error('Invoice not found');
-      
+
+      const job = await db.query.jobs.findFirst({ where: eq(schema.jobs.id, invoice.jobId) });
+      if (!job) throw new Error('Invoice job not found');
+
+      if (!job.customerId || job.customerId !== input.customerId) {
+        throw new Error('Customer does not have access to this invoice');
+      }
+
+      const customer = await db.query.customers.findFirst({ where: eq(schema.customers.id, input.customerId) });
+      if (!customer?.email) throw new Error('Customer email not found');
+
+      const appUrl = process.env.APP_URL || 'http://localhost:3000';
+
       return await createCheckoutSession({
         amount: invoice.totalAmount,
         currency: 'nzd',
         invoiceId: invoice.id,
-        customerEmail: 'customer@example.com', // Get from DB
-        successUrl: `https://gearbox.app/portal/billing?success=true`,
-        cancelUrl: `https://gearbox.app/portal/billing?cancel=true`,
+        customerEmail: customer.email,
+        successUrl: `${appUrl}/portal/billing?success=true&invoiceId=${invoice.id}`,
+        cancelUrl: `${appUrl}/portal/billing?cancel=true&invoiceId=${invoice.id}`,
       });
     }),
   // Signup new workshop

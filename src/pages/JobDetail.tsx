@@ -175,10 +175,11 @@ export default function JobDetail() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="quoted">Quoted / Estimating</SelectItem>
-                    <SelectItem value="in_progress">Currently In Workshop</SelectItem>
-                    <SelectItem value="completed">Work Finalized</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="IN_PROGRESS">Currently In Workshop</SelectItem>
+                    <SelectItem value="WAITING_APPROVAL">Waiting Approval</SelectItem>
+                    <SelectItem value="COMPLETED">Work Finalized</SelectItem>
+                    <SelectItem value="CLOSED">Closed</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="p-4 rounded-2xl bg-muted/20 border border-white dark:border-border/10 space-y-3">

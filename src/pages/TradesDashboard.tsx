@@ -24,6 +24,19 @@ export default function TradesDashboard() {
   const [, setLocation] = useLocation();
   const [ledgerSwitcherOpen, setLedgerSwitcherOpen] = useState(false);
 
+  const resolveJobStatusKey = (status: unknown) => {
+    const raw = typeof status === "string" ? status : "";
+    const normalized = raw.trim().toUpperCase();
+    if (normalized === "NEW") return "NEW";
+    if (normalized === "IN_PROGRESS" || normalized === "IN PROGRESS") return "IN_PROGRESS";
+    if (normalized === "WAITING_APPROVAL" || normalized === "WAITING APPROVAL") return "WAITING_APPROVAL";
+    if (normalized === "COMPLETED") return "COMPLETED";
+    if (normalized === "CLOSED") return "CLOSED";
+    if (normalized === "CANCELLED" || normalized === "CANCELED") return "CANCELLED";
+    if (normalized === "QUOTED" || normalized === "DRAFT") return "QUOTED";
+    return "NEW";
+  };
+
   // Wait for ledger context to initialize from localStorage
   if (activeLedgerId === null || activeLedgerType === null) {
     // Not loaded yet - show loading
@@ -53,9 +66,9 @@ export default function TradesDashboard() {
     { enabled: !!activeLedgerId }
   );
 
-  const activeJobs = jobs?.filter((j) => j.status === "in_progress") || [];
-  const completedJobs = jobs?.filter((j) => j.status === "completed") || [];
-  const quotedJobs = jobs?.filter((j) => j.status === "quoted") || [];
+  const activeJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "IN_PROGRESS") || [];
+  const completedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "COMPLETED") || [];
+  const quotedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "NEW") || [];
 
   if (jobsLoading) {
     return (
@@ -162,12 +175,15 @@ export default function TradesDashboard() {
                 <div className="grid grid-cols-1 gap-6">
                     {jobs.slice(0, 8).map((job) => {
                         const statusConfig = {
-                            quoted: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "Draft Proposal" },
-                            in_progress: { color: "text-primary", bg: "bg-primary/10", icon: Wrench, label: "Active Protocol" },
-                            completed: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Maturity Reached" },
-                            cancelled: { color: "text-red-400", bg: "bg-red-400/10", icon: X, label: "Terminated" },
+                            NEW: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "New" },
+                            IN_PROGRESS: { color: "text-primary", bg: "bg-primary/10", icon: Wrench, label: "In Progress" },
+                            WAITING_APPROVAL: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "Waiting Approval" },
+                            COMPLETED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Completed" },
+                            CLOSED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Closed" },
+                            CANCELLED: { color: "text-red-400", bg: "bg-red-400/10", icon: X, label: "Cancelled" },
                         };
-                        const config = statusConfig[job.status] || statusConfig.in_progress;
+                        const statusKey = resolveJobStatusKey((job as any).status) as keyof typeof statusConfig;
+                        const config = statusConfig[statusKey] || statusConfig.IN_PROGRESS;
                         
                         return (
                             <div 

@@ -1,11 +1,15 @@
 node_modules
-dist
 .env
+.env.*
 local.db
 local.db-journal
 *.log
 .git
+.gitignore
 .vscode
 electron
+release
 build
-!dist
+_terminal_test.txt
+*.md
+!README.md

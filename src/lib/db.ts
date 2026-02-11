@@ -198,13 +198,70 @@ export async function getVehicleById(id: number) {
 // ============================================================================
 
 export async function createInvoice(input: any) {
-    const { items, ...invoiceData } = input;
-    const result = await db.insert(schema.invoices).values(invoiceData).returning({ id: schema.invoices.id });
+    const {
+        items,
+        ledgerId,
+        customerId,
+        jobId,
+        invoiceNumber,
+        invoiceDate,
+        dueDate,
+        subtotal,
+        gstAmount,
+        totalAmount,
+        notes,
+        status,
+        paidDate,
+        ..._rest
+    } = input;
+
+    const result = await db
+        .insert(schema.invoices)
+        .values({
+            jobId,
+            invoiceNumber,
+            invoiceDate,
+            dueDate,
+            subtotal,
+            gstAmount,
+            totalAmount,
+            notes,
+            status,
+            paidDate,
+        })
+        .returning({ id: schema.invoices.id });
     return result[0].id;
 }
 
 export async function getInvoicesByLedger(ledgerId: number) {
-    return []; // Placeholder
+    const rows = await db
+        .select({
+            id: schema.invoices.id,
+            jobId: schema.invoices.jobId,
+            invoiceNumber: schema.invoices.invoiceNumber,
+            invoiceDate: schema.invoices.invoiceDate,
+            dueDate: schema.invoices.dueDate,
+            subtotal: schema.invoices.subtotal,
+            gstAmount: schema.invoices.gstAmount,
+            totalAmount: schema.invoices.totalAmount,
+            status: schema.invoices.status,
+            paidDate: schema.invoices.paidDate,
+            notes: schema.invoices.notes,
+            createdAt: schema.invoices.createdAt,
+            updatedAt: schema.invoices.updatedAt,
+            ledgerId: schema.jobs.ledgerId,
+            jobNumber: schema.jobs.jobNumber,
+            jobDescription: schema.jobs.description,
+            customerName: schema.jobs.customerName,
+            customerEmail: schema.jobs.customerEmail,
+            customerPhone: schema.jobs.customerPhone,
+        })
+        .from(schema.invoices)
+        .innerJoin(schema.jobs, eq(schema.invoices.jobId, schema.jobs.id))
+        .where(eq(schema.jobs.ledgerId, ledgerId))
+        .orderBy(desc(schema.invoices.createdAt));
+
+    return rows;
 }
 
 export async function getInvoiceById(id: number) {
@@ -219,8 +276,54 @@ export async function getInvoiceById(id: number) {
 // ============================================================================
 
 export async function createBooking(input: any) {
-    const result = await db.insert(schema.bookings).values(input).returning({ id: schema.bookings.id });
-    return result[0].id;
+    const ledgerId: number = input.ledgerId;
+    const serviceType: string = input.serviceType;
+
+    const bookingDate: Date = input.bookingDate instanceof Date ? input.bookingDate : new Date(input.bookingDate);
+    const timeSlot: string = String(input.timeSlot || "09:00");
+
+    const datePart = bookingDate.toISOString().split("T")[0];
+    const scheduledDate = new Date(`${datePart}T${timeSlot}:00`);
+
+    let service = await db.query.services.findFirst({
+        where: and(eq(schema.services.ledgerId, ledgerId), eq(schema.services.name, serviceType)),
+    });
+
+    if (!service) {
+        const [created] = await db
+            .insert(schema.services)
+            .values({
+                ledgerId,
+                name: serviceType,
+                description: null,
+                basePrice: 0,
+                estimatedDuration: 60,
+                active: true,
+            })
+            .returning();
+        service = created;
+    }
+
+    const duration = Number.isFinite(Number(service.estimatedDuration)) ? Number(service.estimatedDuration) : 60;
+
+    const [booking] = await db
+        .insert(schema.bookings)
+        .values({
+            ledgerId,
+            customerId: input.customerId,
+            serviceId: service.id,
+            scheduledDate,
+            duration,
+            status: "confirmed",
+            customerName: input.customerName,
+            customerEmail: input.customerEmail,
+            customerPhone: input.customerPhone,
+            vehicleInfo: input.vehicleInfo,
+            notes: input.notes,
+        })
+        .returning();
+
+    return booking.id;
 }
 
 export async function getBookingsByLedger(ledgerId: number) {
