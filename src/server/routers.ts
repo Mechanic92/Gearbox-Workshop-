@@ -728,7 +728,7 @@ export const appRouter = router({
           jobNumber: `JOB-Q-${quote.quoteNumber}`,
           description: `Converted from Quote ${quote.quoteNumber}`,
           status: "IN_PROGRESS",
-          quotedPrice: quote.totalAmount.toString(),
+          quotedPrice: quote.totalAmount,
           customerName: quote.customer?.name,
           customerEmail: quote.customer?.email,
           customerPhone: quote.customer?.phone,
@@ -741,9 +741,9 @@ export const appRouter = router({
               jobId: job.id,
               type: "parts", // Defaulting to parts for quote items unless specified
               description: item.description,
-              quantity: item.quantity.toString(),
-              unitPrice: item.unitPrice.toString(),
-              totalCost: item.totalPrice.toString(),
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalCost: item.totalPrice,
             });
           }
         }

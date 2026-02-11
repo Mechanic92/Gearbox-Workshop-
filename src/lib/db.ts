@@ -117,7 +117,8 @@ export async function getCustomerById(id: number) {
 }
 
 export async function updateCustomer(id: number, input: any) {
-    await db.update(schema.customers).set(input).where(eq(schema.customers.id, id));
+    const { id: _id, ledgerId: _lid, ...fields } = input;
+    await db.update(schema.customers).set({ ...fields, updatedAt: new Date() }).where(eq(schema.customers.id, id));
 }
 
 export async function searchCustomers(ledgerId: number, query: string) {
@@ -150,7 +151,8 @@ export async function getJobById(id: number) {
 }
 
 export async function updateJob(id: number, input: any) {
-    await db.update(schema.jobs).set(input).where(eq(schema.jobs.id, id));
+    const { id: _id, ...fields } = input;
+    await db.update(schema.jobs).set({ ...fields, updatedAt: new Date() }).where(eq(schema.jobs.id, id));
 }
 
 export async function createJobCost(input: any) {
@@ -339,11 +341,49 @@ export async function getBookingById(id: number) {
 // ============================================================================
 
 export async function createQuote(input: any) {
-    const { items, ...data } = input;
-    const result = await db.insert(schema.quotes).values(data).returning({ id: schema.quotes.id });
+    const {
+        items,
+        vehicleInfo,  // not a quotes column — strip it
+        ledgerId,
+        customerId,
+        quoteNumber,
+        subtotal,
+        gstAmount,
+        totalAmount,
+        expiryDate,
+        notes,
+        status,
+        bookingId,
+        jobId,
+    } = input;
+
+    const result = await db.insert(schema.quotes).values({
+        ledgerId,
+        customerId,
+        quoteNumber,
+        subtotal,
+        gstAmount,
+        totalAmount,
+        expiryDate,
+        notes,
+        status,
+        bookingId,
+        jobId,
+    }).returning({ id: schema.quotes.id });
+
     const quoteId = result[0].id;
+
     if (items && items.length) {
-        await db.insert(schema.quoteItems).values(items.map((i: any) => ({ ...i, quoteId })));
+        await db.insert(schema.quoteItems).values(
+            items.map((i: any) => ({
+                quoteId,
+                description: i.description,
+                quantity: i.quantity,
+                unitPrice: i.unitPrice,
+                totalPrice: i.total ?? i.totalPrice ?? (i.quantity * i.unitPrice),
+                itemType: i.itemType ?? "labor",
+            }))
+        );
     }
     return quoteId;
 }
