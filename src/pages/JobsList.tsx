@@ -28,6 +28,13 @@ export default function JobsList() {
   );
 
   const statusConfig = {
+    new: {
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      icon: Clock,
+      label: "New",
+      glow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+    },
     quoted: { 
       color: "text-blue-400", 
       bg: "bg-blue-400/10", 
@@ -42,12 +49,26 @@ export default function JobsList() {
       label: "In Progress",
       glow: "shadow-[0_0_20px_oklch(var(--primary)/0.3)]"
     },
+    waiting_approval: {
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      icon: Clock,
+      label: "Waiting Approval",
+      glow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+    },
     completed: { 
       color: "text-emerald-400", 
       bg: "bg-emerald-400/10", 
       icon: CheckCircle2, 
       label: "Completed",
       glow: "shadow-[0_0_20px_rgba(52,211,153,0.3)]"
+    },
+    closed: {
+      color: "text-emerald-400",
+      bg: "bg-emerald-400/10",
+      icon: CheckCircle2,
+      label: "Closed",
+      glow: "shadow-[0_0_20px_rgba(52,211,153,0.3)]",
     },
     cancelled: { 
       color: "text-red-400", 
@@ -56,6 +77,19 @@ export default function JobsList() {
       label: "Cancelled",
       glow: "shadow-[0_0_20px_rgba(248,113,113,0.3)]"
     },
+  };
+
+  const resolveStatusKey = (status: unknown) => {
+    const raw = typeof status === "string" ? status : "";
+    const normalized = raw.trim().toLowerCase();
+    if (normalized === "new") return "new";
+    if (normalized === "in_progress" || normalized === "in progress") return "in_progress";
+    if (normalized === "waiting_approval" || normalized === "waiting approval") return "waiting_approval";
+    if (normalized === "completed") return "completed";
+    if (normalized === "closed") return "closed";
+    if (normalized === "cancelled" || normalized === "canceled") return "cancelled";
+    if (normalized === "quoted" || normalized === "draft") return "quoted";
+    return "new";
   };
 
   const filteredJobs = jobs.filter(job => 
@@ -135,7 +169,7 @@ export default function JobsList() {
         ) : (
           <div className="grid gap-6">
             {filteredJobs.map((job) => {
-              const status = statusConfig[job.status as keyof typeof statusConfig];
+              const status = statusConfig[resolveStatusKey((job as any).status) as keyof typeof statusConfig];
               const StatusIcon = status.icon;
 
               return (

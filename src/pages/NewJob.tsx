@@ -36,6 +36,7 @@ const JOB_TEMPLATES = [
 export default function NewJob() {
   const { activeLedgerId } = useLedger();
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
 
   if (!activeLedgerId) {
     setLocation("/setup/ledger");
@@ -62,8 +63,14 @@ export default function NewJob() {
 
   const createJobMutation = trpc.job.create.useMutation({
     onSuccess: (data) => {
+      if (activeLedgerId) {
+        utils.job.list.invalidate({ ledgerId: activeLedgerId });
+      }
       toast.success("Job initialized in workshop queue");
       setLocation(`/trades/jobs/${data.id}`);
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to create job");
     },
   });
 
@@ -91,11 +98,18 @@ export default function NewJob() {
 
   const handleSubmit = () => {
     if (!activeLedgerId || !jobNumber.trim() || !description.trim()) return;
+
+    const quotedPrice = Number(calculatedQuote.quote.toFixed(2));
+    if (!Number.isFinite(quotedPrice)) {
+      toast.error("Invalid quote amount");
+      return;
+    }
+
     createJobMutation.mutate({
       ledgerId: activeLedgerId,
       jobNumber: jobNumber.trim(),
       description: description.trim(),
-      quotedPrice: calculatedQuote.quote.toFixed(2),
+      quotedPrice,
       customerName: customerName.trim() || undefined,
       customerPhone: customerPhone.trim() || undefined,
       customerEmail: customerEmail.trim() || undefined,
