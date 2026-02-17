@@ -2,9 +2,9 @@ import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/lib/schema.ts",
-  driver: "turso", // Use turso/libsql driver
+  driver: "turso",
   dbCredentials: {
-    url: "file:local.db",
+    url: process.env.DATABASE_URL || "file:local.db",
   },
   out: "./drizzle",
 } satisfies Config;
