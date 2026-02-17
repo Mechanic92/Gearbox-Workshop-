@@ -84,6 +84,7 @@ if (process.env.NODE_ENV === 'production') {
   // 2. Serve static assets from both dist and public
   app.use(express.static(distPath));
   app.use(express.static(publicPath));
+  app.use('/widget', express.static(path.resolve(process.cwd(), 'public-widget')));
 
   // 3. All other non-API routes serve the React app
   app.get('*', (req, res) => {
