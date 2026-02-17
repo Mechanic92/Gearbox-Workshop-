@@ -40,10 +40,9 @@
   }
 
   .dark {
-    /* Already dark by default now, but can adjust if specific dark class is used */
-    --background: 10% 0.005 285;
-    --card: 14% 0.006 285;
-    --border: 18% 0.01 285;
+    --background: 220 15% 5%;
+    --card: 220 15% 8%;
+    --border: 220 15% 15%;
   }
 }
 
