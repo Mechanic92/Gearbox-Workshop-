@@ -1,9 +1,9 @@
-import { db } from '@/lib/db';
-import * as schema from '@/lib/schema';
+import { db } from '../db';
+import * as schema from '../schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
-import { sendEmail } from '@/lib/notifications/email';
-import { sendSMS } from '@/lib/notifications/sms';
+import { sendEmail } from '../notifications/email';
+import { sendSMS } from '../notifications/sms';
 
 /**
  * Magic Link Authentication

@@ -125,11 +125,11 @@ export default function BookingCalendar() {
           <div className="lg:col-span-1 space-y-8">
             <Card className="border-none glass-dark rounded-[3rem] overflow-hidden premium-shadow">
               <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={handlePreviousMonth} className="rounded-full hover:bg-white/10 text-white/60">
+                <Button variant="ghost" size="icon" onClick={handlePreviousMonth} className="rounded-full hover:bg-card/10 text-white/60">
                   <ChevronLeft size={20} />
                 </Button>
                 <h3 className="text-sm font-black uppercase tracking-widest italic">{format(currentDate, "MMMM yyyy")}</h3>
-                <Button variant="ghost" size="icon" onClick={handleNextMonth} className="rounded-full hover:bg-white/10 text-white/60">
+                <Button variant="ghost" size="icon" onClick={handleNextMonth} className="rounded-full hover:bg-card/10 text-white/60">
                   <ChevronRight size={20} />
                 </Button>
               </div>
@@ -154,9 +154,9 @@ export default function BookingCalendar() {
                             disabled={isPast}
                             className={`
                                 aspect-square flex items-center justify-center rounded-2xl text-[10px] font-black transition-all border
-                                ${isSelected ? "bg-primary text-black border-primary shadow-[0_0_20px_oklch(var(--primary)/0.4)]" : ""}
+                                ${isSelected ? "bg-primary text-foreground border-primary shadow-[0_0_20px_oklch(var(--primary)/0.4)]" : ""}
                                 ${isToday && !isSelected ? "border-primary/40 text-primary" : ""}
-                                ${!isSelected && !isToday && !isPast ? "bg-white/5 border-white/5 text-white/60 hover:border-white/20" : ""}
+                                ${!isSelected && !isToday && !isPast ? "bg-card/5 border-white/5 text-white/60 hover:border-white/20" : ""}
                                 ${isPast ? "opacity-10 cursor-not-allowed border-transparent" : ""}
                             `}
                         >
@@ -199,7 +199,7 @@ export default function BookingCalendar() {
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Service Classification</Label>
                             <Select value={serviceType} onValueChange={setServiceType}>
-                                <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold italic uppercase tracking-widest text-xs focus:ring-primary/20">
+                                <SelectTrigger className="h-14 bg-card/5 border-white/10 rounded-2xl font-bold italic uppercase tracking-widest text-xs focus:ring-primary/20">
                                     <SelectValue placeholder="Select Operation..." />
                                 </SelectTrigger>
                                 <SelectContent className="glass-dark border-white/10">
@@ -227,7 +227,7 @@ export default function BookingCalendar() {
                                             onClick={() => setSelectedTime(time)}
                                             className={`
                                                 h-10 rounded-xl font-black text-[10px] uppercase tracking-tighter transition-all border
-                                                ${selectedTime === time ? "bg-primary text-black border-primary shadow-lg shadow-primary/20" : "bg-white/5 border-white/5 text-white/40 hover:border-white/20"}
+                                                ${selectedTime === time ? "bg-primary text-foreground border-primary shadow-lg shadow-primary/20" : "bg-card/5 border-white/5 text-white/40 hover:border-white/20"}
                                             `}
                                         >
                                             {time}
@@ -245,7 +245,7 @@ export default function BookingCalendar() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Full Legal Name</Label>
                                 <Input 
-                                    className="h-14 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                    className="h-14 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="e.g. Marcus Aurelius"
                                     value={customerName}
                                     onChange={e => setCustomerName(e.target.value)}
@@ -254,7 +254,7 @@ export default function BookingCalendar() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Communication Endpoint (Mobile)</Label>
                                 <Input 
-                                    className="h-14 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                    className="h-14 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="+64 2X XXX XXXX"
                                     value={customerPhone}
                                     onChange={e => setCustomerPhone(e.target.value)}
@@ -266,7 +266,7 @@ export default function BookingCalendar() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Digital Mail (Required for Sync)</Label>
                                 <Input 
-                                    className="h-14 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                    className="h-14 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="client@cyber.net"
                                     type="email"
                                     value={customerEmail}
@@ -276,7 +276,7 @@ export default function BookingCalendar() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Vehicle Module Identifier (Rego)</Label>
                                 <Input 
-                                    className="h-14 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                    className="h-14 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="XYZ123"
                                     value={vehicleInfo}
                                     onChange={e => setVehicleInfo(e.target.value)}
@@ -286,7 +286,7 @@ export default function BookingCalendar() {
                    </div>
 
                    <Button 
-                    className="w-full h-20 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-xs italic premium-shadow mt-8"
+                    className="w-full h-20 rounded-[2.5rem] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-xs italic premium-shadow mt-8"
                     onClick={handleSubmitBooking}
                     disabled={createBookingMutation.isLoading || !selectedDate || !selectedTime || !serviceType || !customerName || !customerPhone || !customerEmail}
                    >

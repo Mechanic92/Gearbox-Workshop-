@@ -67,14 +67,14 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                  className="bg-card/5 border-white/10 text-white placeholder:text-white/20"
                 />
               </div>
 
               <div className="pt-4">
                 <Button 
                     type="submit" 
-                    className="w-full bg-primary text-black hover:bg-primary/90 font-bold"
+                    className="w-full bg-primary text-foreground hover:bg-primary/90 font-bold"
                     disabled={login.isLoading}
                 >
                     {login.isLoading ? (

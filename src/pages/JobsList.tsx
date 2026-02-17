@@ -131,12 +131,12 @@ export default function JobsList() {
               placeholder="Search jobs, customers, job numbers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-2xl font-medium text-base"
+              className="h-16 pl-16 bg-card/5 border-white/10 text-white placeholder:text-white/30 rounded-2xl font-medium text-base"
             />
           </div>
           <Button
             variant="outline"
-            className="h-16 px-8 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 font-bold"
+            className="h-16 px-8 rounded-2xl border-white/10 bg-card/5 hover:bg-card/10 font-bold"
           >
             <Filter size={20} className="mr-2" />
             Filter
@@ -149,7 +149,7 @@ export default function JobsList() {
           </div>
         ) : filteredJobs.length === 0 ? (
           <Card className="border-none glass p-16 text-center rounded-[3rem]">
-            <div className="w-24 h-24 rounded-[2rem] bg-white/5 flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 rounded-[2rem] bg-card/5 flex items-center justify-center mx-auto mb-6">
               <Wrench size={40} className="text-white/20" />
             </div>
             <h3 className="text-2xl font-black text-white mb-3">No Jobs Found</h3>
@@ -177,7 +177,7 @@ export default function JobsList() {
                   key={job.id}
                   onClick={() => navigate(`/trades/jobs/${job.id}`)}
                   className={cn(
-                    "border-none glass hover:bg-white/10 transition-all duration-500 cursor-pointer rounded-[2rem] overflow-hidden group",
+                    "border-none glass hover:bg-card/10 transition-all duration-500 cursor-pointer rounded-[2rem] overflow-hidden group",
                     status.glow
                   )}
                 >
@@ -225,7 +225,7 @@ export default function JobsList() {
 
                         <Button
                           variant="ghost"
-                          className="h-12 px-6 rounded-xl bg-white/5 hover:bg-primary/20 font-bold group-hover:bg-primary group-hover:text-black transition-all"
+                          className="h-12 px-6 rounded-xl bg-card/5 hover:bg-primary/20 font-bold group-hover:bg-primary group-hover:text-foreground transition-all"
                         >
                           View Details
                           <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />

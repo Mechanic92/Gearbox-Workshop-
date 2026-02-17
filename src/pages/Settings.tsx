@@ -80,6 +80,22 @@ export default function Settings() {
     }
   });
 
+  const scanRemindersMutation = trpc.automation.scanAndSendReminders.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Scan complete. ${data.sentCount} reminders dispatched.`);
+    }
+  });
+
+  const autoReplenishMutation = trpc.automation.autoReplenishStock.useMutation({
+    onSuccess: (data) => {
+      if (data.poCreated) {
+        toast.success(`Replenishment complete. ${data.supplierCount} Purchase Orders generated.`);
+      } else {
+        toast.info("Stock levels optimal. No replenishment needed.");
+      }
+    }
+  });
+
   useEffect(() => {
     if (ledger) {
       setGstRegistered(ledger.gstRegistered);
@@ -132,8 +148,8 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen bg-background pb-32">
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -170,7 +186,7 @@ export default function Settings() {
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Personal workstation authentication and profile settings.</p>
             </div>
             <div className="lg:col-span-2">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card overflow-hidden">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card overflow-hidden">
                     <CardContent className="p-8 flex items-center gap-6">
                         <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary text-3xl font-black">
                             {user?.name?.charAt(0) || "O"}
@@ -197,7 +213,7 @@ export default function Settings() {
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Core business data emitted on invoices, quotes, and reports.</p>
             </div>
             <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card">
                     <CardContent className="p-8 space-y-8">
                         <div className="grid sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
@@ -244,7 +260,7 @@ export default function Settings() {
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Configure shop-floor resources and window availability protocols.</p>
             </div>
             <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
                     <CardContent className="p-8 space-y-8">
                         <div className="grid sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
@@ -279,7 +295,7 @@ export default function Settings() {
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Manage external touchpoints and customer self-service conduits.</p>
             </div>
             <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
                     <CardContent className="p-8 space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
@@ -316,7 +332,7 @@ export default function Settings() {
                             <p className="text-[10px] font-bold leading-relaxed opacity-60">
                                 To embed this booking terminal in your website, insert the following iframe component into your HTML:
                             </p>
-                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
+                            <div className="p-4 rounded-xl bg-card/5 border border-white/10 overflow-x-auto">
                                 <pre className="text-[9px] font-mono text-primary">
                                     {`<iframe src="${window.location.protocol}//${window.location.host}/public/booking/${activeLedgerId}" width="100%" height="700px" frameborder="0"></iframe>`}
                                 </pre>
@@ -336,7 +352,7 @@ export default function Settings() {
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Configure taxation logic and accounting synchronization protocols.</p>
             </div>
             <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
                     <CardContent className="p-8 space-y-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
@@ -431,14 +447,73 @@ export default function Settings() {
 
         <div className="h-px bg-border/40" />
 
-        {/* Global Controls Section */}
+        {/* Automated Operations Section */}
+        <section className="grid lg:grid-cols-3 gap-12">
+            <div className="space-y-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-1">Automated Operations</h3>
+                <p className="text-xs font-bold text-muted-foreground leading-relaxed">Enable autonomous protocols for customer retention and asset management.</p>
+            </div>
+            <div className="lg:col-span-2 space-y-6">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
+                    <CardContent className="p-8 space-y-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                                    <Bell size={24} />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-black italic">Lifecycle Reminders</h4>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Auto-notify customers 30 days before WoF/Rego expiry</p>
+                                </div>
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="font-black text-[9px] uppercase tracking-widest h-9 px-4 rounded-xl"
+                                onClick={() => scanRemindersMutation.mutate({ ledgerId: activeLedgerId! })}
+                                disabled={scanRemindersMutation.isLoading}
+                            >
+                                {scanRemindersMutation.isLoading ? <RefreshCcw className="w-3 h-3 animate-spin" /> : "Run Now"}
+                            </Button>
+                        </div>
+                        
+                        <div className="h-px bg-border/10" />
+
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                                    <RefreshCcw size={24} />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-black italic">Inventory Replenishment</h4>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Auto-generate Purchase Orders when parts hit safety levels</p>
+                                </div>
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="font-black text-[9px] uppercase tracking-widest h-9 px-4 rounded-xl"
+                                onClick={() => autoReplenishMutation.mutate({ ledgerId: activeLedgerId! })}
+                                disabled={autoReplenishMutation.isLoading}
+                            >
+                                {autoReplenishMutation.isLoading ? <RefreshCcw className="w-3 h-3 animate-spin" /> : "Run Now"}
+                            </Button>
+
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+
+        <div className="h-px bg-border/40" />
+
         <section className="grid lg:grid-cols-3 gap-12">
             <div className="space-y-4">
                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-1">Global Overrides</h3>
                 <p className="text-xs font-bold text-muted-foreground leading-relaxed">Dangerous actions and master system parameters.</p>
             </div>
             <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
                     <CardContent className="p-8 space-y-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">

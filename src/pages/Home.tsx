@@ -64,11 +64,11 @@ export default function Home() {
             }
           ].map((card, i) => (
               <div key={i} className="group relative p-1 rounded-[3rem] transition-all duration-700 hover:bg-gradient-to-br from-white/20 to-transparent premium-shadow overflow-hidden">
-                <Card className="h-full border-none glass-dark rounded-[2.9rem] overflow-hidden group-hover:bg-white/5 transition-all duration-500">
+                <Card className="h-full border-none glass-dark rounded-[2.9rem] overflow-hidden group-hover:bg-card/5 transition-all duration-500">
                    <CardContent className="p-12 space-y-8">
                      <div className={cn(
                         "w-20 h-20 rounded-3xl flex items-center justify-center transition-transform duration-700 group-hover:scale-110",
-                        card.color === 'primary' ? "bg-primary/20 text-primary border border-primary/20 shadow-[0_0_30px_oklch(var(--primary)/0.2)]" : "bg-white/10 text-white border border-white/10"
+                        card.color === 'primary' ? "bg-primary/20 text-primary border border-primary/20 shadow-[0_0_30px_oklch(var(--primary)/0.2)]" : "bg-card/10 text-white border border-white/10"
                      )}>
                         <card.icon size={40} strokeWidth={2.5} />
                      </div>
@@ -79,7 +79,7 @@ export default function Home() {
                      <Link href={card.path}>
                         <Button className={cn(
                             "w-full h-16 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all duration-500 group/btn",
-                            card.color === 'primary' ? "bg-white text-black hover:bg-primary hover:text-white" : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                            card.color === 'primary' ? "bg-card text-foreground hover:bg-primary hover:text-white" : "bg-card/5 text-white hover:bg-card/10 border border-white/10"
                         )}>
                             {card.btn}
                             <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-2 transition-transform" strokeWidth={3} />

@@ -94,7 +94,7 @@ export default function DVIApproval() {
   return (
     <div className="min-h-screen bg-[#FDFDFF] font-sans selection:bg-blue-200 antialiased">
       {/* Trust Header */}
-      <div className="bg-white border-b border-neutral-100 sticky top-0 z-50">
+      <div className="bg-card border-b border-border sticky top-0 z-50">
         <div className="container max-w-4xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic">G</div>
@@ -118,14 +118,14 @@ export default function DVIApproval() {
           <h2 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Review Your Vehicle Health</h2>
           <p className="text-neutral-500 font-medium max-w-md mx-auto">
             Hi {dvi.inspection.customerName || 'Customer'}, our technician has completed a full digital inspection of your 
-            <span className="text-neutral-900 font-bold"> {dvi.inspection.vehicleRego}</span>. Please review the findings below.
+            <span className="text-foreground font-bold"> {dvi.inspection.vehicleRego}</span>. Please review the findings below.
           </p>
         </section>
 
         {/* Vehicle Info Card */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-none shadow-sm bg-white p-6 rounded-3xl flex items-center gap-4">
-            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-900">
+          <Card className="border-none shadow-sm bg-card p-6 rounded-3xl flex items-center gap-4">
+            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-foreground">
               <Car className="w-6 h-6" />
             </div>
             <div>
@@ -133,8 +133,8 @@ export default function DVIApproval() {
               <p className="text-sm font-black uppercase tracking-tight">{dvi.inspection.vehicleRego}</p>
             </div>
           </Card>
-          <Card className="border-none shadow-sm bg-white p-6 rounded-3xl flex items-center gap-4">
-            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-900">
+          <Card className="border-none shadow-sm bg-card p-6 rounded-3xl flex items-center gap-4">
+            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-foreground">
               <Clock className="w-6 h-6" />
             </div>
             <div>
@@ -144,8 +144,8 @@ export default function DVIApproval() {
               </p>
             </div>
           </Card>
-          <Card className="border-none shadow-sm bg-white p-6 rounded-3xl flex items-center gap-4">
-            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-900">
+          <Card className="border-none shadow-sm bg-card p-6 rounded-3xl flex items-center gap-4">
+            <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-foreground">
               <Phone className="w-6 h-6" />
             </div>
             <div>
@@ -167,15 +167,15 @@ export default function DVIApproval() {
               <div 
                 key={item.id} 
                 className={cn(
-                  "group bg-white rounded-[32px] border transition-all duration-300 overflow-hidden",
+                  "group bg-card rounded-[32px] border transition-all duration-300 overflow-hidden",
                   approvedItems.includes(item.id) 
                     ? "border-blue-500 ring-4 ring-blue-500/5 shadow-xl shadow-blue-500/10" 
-                    : "border-neutral-100 shadow-sm"
+                    : "border-border shadow-sm"
                 )}
               >
                 <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6">
                    {/* Thumbnail Gallery */}
-                   <div className="w-full md:w-48 h-48 md:h-auto rounded-3xl bg-neutral-50 overflow-hidden relative flex-shrink-0 cursor-pointer group-hover:scale-[1.02] transition-transform">
+                   <div className="w-full md:w-48 h-48 md:h-auto rounded-3xl bg-card overflow-hidden relative flex-shrink-0 cursor-pointer group-hover:scale-[1.02] transition-transform">
                     {item.media && item.media[0] ? (
                       <div className="relative w-full h-full">
                         <img 
@@ -185,7 +185,7 @@ export default function DVIApproval() {
                         />
                         {item.media[0].type === 'video' && (
                           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50">
+                            <div className="w-12 h-12 bg-card/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50">
                               <Play className="w-5 h-5 text-white fill-white" />
                             </div>
                           </div>
@@ -219,7 +219,7 @@ export default function DVIApproval() {
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Investment</p>
-                        <p className="text-2xl font-black tracking-tighter text-neutral-900">${item.estimatedCost?.toFixed(2) || '0.00'}</p>
+                        <p className="text-2xl font-black tracking-tighter text-foreground">${item.estimatedCost?.toFixed(2) || '0.00'}</p>
                       </div>
                     </div>
 
@@ -227,7 +227,7 @@ export default function DVIApproval() {
                       {item.comment || 'No specific notes provided.'}
                     </p>
 
-                    <div className="flex items-center gap-4 pt-4 border-t border-neutral-100">
+                    <div className="flex items-center gap-4 pt-4 border-t border-border">
                       <Button
                         onClick={() => toggleItem(item.id)}
                         className={cn(
@@ -246,7 +246,7 @@ export default function DVIApproval() {
                       <Button 
                         variant="link" 
                         onClick={() => toggleExpand(item.id)}
-                        className="text-neutral-400 hover:text-neutral-900 font-black text-[10px] uppercase tracking-widest"
+                        className="text-neutral-400 hover:text-foreground font-black text-[10px] uppercase tracking-widest"
                       >
                          MORE DETAILS {expandedItems.includes(item.id) ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
                       </Button>
@@ -255,13 +255,13 @@ export default function DVIApproval() {
                 </div>
 
                 {expandedItems.includes(item.id) && (
-                  <div className="bg-neutral-50 p-8 border-t border-neutral-100 animate-in slide-in-from-top-4">
+                  <div className="bg-card p-8 border-t border-border animate-in slide-in-from-top-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <div className="space-y-4">
                           <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
                             <Info className="w-3 h-3" /> Technician Recommendation
                           </p>
-                          <p className="text-sm font-bold text-neutral-700 leading-relaxed italic border-l-4 border-blue-500 pl-4 py-2 bg-white rounded-r-xl">
+                          <p className="text-sm font-bold text-neutral-700 leading-relaxed italic border-l-4 border-blue-500 pl-4 py-2 bg-card rounded-r-xl">
                             "{item.recommendedAction || 'Manufacturer recommended service for vehicle longevity.'}"
                           </p>
                        </div>
@@ -271,7 +271,7 @@ export default function DVIApproval() {
                           </p>
                           <div className="grid grid-cols-4 gap-2">
                             {item.media.map((m: any, i: number) => (
-                              <div key={i} className="aspect-square bg-white rounded-xl border border-neutral-200 overflow-hidden cursor-zoom-in">
+                              <div key={i} className="aspect-square bg-card rounded-xl border border-neutral-200 overflow-hidden cursor-zoom-in">
                                 <img src={m.imageUrl || m.file_path} className="w-full h-full object-cover" />
                               </div>
                             ))}
@@ -333,7 +333,7 @@ export default function DVIApproval() {
 // Sub-components for States
 function LoadingState() {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
+    <div className="min-h-screen bg-card flex flex-col items-center justify-center space-y-4">
       <Spinner className="w-12 h-12 text-blue-600 animate-spin" />
       <p className="text-xs font-black uppercase tracking-widest text-neutral-400">Loading Secure Portal...</p>
     </div>
@@ -350,7 +350,7 @@ function ErrorState() {
       <p className="text-neutral-500 font-medium max-w-xs mx-auto mb-8">
         This link has expired or is invalid. Please contact the workshop to request a new inspection link.
       </p>
-      <Button variant="outline" className="rounded-full py-6 px-8 font-black uppercase tracking-widest bg-white">Return Home</Button>
+      <Button variant="outline" className="rounded-full py-6 px-8 font-black uppercase tracking-widest bg-card">Return Home</Button>
     </div>
   );
 }
@@ -361,18 +361,18 @@ function SuccessState() {
       <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-8 border-4 border-white shadow-xl">
         <CheckCircle2 className="w-12 h-12" />
       </div>
-      <h2 className="text-4xl font-black tracking-tighter uppercase italic mb-4 leading-none text-neutral-900">Thank You!</h2>
+      <h2 className="text-4xl font-black tracking-tighter uppercase italic mb-4 leading-none text-foreground">Thank You!</h2>
       <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] mb-8">Work Authorization Success</p>
       <p className="text-neutral-600 font-medium max-w-md mx-auto mb-12">
         We've received your approval and notified the technician. We'll get started right away and update you when your vehicle is ready for pickup.
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md">
-         <Card className="p-6 bg-white border-none shadow-sm rounded-3xl">
+         <Card className="p-6 bg-card border-none shadow-sm rounded-3xl">
            <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-1">Pickup Est.</p>
            <p className="text-xl font-black tracking-tighter uppercase italic">Today 4:30 PM</p>
          </Card>
-         <Card className="p-6 bg-white border-none shadow-sm rounded-3xl">
+         <Card className="p-6 bg-card border-none shadow-sm rounded-3xl">
            <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-1">Total Auth</p>
            <p className="text-xl font-black tracking-tighter uppercase italic text-green-600">$425.00</p>
          </Card>

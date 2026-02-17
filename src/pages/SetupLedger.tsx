@@ -144,7 +144,7 @@ export default function SetupLedger() {
                         <div 
                             className={cn(
                                 "w-10 h-1 rounded-full transition-all duration-700",
-                                currentIdx >= idx ? "bg-primary shadow-[0_0_15px_oklch(var(--primary))]" : "bg-white/10"
+                                currentIdx >= idx ? "bg-primary shadow-[0_0_15px_oklch(var(--primary))]" : "bg-card/10"
                             )}
                         />
                     </div>
@@ -157,11 +157,11 @@ export default function SetupLedger() {
                         <div 
                             className={cn(
                                 "group relative p-1 transition-all duration-500 rounded-[2.5rem] cursor-pointer",
-                                ledgerType === 'trades' ? "bg-gradient-to-br from-primary to-transparent premium-shadow" : "hover:bg-white/5"
+                                ledgerType === 'trades' ? "bg-gradient-to-br from-primary to-transparent premium-shadow" : "hover:bg-card/5"
                             )}
                             onClick={() => setLedgerType("trades")}
                         >
-                            <Card className="h-full border-none glass-dark rounded-[2.4rem] overflow-hidden group-hover:bg-white/5 transition-colors">
+                            <Card className="h-full border-none glass-dark rounded-[2.4rem] overflow-hidden group-hover:bg-card/5 transition-colors">
                                 <CardContent className="p-10 space-y-6">
                                     <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-700 border border-primary/20">
                                         <Wrench size={40} />
@@ -171,8 +171,8 @@ export default function SetupLedger() {
                                         <p className="text-lg font-medium text-muted-foreground leading-relaxed">Modern workshop management, real-time job costing & CRM.</p>
                                     </div>
                                     <div className="pt-6 border-t border-white/5 flex gap-4">
-                                        <div className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-black uppercase tracking-widest text-primary">NZTA Ready</div>
-                                        <div className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-black uppercase tracking-widest text-primary">Invoicing</div>
+                                        <div className="px-3 py-1 rounded-full bg-card/5 text-[10px] font-black uppercase tracking-widest text-primary">NZTA Ready</div>
+                                        <div className="px-3 py-1 rounded-full bg-card/5 text-[10px] font-black uppercase tracking-widest text-primary">Invoicing</div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -181,13 +181,13 @@ export default function SetupLedger() {
                         <div 
                             className={cn(
                                 "group relative p-1 transition-all duration-500 rounded-[2.5rem] cursor-pointer",
-                                ledgerType === 'rental' ? "bg-gradient-to-br from-primary to-transparent premium-shadow" : "hover:bg-white/5"
+                                ledgerType === 'rental' ? "bg-gradient-to-br from-primary to-transparent premium-shadow" : "hover:bg-card/5"
                             )}
                             onClick={() => setLedgerType("rental")}
                         >
-                            <Card className="h-full border-none glass-dark rounded-[2.4rem] overflow-hidden group-hover:bg-white/5 transition-colors">
+                            <Card className="h-full border-none glass-dark rounded-[2.4rem] overflow-hidden group-hover:bg-card/5 transition-colors">
                                 <CardContent className="p-10 space-y-6 opacity-60 group-hover:opacity-100 transition-opacity">
-                                    <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-primary transition-colors border border-white/10">
+                                    <div className="w-20 h-20 rounded-3xl bg-card/5 flex items-center justify-center text-white/40 group-hover:text-primary transition-colors border border-white/10">
                                         <Building2 size={40} />
                                     </div>
                                     <div>
@@ -216,7 +216,7 @@ export default function SetupLedger() {
                                 />
                              </div>
                              <div className="flex gap-6">
-                                 <Button variant="ghost" className="h-16 flex-1 font-bold rounded-2xl hover:bg-white/5 text-muted-foreground" onClick={() => setStep("type")}><ArrowLeft size={18} className="mr-2" /> Back</Button>
+                                 <Button variant="ghost" className="h-16 flex-1 font-bold rounded-2xl hover:bg-card/5 text-muted-foreground" onClick={() => setStep("type")}><ArrowLeft size={18} className="mr-2" /> Back</Button>
                                  <Button className="h-16 flex-[2] font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl shadow-primary/20" onClick={() => setStep("tax")} disabled={!ledgerName}>Proceed <ArrowRight size={18} className="ml-2" /></Button>
                              </div>
                         </div>
@@ -226,7 +226,7 @@ export default function SetupLedger() {
                 {step === "tax" && (
                     <Card className="border-none glass premium-shadow p-12 max-w-xl mx-auto w-full rounded-[3rem] animate-in fade-in slide-in-from-right-12 duration-700">
                         <div className="space-y-8 text-white">
-                             <div className="p-8 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
+                             <div className="p-8 rounded-[2rem] bg-card/5 border border-white/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
                                  <div className="space-y-1">
                                      <h4 className="font-black text-primary uppercase tracking-widest text-[10px]">Taxation Core</h4>
                                      <p className="text-xl font-black tracking-tight">Registered for GST?</p>
@@ -251,7 +251,7 @@ export default function SetupLedger() {
                                  </div>
                              )}
 
-                             <div className="p-8 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
+                             <div className="p-8 rounded-[2rem] bg-card/5 border border-white/10 flex items-center justify-between group hover:border-primary/30 transition-colors">
                                  <div className="space-y-1">
                                      <h4 className="font-black text-primary uppercase tracking-widest text-[10px]">Intelligent Tax</h4>
                                      <p className="text-xl font-black tracking-tight">Enable AIM Compliance?</p>
@@ -260,7 +260,7 @@ export default function SetupLedger() {
                              </div>
 
                              <div className="flex gap-6 pt-4">
-                                 <Button variant="ghost" className="h-16 flex-1 font-bold rounded-2xl hover:bg-white/5 text-muted-foreground" onClick={() => setStep("details")}><ArrowLeft size={18} className="mr-2" /> Back</Button>
+                                 <Button variant="ghost" className="h-16 flex-1 font-bold rounded-2xl hover:bg-card/5 text-muted-foreground" onClick={() => setStep("details")}><ArrowLeft size={18} className="mr-2" /> Back</Button>
                                  <Button className="h-16 flex-[2] font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl shadow-primary/20" onClick={handleCreateLedger} disabled={isSubmitting}>
                                      {isSubmitting ? <Loader2 className="animate-spin" /> : <>Finalize Configuration <Rocket size={18} className="ml-2" /></>}
                                  </Button>
@@ -287,7 +287,7 @@ export default function SetupLedger() {
             <footer className="flex justify-center h-20">
                  {step === "type" && ledgerType && (
                      <Button 
-                        className="h-16 px-16 rounded-full font-black uppercase tracking-[0.3em] text-xs shadow-[0_20px_40px_rgba(0,0,0,0.5)] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4" 
+                        className="h-16 px-16 rounded-full font-black uppercase tracking-[0.3em] text-xs shadow-[0_20px_40px_rgba(0,0,0,0.5)] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4" 
                         onClick={() => setStep("details")}
                      >
                          Construct Ledger <ArrowRight size={18} className="ml-3 group-hover:translate-x-2 transition-transform" />

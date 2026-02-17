@@ -1,5 +1,5 @@
-import { db } from '@/lib/db';
-import * as schema from '@/lib/schema';
+import { db } from './db';
+import * as schema from './schema';
 import { eq, and, like, lt, desc } from 'drizzle-orm';
 
 /**

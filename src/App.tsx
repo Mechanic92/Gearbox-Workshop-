@@ -18,10 +18,13 @@ import QuoteDetail from "./pages/QuoteDetail";
 import DVICapture from "./pages/DVICapture";
 import DVIApproval from "./pages/DVIApproval";
 import Customers from "./pages/Customers";
+import CustomerDetail from "./pages/CustomerDetail";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import GenerateInvoice from "./pages/GenerateInvoice";
 import JobsList from "./pages/JobsList";
+import InvoicesList from "./pages/InvoicesList";
+import QuotesList from "./pages/QuotesList";
 import DVIList from "./pages/DVIList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -88,6 +91,12 @@ function RouterComp() {
       <Route path="/trades/jobs/:id/invoice">
         <ProtectedRoute component={GenerateInvoice} path="/trades/jobs/:id/invoice" />
       </Route>
+      <Route path="/trades/invoices">
+        <ProtectedRoute component={InvoicesList} path="/trades/invoices" />
+      </Route>
+      <Route path="/trades/quotes">
+        <ProtectedRoute component={QuotesList} path="/trades/quotes" />
+      </Route>
       <Route path="/trades/vehicles">
         <ProtectedRoute component={Vehicles} path="/trades/vehicles" />
       </Route>
@@ -108,6 +117,9 @@ function RouterComp() {
       </Route>
       <Route path="/trades/customers">
         <ProtectedRoute component={Customers} path="/trades/customers" />
+      </Route>
+      <Route path="/trades/customers/:id">
+        <ProtectedRoute component={CustomerDetail} path="/trades/customers/:id" />
       </Route>
       <Route path="/trades/reports">
         <ProtectedRoute component={Reports} path="/trades/reports" />
@@ -142,7 +154,7 @@ function App() {
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <ErrorBoundary>
-          <ThemeProvider defaultTheme="light">
+          <ThemeProvider defaultTheme="dark">
             <LedgerProvider>
               <TooltipProvider>
                 <Toaster />

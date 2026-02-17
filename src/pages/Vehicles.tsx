@@ -118,8 +118,8 @@ export default function Vehicles() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen bg-background dark:bg-background pb-32">
+      <div className="sticky top-0 z-30 bg-card/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -185,7 +185,7 @@ export default function Vehicles() {
               };
 
               return (
-                <Card key={vehicle.id} className="group border-none shadow-xl shadow-black/5 bg-white dark:bg-card hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
+                <Card key={vehicle.id} className="group border-none shadow-xl shadow-black/5 bg-card dark:bg-card hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
                   <div className="h-2 bg-primary/20" />
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between mb-4">
@@ -223,7 +223,7 @@ export default function Vehicles() {
 
       {/* Asset Registration Modal */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-white dark:bg-card">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-card dark:bg-card">
            <div className="bg-primary p-8 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10">
                 <ShieldCheck size={100} />

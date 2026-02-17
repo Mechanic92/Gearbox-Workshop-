@@ -113,17 +113,17 @@ export default function CameraCapture({ onCapture, onClose, maxPhotos = 10 }: Ca
           <div className="flex items-center justify-between">
             <button
               onClick={onClose}
-              className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white"
+              className="w-12 h-12 rounded-full bg-card/20 backdrop-blur-md flex items-center justify-center text-white"
             >
               <X className="w-6 h-6" />
             </button>
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2">
+            <div className="flex items-center gap-2 bg-card/20 backdrop-blur-md rounded-full px-4 py-2">
               <Camera className="w-4 h-4 text-white" />
               <span className="text-sm font-black text-white">{capturedImages.length}/{maxPhotos}</span>
             </div>
             <button
               onClick={switchCamera}
-              className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white"
+              className="w-12 h-12 rounded-full bg-card/20 backdrop-blur-md flex items-center justify-center text-white"
             >
               <RotateCw className="w-6 h-6" />
             </button>
@@ -168,10 +168,10 @@ export default function CameraCapture({ onCapture, onClose, maxPhotos = 10 }: Ca
             <button
               onClick={capturePhoto}
               disabled={capturedImages.length >= maxPhotos}
-              className="w-20 h-20 rounded-full bg-white border-4 border-white/30 shadow-2xl flex items-center justify-center disabled:opacity-50 active:scale-95 transition-transform"
+              className="w-20 h-20 rounded-full bg-card border-4 border-white/30 shadow-2xl flex items-center justify-center disabled:opacity-50 active:scale-95 transition-transform"
             >
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
-                <Camera className="w-8 h-8 text-neutral-900" />
+              <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center">
+                <Camera className="w-8 h-8 text-foreground" />
               </div>
             </button>
           </div>
@@ -185,7 +185,7 @@ export default function CameraCapture({ onCapture, onClose, maxPhotos = 10 }: Ca
         {/* Flash Effect */}
         {capturedImages.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
-            <div className="w-full h-full bg-white animate-flash" />
+            <div className="w-full h-full bg-card animate-flash" />
           </div>
         )}
       </div>

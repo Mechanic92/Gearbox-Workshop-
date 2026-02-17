@@ -80,9 +80,9 @@ export default function Customers() {
   if (!activeLedgerId) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
+    <div className="min-h-screen bg-background dark:bg-background pb-32">
       {/* Premium Header */}
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <div className="sticky top-0 z-30 bg-card/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -114,7 +114,7 @@ export default function Customers() {
       <div className="container py-8 max-w-6xl space-y-8">
         {/* KPI Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-6 rounded-3xl bg-white dark:bg-card shadow-xl shadow-black/5 flex items-center gap-4">
+            <div className="p-6 rounded-3xl bg-card dark:bg-card shadow-xl shadow-black/5 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                     <Users size={24} />
                 </div>
@@ -123,7 +123,7 @@ export default function Customers() {
                     <p className="text-xl font-black">{customers?.length || 0}</p>
                 </div>
             </div>
-            <div className="p-6 rounded-3xl bg-white dark:bg-card shadow-xl shadow-black/5 flex items-center gap-4">
+            <div className="p-6 rounded-3xl bg-card dark:bg-card shadow-xl shadow-black/5 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-600">
                     <UserCheck size={24} />
                 </div>
@@ -143,7 +143,7 @@ export default function Customers() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Query name, contact, or location metadata..."
-                className="pl-12 h-16 border-none shadow-2xl shadow-black/[0.03] text-lg font-bold rounded-3xl bg-white dark:bg-card placeholder:font-medium"
+                className="pl-12 h-16 border-none shadow-2xl shadow-black/[0.03] text-lg font-bold rounded-3xl bg-card dark:bg-card placeholder:font-medium"
             />
             <div className="absolute inset-y-0 right-4 flex items-center gap-2">
                 <Badge variant="outline" className="h-6 font-black uppercase text-[9px] opacity-40">Filters: OFF</Badge>
@@ -154,13 +154,13 @@ export default function Customers() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-48 rounded-3xl bg-white dark:bg-card animate-pulse shadow-xl shadow-black/5" />
+                    <div key={i} className="h-48 rounded-3xl bg-card dark:bg-card animate-pulse shadow-xl shadow-black/5" />
                 ))
             ) : filteredCustomers && filteredCustomers.length > 0 ? (
                 filteredCustomers.map((customer) => (
                     <Card 
                         key={customer.id} 
-                        className="group border-none shadow-xl shadow-black/5 bg-white dark:bg-card hover:scale-[1.01] transition-all duration-300 overflow-hidden cursor-pointer"
+                        className="group border-none shadow-xl shadow-black/5 bg-card dark:bg-card hover:scale-[1.01] transition-all duration-300 overflow-hidden cursor-pointer"
                         onClick={() => setLocation(`/trades/customers/${customer.id}`)}
                     >
                         <CardContent className="p-0 flex">
@@ -227,7 +227,7 @@ export default function Customers() {
 
       {/* Premium Registration Modal */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-white dark:bg-card">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-card dark:bg-card">
           <div className="bg-primary p-8 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10">
                 <Users size={100} />

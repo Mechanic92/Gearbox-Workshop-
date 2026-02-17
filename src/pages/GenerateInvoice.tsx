@@ -154,8 +154,8 @@ export default function GenerateInvoice() {
   if (!job) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen bg-background dark:bg-background pb-32">
+      <div className="sticky top-0 z-30 bg-card/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -186,7 +186,7 @@ export default function GenerateInvoice() {
             <div className="lg:col-span-2 space-y-8">
                 {/* Information Flow */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card rounded-[2rem]">
+                    <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card rounded-[2rem]">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex items-center gap-2">
                                 <User size={14} /> Consignee Metadata
@@ -199,7 +199,7 @@ export default function GenerateInvoice() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card rounded-[2rem]">
+                    <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card rounded-[2rem]">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex items-center gap-2">
                                 <Building2 size={14} /> Originator Profile
@@ -213,7 +213,7 @@ export default function GenerateInvoice() {
                     </Card>
                 </div>
 
-                <Card className="border-none shadow-2xl shadow-black/5 bg-white dark:bg-card overflow-hidden rounded-[2.5rem]">
+                <Card className="border-none shadow-2xl shadow-black/5 bg-card dark:bg-card overflow-hidden rounded-[2.5rem]">
                     <div className="bg-muted/30 p-6 border-b border-border/10 flex items-center justify-between">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Transactional Parameters</h3>
                         <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest border-primary/20 text-primary">IRD Compliance Layer Active</Badge>
@@ -263,7 +263,7 @@ export default function GenerateInvoice() {
             <div className="space-y-8">
                 <Card className="border-none shadow-2xl shadow-primary/5 bg-primary p-10 text-white relative overflow-hidden rounded-[3rem]">
                     {/* Background Detail */}
-                    <div className="absolute top-[-10%] right-[-10%] w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                    <div className="absolute top-[-10%] right-[-10%] w-40 h-40 bg-card/10 rounded-full blur-3xl" />
                     
                     <div className="relative space-y-10">
                         <div>
@@ -282,7 +282,7 @@ export default function GenerateInvoice() {
                                     <span>${invoiceCalculations?.gstAmount.toLocaleString()}</span>
                                 </div>
                             )}
-                            <div className="h-px bg-white/20" />
+                            <div className="h-px bg-card/20" />
                             <div className="flex justify-between items-center py-2">
                                 <span className="font-black text-xs uppercase tracking-[0.3em] italic">Final Maturity</span>
                                 <span className="text-3xl font-black">${invoiceCalculations?.total.toLocaleString()}</span>
@@ -290,7 +290,7 @@ export default function GenerateInvoice() {
                         </div>
 
                         <div className="pt-4">
-                            <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/10 border border-white/20">
+                            <div className="flex items-center gap-3 p-4 rounded-2xl bg-card/10 border border-white/20">
                                 <Clock size={18} className="text-white" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">Due date synchronized</span>
                             </div>
@@ -300,7 +300,7 @@ export default function GenerateInvoice() {
 
                 <section className="space-y-6">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 px-4">System Logic Gates</h4>
-                    <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card rounded-[2rem]">
+                    <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card rounded-[2rem]">
                         <CardContent className="p-8 space-y-8">
                             <div className="flex items-center justify-between">
                                 <div>

@@ -82,7 +82,7 @@ export default function PublicBooking() {
 
   if (step === 3) {
       return (
-          <div className="min-h-screen bg-[#070708] flex items-center justify-center p-6 sm:p-12 overflow-hidden selection:bg-primary selection:text-black">
+          <div className="min-h-screen bg-[#070708] flex items-center justify-center p-6 sm:p-12 overflow-hidden selection:bg-primary selection:text-foreground">
               <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[150px] animate-pulse" />
                   <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[150px]" />
@@ -100,7 +100,7 @@ export default function PublicBooking() {
                       Thank you! {shopInfo?.name} has received your booking for {format(selectedDate!, "MMMM do")} at {selectedTime}. We've sent a confirmation to your phone.
                   </p>
                   <Button 
-                    className="w-full h-16 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all duration-500"
+                    className="w-full h-16 rounded-2xl bg-card text-foreground font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all duration-500"
                     onClick={() => window.location.reload()}
                   >
                       Finish
@@ -111,7 +111,7 @@ export default function PublicBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070708] text-white selection:bg-primary selection:text-black font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#070708] text-white selection:bg-primary selection:text-foreground font-sans antialiased overflow-x-hidden">
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none z-0">
           <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,rgba(59,130,246,0.08),transparent_50%)]" />
@@ -121,7 +121,7 @@ export default function PublicBooking() {
       <header className="sticky top-0 z-50 glass border-b border-white/5">
         <div className="container max-w-7xl h-24 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center font-black italic text-2xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+            <div className="w-12 h-12 rounded-2xl bg-card text-foreground flex items-center justify-center font-black italic text-2xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                 {shopInfo?.name?.charAt(0) || 'G'}
             </div>
             <div>
@@ -138,7 +138,7 @@ export default function PublicBooking() {
               ].map(s => (
                   <div key={s.id} className={cn("flex items-center gap-3 transition-opacity", step !== s.id && "opacity-30")}>
                       <span className="text-[10px] font-black uppercase tracking-widest leading-none">{s.label}</span>
-                      <div className={cn("w-8 h-1 rounded-full", step === s.id ? "bg-primary" : "bg-white/10")} />
+                      <div className={cn("w-8 h-1 rounded-full", step === s.id ? "bg-primary" : "bg-card/10")} />
                   </div>
               ))}
           </div>
@@ -171,11 +171,11 @@ export default function PublicBooking() {
                                             className={cn(
                                                 "p-6 rounded-3xl border text-left transition-all duration-500 hover:scale-[1.02]",
                                                 formData.serviceType === s.name 
-                                                    ? "bg-primary border-primary text-black shadow-2xl shadow-primary/20" 
-                                                    : "bg-white/5 border-white/5 text-white/60 hover:border-white/20"
+                                                    ? "bg-primary border-primary text-foreground shadow-2xl shadow-primary/20" 
+                                                    : "bg-card/5 border-white/5 text-white/60 hover:border-white/20"
                                             )}
                                         >
-                                            <Zap size={20} className={cn("mb-3", formData.serviceType === s.name ? "text-black" : "text-primary")} />
+                                            <Zap size={20} className={cn("mb-3", formData.serviceType === s.name ? "text-foreground" : "text-primary")} />
                                             <p className="text-[10px] font-black uppercase tracking-widest">{s.name}</p>
                                         </button>
                                     ))}
@@ -194,8 +194,8 @@ export default function PublicBooking() {
                                                 className={cn(
                                                     "flex-shrink-0 w-24 h-28 rounded-3xl border flex flex-col items-center justify-center transition-all duration-500",
                                                     isSelected 
-                                                        ? "bg-white border-white text-black shadow-2xl shadow-white/10 scale-105" 
-                                                        : "bg-white/5 border-white/5 text-white/60 hover:border-white/20"
+                                                        ? "bg-card border-white text-foreground shadow-2xl shadow-white/10 scale-105" 
+                                                        : "bg-card/5 border-white/5 text-white/60 hover:border-white/20"
                                                 )}
                                             >
                                                 <span className="text-[10px] font-black uppercase tracking-widest mb-1">{format(day, "EEE")}</span>
@@ -211,7 +211,7 @@ export default function PublicBooking() {
                                     <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Available Times</Label>
                                     {availabilityLoading ? (
                                         <div className="grid grid-cols-4 gap-4">
-                                            {[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-2xl animate-pulse" />)}
+                                            {[1,2,3,4].map(i => <div key={i} className="h-14 bg-card/5 rounded-2xl animate-pulse" />)}
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -222,8 +222,8 @@ export default function PublicBooking() {
                                                     className={cn(
                                                         "h-14 rounded-2xl border font-black text-[10px] uppercase tracking-widest transition-all duration-500",
                                                         selectedTime === time
-                                                            ? "bg-primary border-primary text-black shadow-xl shadow-primary/20"
-                                                            : "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
+                                                            ? "bg-primary border-primary text-foreground shadow-xl shadow-primary/20"
+                                                            : "bg-card/5 border-white/5 text-white/40 hover:border-white/20"
                                                     )}
                                                 >
                                                     {time}
@@ -237,7 +237,7 @@ export default function PublicBooking() {
 
                             <div className="pt-12">
                                     <Button 
-                                        className="h-24 w-full md:w-80 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic group"
+                                        className="h-24 w-full md:w-80 rounded-[2.5rem] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic group"
                                         onClick={handleNext}
                                         disabled={!selectedDate || !selectedTime || !formData.serviceType}
                                     >
@@ -261,7 +261,7 @@ export default function PublicBooking() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Full Name</Label>
                                 <Input 
-                                    className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                    className="h-16 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                     placeholder="e.g. Marcus Aurelius"
                                     value={formData.name}
                                     onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -272,7 +272,7 @@ export default function PublicBooking() {
                                 <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Email Address</Label>
                                     <Input 
-                                        className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                        className="h-16 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                         placeholder="user@cyber.net"
                                         type="email"
                                         value={formData.email}
@@ -282,7 +282,7 @@ export default function PublicBooking() {
                                 <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Phone Number</Label>
                                     <Input 
-                                        className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
+                                        className="h-16 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20"
                                         placeholder="+64 2X XXX XXXX"
                                         value={formData.phone}
                                         onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
@@ -293,7 +293,7 @@ export default function PublicBooking() {
                             <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Vehicle Plate (Registration)</Label>
                                 <Input 
-                                    className="h-16 bg-white/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20 text-3xl text-center"
+                                    className="h-16 bg-card/5 border-white/10 rounded-2xl font-black italic uppercase placeholder:text-white/10 focus:ring-primary/20 text-3xl text-center"
                                     placeholder="XYZ123"
                                     value={formData.rego}
                                     onChange={e => setFormData(prev => ({ ...prev, rego: e.target.value }))}
@@ -309,7 +309,7 @@ export default function PublicBooking() {
                                     Back
                                 </Button>
                                 <Button 
-                                    className="h-20 flex-1 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic premium-shadow"
+                                    className="h-20 flex-1 rounded-[2.5rem] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-700 font-black uppercase tracking-[0.3em] text-xs italic premium-shadow"
                                     onClick={() => createBookingMutation.mutate({
                                         shopId: shopId!,
                                         customerName: formData.name,
@@ -351,7 +351,7 @@ export default function PublicBooking() {
                                 { label: "Vehicle Plate", val: formData.rego || "Pending", icon: Car },
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-6 group">
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 group-hover:text-primary transition-colors">
+                                    <div className="w-10 h-10 rounded-xl bg-card/5 border border-white/5 flex items-center justify-center text-white/20 group-hover:text-primary transition-colors">
                                         <item.icon size={18} />
                                     </div>
                                     <div>
@@ -362,7 +362,7 @@ export default function PublicBooking() {
                             ))}
                         </div>
                         
-                        <div className="h-px bg-white/5" />
+                        <div className="h-px bg-card/5" />
                         
                         <div className="space-y-3">
                             <p className="text-[9px] font-black uppercase tracking-widest text-white/20 flex items-center gap-2">

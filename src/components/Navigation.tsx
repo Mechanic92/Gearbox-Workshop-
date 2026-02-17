@@ -3,8 +3,10 @@ import { useLocation } from "wouter";
 import { 
   Menu, X, Home, Wrench, Users, Calendar, 
   BarChart3, Car, CheckSquare, ChevronRight, LogOut,
-  Zap, Settings as SettingsIcon, LayoutGrid, PanelLeftClose, PanelLeft
+  Zap, Settings as SettingsIcon, LayoutGrid, PanelLeftClose, PanelLeft,
+  FileText, Receipt, Package
 } from "lucide-react";
+
 import { useLedger } from "@/contexts/LedgerContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -29,6 +31,8 @@ export default function Navigation() {
       items: [
         { label: "Overview", icon: Home, path: "/trades/dashboard" },
         { label: "Workflow", icon: Wrench, path: "/trades/jobs" },
+        { label: "Invoices", icon: Receipt, path: "/trades/invoices" },
+        { label: "Quotes", icon: FileText, path: "/trades/quotes" },
         { label: "Assets", icon: Car, path: "/trades/vehicles" },
         { label: "Network", icon: Users, path: "/trades/customers" },
       ],
@@ -37,9 +41,11 @@ export default function Navigation() {
       category: "Operations",
       items: [
         { label: "Schedule", icon: Calendar, path: "/bookings" },
+        { label: "Inventory", icon: Package, path: "/trades/inventory" },
         { label: "Protocol", icon: CheckSquare, path: "/dvi" },
       ],
     },
+
     {
       category: "System",
       items: [
@@ -66,7 +72,7 @@ export default function Navigation() {
       {/* Brand */}
       <div className="mb-12 flex flex-col items-start px-4">
         <div className="flex items-center gap-4 group cursor-pointer" onClick={() => navigate("/")}>
-          <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform duration-500">
+          <div className="w-12 h-12 rounded-2xl bg-card text-foreground flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform duration-500">
             <Zap size={24} fill="currentColor" />
           </div>
           {!isCollapsed && (
@@ -78,7 +84,7 @@ export default function Navigation() {
         </div>
         
         {activeLedgerType && !isCollapsed && (
-          <div className="mt-10 w-full p-4 rounded-3xl bg-white/5 border border-white/5 flex items-center gap-4 group cursor-pointer hover:bg-white/10 transition-all duration-300">
+          <div className="mt-10 w-full p-4 rounded-3xl bg-card/5 border border-white/5 flex items-center gap-4 group cursor-pointer hover:bg-card/10 transition-all duration-300">
             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
                 <LayoutGrid size={18} />
             </div>
@@ -93,7 +99,7 @@ export default function Navigation() {
       {/* Desktop Collapse Toggle */}
       <button
         onClick={toggleCollapse}
-        className="hidden lg:flex absolute top-6 right-6 w-10 h-10 rounded-xl bg-white/5 hover:bg-primary/20 border border-white/10 items-center justify-center transition-all duration-300 group z-50"
+        className="hidden lg:flex absolute top-6 right-6 w-10 h-10 rounded-xl bg-card/5 hover:bg-primary/20 border border-white/10 items-center justify-center transition-all duration-300 group z-50"
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? (
@@ -125,8 +131,8 @@ export default function Navigation() {
                         "w-full flex items-center gap-4 py-3.5 rounded-2xl transition-all duration-500 group relative overflow-hidden",
                         isCollapsed ? "px-3 justify-center" : "px-4",
                         isActive 
-                        ? "bg-white text-black shadow-[0_15px_30px_rgba(255,255,255,0.1)]" 
-                        : "text-white/50 hover:text-white hover:bg-white/5"
+                        ? "bg-card text-foreground shadow-[0_15px_30px_rgba(255,255,255,0.1)]" 
+                        : "text-white/50 hover:text-white hover:bg-card/5"
                     )}
                   >
                     <Icon size={20} className={cn("transition-all duration-500", isActive ? "scale-110" : "group-hover:text-primary")} strokeWidth={2.5} />
@@ -145,11 +151,11 @@ export default function Navigation() {
       {/* User Footer */}
       <div className="mt-8">
         <div className={cn(
-          "p-4 rounded-[2rem] bg-white/5 flex items-center gap-4 group",
+          "p-4 rounded-[2rem] bg-card/5 flex items-center gap-4 group",
           isCollapsed && "flex-col p-3"
         )}>
           <div className="relative">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-black font-black text-sm shadow-lg">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-foreground font-black text-sm shadow-lg">
                 {user?.name?.[0] || "U"}
             </div>
             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-4 border-background" />

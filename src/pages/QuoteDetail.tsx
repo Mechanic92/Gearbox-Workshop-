@@ -89,7 +89,7 @@ export default function QuoteDetail() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-2xl hover:bg-white/10 text-white/40 hover:text-white transition-all"
+              className="rounded-2xl hover:bg-card/10 text-white/40 hover:text-white transition-all"
               onClick={() => window.history.back()}
             >
               <ArrowLeft size={20} />
@@ -109,14 +109,14 @@ export default function QuoteDetail() {
           <div className="flex items-center gap-3">
              <Button 
                 variant="outline" 
-                className="rounded-xl border-white/10 bg-white/5 font-black text-[10px] uppercase tracking-widest h-12 px-6"
+                className="rounded-xl border-white/10 bg-card/5 font-black text-[10px] uppercase tracking-widest h-12 px-6"
                 onClick={handleCopyLink}
              >
                 <Share2 size={16} className="mr-2" /> Share
              </Button>
              {quote.status !== 'approved' && (
                 <Button 
-                    className="rounded-xl bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-[10px] uppercase tracking-widest h-12 px-8"
+                    className="rounded-xl bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 font-black text-[10px] uppercase tracking-widest h-12 px-8"
                     onClick={() => convertToJobMutation.mutate({ id: quote.id })}
                     disabled={convertToJobMutation.isLoading}
                 >
@@ -160,16 +160,16 @@ export default function QuoteDetail() {
 
             {/* Line Items Matrix */}
             <Card className="border-none glass-dark rounded-[3rem] overflow-hidden premium-shadow">
-                <div className="p-8 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                <div className="p-8 border-b border-white/5 bg-card/5 flex items-center justify-between">
                     <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 italic">Resource Configuration</h2>
                     <Badge variant="outline" className="text-[9px] font-black uppercase border-white/10 opacity-40">L-ID: {quote.ledgerId}</Badge>
                 </div>
                 <CardContent className="p-0">
                     <div className="divide-y divide-white/5">
                         {quote.items?.map((item: any, idx: number) => (
-                            <div key={idx} className="p-8 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                            <div key={idx} className="p-8 flex items-center justify-between hover:bg-card/5 transition-colors group">
                                 <div className="flex items-center gap-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/20 group-hover:text-primary transition-colors">
+                                    <div className="w-12 h-12 rounded-2xl bg-card/5 border border-white/10 flex items-center justify-center text-white/20 group-hover:text-primary transition-colors">
                                         {item.itemType === 'labor' ? <Clock size={20} /> : <Package size={20} />}
                                     </div>
                                     <div>
@@ -196,8 +196,8 @@ export default function QuoteDetail() {
 
           {/* Economic Synthesis Sidebar */}
           <div className="space-y-8">
-            <Card className="border-none bg-primary rounded-[3.5rem] p-10 text-black premium-shadow relative overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-40 h-40 bg-white/20 rounded-full blur-3xl animate-pulse" />
+            <Card className="border-none bg-primary rounded-[3.5rem] p-10 text-foreground premium-shadow relative overflow-hidden">
+                <div className="absolute top-[-10%] right-[-10%] w-40 h-40 bg-card/20 rounded-full blur-3xl animate-pulse" />
                 <div className="relative space-y-10">
                     <div>
                         <p className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Aggregate Valuation</p>
@@ -244,7 +244,7 @@ export default function QuoteDetail() {
 
                 {quote.status === 'approved' && !quote.jobId && (
                     <Button 
-                        className="h-20 rounded-[2.5rem] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-xs italic premium-shadow"
+                        className="h-20 rounded-[2.5rem] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-xs italic premium-shadow"
                         onClick={() => convertToJobMutation.mutate({ id: quote.id })}
                     >
                          Convert to Workshop Loop <ChevronRight className="ml-2" />
@@ -269,7 +269,7 @@ export default function QuoteDetail() {
                 </header>
                 <div className="space-y-6">
                     <div className="flex gap-4">
-                        <div className="w-px bg-white/10 relative">
+                        <div className="w-px bg-card/10 relative">
                             <div className="absolute top-0 left-[-2px] w-1 h-1 rounded-full bg-primary" />
                         </div>
                         <div className="pb-4">
@@ -278,7 +278,7 @@ export default function QuoteDetail() {
                         </div>
                     </div>
                     <div className="flex gap-4 opacity-50">
-                        <div className="w-px bg-white/10 relative" />
+                        <div className="w-px bg-card/10 relative" />
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest mb-1 italic">Awaiting Recipient Sync</p>
                             <p className="text-[9px] text-white/40 font-bold">State: {quote.status}</p>

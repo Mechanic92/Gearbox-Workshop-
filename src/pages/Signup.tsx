@@ -86,7 +86,7 @@ export default function Signup() {
                   value={formData.shopName}
                   onChange={(e) => setFormData({...formData, shopName: e.target.value})}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                  className="bg-card/5 border-white/10 text-white placeholder:text-white/20"
                 />
               </div>
 
@@ -98,7 +98,7 @@ export default function Signup() {
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                  className="bg-card/5 border-white/10 text-white placeholder:text-white/20"
                 />
               </div>
 
@@ -111,7 +111,7 @@ export default function Signup() {
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                  className="bg-card/5 border-white/10 text-white placeholder:text-white/20"
                 />
               </div>
 
@@ -123,7 +123,7 @@ export default function Signup() {
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                  className="bg-card/5 border-white/10 text-white placeholder:text-white/20"
                   minLength={8}
                 />
               </div>
@@ -131,7 +131,7 @@ export default function Signup() {
               <div className="pt-4">
                 <Button 
                     type="submit" 
-                    className="w-full bg-primary text-black hover:bg-primary/90 font-bold"
+                    className="w-full bg-primary text-foreground hover:bg-primary/90 font-bold"
                     disabled={signup.isLoading}
                 >
                     {signup.isLoading ? (

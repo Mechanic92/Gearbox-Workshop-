@@ -1,13 +1,13 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
-import { db } from '@/lib/db';
-import * as schema from '@/lib/schema';
+import { db } from '../../lib/db';
+import * as schema from '../../lib/schema';
 import { eq, and } from 'drizzle-orm';
-import { calculateAvailability } from '@/lib/availability';
-import { sendSMS } from '@/lib/notifications/sms';
-import { sendEmail } from '@/lib/notifications/email';
-import { sendMagicLink, validateMagicLink } from '@/lib/auth/magic-link';
-import { createCheckoutSession } from '@/lib/payments';
+import { calculateAvailability } from '../../lib/availability';
+import { sendSMS } from '../../lib/notifications/sms';
+import { sendEmail } from '../../lib/notifications/email';
+import { sendMagicLink, validateMagicLink } from '../../lib/auth/magic-link';
+import { createCheckoutSession } from '../../lib/payments';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -247,7 +247,34 @@ export const publicRouter = t.router({
       };
     }),
 
+  // Vehicle Registration Lookup (NZ context)
+  vehicleLookup: t.procedure
+    .input(z.object({ registration: z.string() }))
+    .query(async ({ input }) => {
+      // In a real 2026 system, this would call NZTA / MotorWeb / CarJam API
+      // For this demo, we'll provide smart mocks for high-end vehicles
+      const rego = input.registration.toUpperCase();
+      
+      const mocks: Record<string, any> = {
+        'ABC123': { make: 'Toyota', model: 'Hilux', year: 2023, color: 'White' },
+        'GRB0X1': { make: 'Tesla', model: 'Model 3', year: 2024, color: 'Midnight Silver' },
+        'WKS0FT': { make: 'Audi', model: 'RS6', year: 2023, color: 'Nardo Grey' },
+        'FAST1': { make: 'Ferrari', model: '488 GTB', year: 2022, color: 'Rosso Corsa' },
+      };
+
+      if (mocks[rego]) return mocks[rego];
+
+      // Generic fallback for any other rego
+      return {
+        make: 'Generic',
+        model: 'Vehicle',
+        year: 2020,
+        color: 'Unknown'
+      };
+    }),
+
   // Get DVI details for customer approval (public, token-based)
+
   getDVI: t.procedure
     .input(
       z.object({

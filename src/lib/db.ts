@@ -389,12 +389,51 @@ export async function createQuote(input: any) {
 }
 
 export async function getQuotesByLedger(ledgerId: number) {
-    return db.query.quotes.findMany({ where: eq(schema.quotes.ledgerId, ledgerId) });
+    const rows = await db
+        .select({
+            id: schema.quotes.id,
+            ledgerId: schema.quotes.ledgerId,
+            bookingId: schema.quotes.bookingId,
+            jobId: schema.quotes.jobId,
+            quoteNumber: schema.quotes.quoteNumber,
+            customerId: schema.quotes.customerId,
+            subtotal: schema.quotes.subtotal,
+            gstAmount: schema.quotes.gstAmount,
+            totalAmount: schema.quotes.totalAmount,
+            status: schema.quotes.status,
+            expiryDate: schema.quotes.expiryDate,
+            approvedDate: schema.quotes.approvedDate,
+            notes: schema.quotes.notes,
+            createdAt: schema.quotes.createdAt,
+            updatedAt: schema.quotes.updatedAt,
+            customerName: schema.customers.name,
+            customerEmail: schema.customers.email,
+            customerPhone: schema.customers.phone,
+        })
+        .from(schema.quotes)
+        .innerJoin(schema.customers, eq(schema.quotes.customerId, schema.customers.id))
+        .where(eq(schema.quotes.ledgerId, ledgerId))
+        .orderBy(desc(schema.quotes.createdAt));
+
+    return rows;
 }
 
 export async function getQuoteById(id: number) {
-    const quote = await db.query.quotes.findFirst({ where: eq(schema.quotes.id, id), with: { items: true } as any });
-    return quote as any; 
+    const quote = await db.query.quotes.findFirst({ where: eq(schema.quotes.id, id) });
+    if (!quote) return null;
+
+    const items = await db.query.quoteItems.findMany({ where: eq(schema.quoteItems.quoteId, id) });
+    const customer = quote.customerId
+        ? await db.query.customers.findFirst({ where: eq(schema.customers.id, quote.customerId) })
+        : null;
+
+    return {
+        ...quote,
+        items,
+        customerName: customer?.name || null,
+        customerEmail: customer?.email || null,
+        customerPhone: customer?.phone || null,
+    };
 }
 
 export async function updateQuoteStatus(id: number, status: string) {
@@ -502,6 +541,13 @@ export async function createFullDviInspection(input: {
     });
 }
 
+export async function getDviInspectionsByLedger(ledgerId: number) {
+    return db.query.dviInspections.findMany({
+        where: eq(schema.dviInspections.ledgerId, ledgerId),
+        orderBy: desc(schema.dviInspections.createdAt),
+    });
+}
+
 export async function getDviInspectionById(id: number) {
     return db.query.dviInspections.findFirst({ 
         where: eq(schema.dviInspections.id, id),
@@ -544,3 +590,98 @@ export async function updateInvoiceSettings(ledgerId: number, input: any) {
     return result[0].id;
   }
 }
+
+// ============================================================================
+// INVENTORY & SUPPLIERS
+// ============================================================================
+
+export async function getPartsByLedger(ledgerId: number) {
+    return db.query.parts.findMany({
+        where: eq(schema.parts.ledgerId, ledgerId)
+    });
+}
+
+export async function createPart(input: any) {
+    const result = await db.insert(schema.parts).values({
+        ...input,
+        updatedAt: new Date()
+    }).returning({ id: schema.parts.id });
+    return result[0].id;
+}
+
+export async function updatePart(id: number, input: any) {
+    const { id: _id, ledgerId: _lid, ...fields } = input;
+    await db.update(schema.parts).set({ ...fields, updatedAt: new Date() }).where(eq(schema.parts.id, id));
+}
+
+export async function getSuppliersByLedger(ledgerId: number) {
+    return db.query.suppliers.findMany({
+        where: eq(schema.suppliers.ledgerId, ledgerId)
+    });
+}
+
+export async function createSupplier(input: any) {
+    const result = await db.insert(schema.suppliers).values({
+        ...input,
+        updatedAt: new Date()
+    }).returning({ id: schema.suppliers.id });
+    return result[0].id;
+}
+
+export async function recordStockMovement(input: any) {
+    return await db.transaction(async (tx) => {
+        const movement = await tx.insert(schema.stockMovements).values({
+            ...input,
+            createdAt: new Date()
+        }).returning();
+
+        // Update current stock level
+        const part = await tx.query.parts.findFirst({
+            where: eq(schema.parts.id, input.partId)
+        });
+
+        if (part) {
+            await tx.update(schema.parts)
+                .set({ 
+                    stockQuantity: (part.stockQuantity || 0) + input.quantity,
+                    updatedAt: new Date()
+                })
+                .where(eq(schema.parts.id, input.partId));
+        }
+
+        return movement[0];
+    });
+}
+
+// ============================================================================
+// DASHBOARD & ANALYTICS
+// ============================================================================
+
+export async function getDashboardStats(ledgerId: number) {
+    const [jobs, invoices, allParts] = await Promise.all([
+        db.query.jobs.findMany({ where: eq(schema.jobs.ledgerId, ledgerId) }),
+        getInvoicesByLedger(ledgerId),
+        db.query.parts.findMany({ where: eq(schema.parts.ledgerId, ledgerId) })
+    ]);
+
+    const activeOperations = jobs.filter(j => j.status === 'IN_PROGRESS').length;
+    const pendingQuotes = jobs.filter(j => j.status === 'WAITING_APPROVAL').length;
+    const lowStockItems = allParts.filter(p => (p.stockQuantity || 0) <= (p.minStockLevel || 0)).length;
+    
+    // Revenue last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const monthlyRevenue = invoices
+        .filter(inv => new Date(inv.createdAt) >= thirtyDaysAgo)
+        .reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+    return {
+        activeOperations,
+        pendingQuotes,
+        lowStockItems,
+        monthlyRevenue,
+        activeAssets: allParts.length,
+    };
+}
+

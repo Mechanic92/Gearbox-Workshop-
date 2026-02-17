@@ -120,8 +120,8 @@ export default function NewJob() {
   if (!activeLedgerId) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
-       <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen bg-background dark:bg-background pb-32">
+       <div className="sticky top-0 z-30 bg-card/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -151,7 +151,7 @@ export default function NewJob() {
         <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
                 {/* Template Engine */}
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card overflow-hidden">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card overflow-hidden">
                     <div className="bg-primary/5 p-6 border-b border-primary/10 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <Sparkles className="text-primary w-5 h-5" />
@@ -176,7 +176,7 @@ export default function NewJob() {
                 </Card>
 
                 {/* Core Specifications */}
-                <Card className="border-none shadow-2xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-2xl shadow-black/5 bg-card dark:bg-card">
                     <CardHeader className="p-8 pb-0">
                         <CardTitle className="text-2xl font-black tracking-tighter flex items-center gap-2">
                             <Wrench className="text-primary" /> Service Specifications
@@ -213,7 +213,7 @@ export default function NewJob() {
                 </Card>
 
                 {/* Client Profile */}
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card">
                     <CardHeader className="p-8 pb-0">
                         <CardTitle className="text-2xl font-black tracking-tighter flex items-center gap-2">
                             <User className="text-primary" /> Client Identity
@@ -259,7 +259,7 @@ export default function NewJob() {
                                 <span>Projected Yield</span>
                                 <span>${calculatedQuote.profit.toLocaleString()}</span>
                             </div>
-                            <div className="h-px bg-white/20" />
+                            <div className="h-px bg-card/20" />
                             <div className="flex justify-between items-center py-2">
                                 <span className="font-black text-sm uppercase tracking-widest">Total Estimate</span>
                                 <span className="text-2xl font-black">${calculatedQuote.quote.toLocaleString()}</span>
@@ -267,7 +267,7 @@ export default function NewJob() {
                         </div>
 
                         <div className="pt-2">
-                            <div className="flex items-center gap-2 p-3 rounded-2xl bg-white/10 border border-white/20">
+                            <div className="flex items-center gap-2 p-3 rounded-2xl bg-card/10 border border-white/20">
                                 <Target size={16} className="text-white" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest">{calculatedQuote.profitMargin.toFixed(1)}% Operating Margin</span>
                             </div>
@@ -275,7 +275,7 @@ export default function NewJob() {
                     </div>
                 </Card>
 
-                <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card p-6 space-y-6">
+                <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card p-6 space-y-6">
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-1">Valuation Logic</h3>
                     
                     <div className="grid grid-cols-2 gap-4">

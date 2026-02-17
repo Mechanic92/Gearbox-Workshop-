@@ -6,13 +6,15 @@ import {
   Building2, Car, FileText, Loader2, Plus, Wrench, 
   TrendingUp, Clock, CheckCircle2, AlertCircle, 
   ChevronRight, Calendar, ArrowUpRight, X, Users, BarChart3,
-  Search, Filter, LayoutGrid, Zap
+  Search, Filter, LayoutGrid, Zap, Package
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { LedgerSwitcher } from "@/components/LedgerSwitcher";
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
 
 export default function TradesDashboard() {
   const { user } = useAuth();
@@ -66,6 +68,16 @@ export default function TradesDashboard() {
     { enabled: !!activeLedgerId }
   );
 
+  const { data: stats } = trpc.analytics.getDashboardStats.useQuery(
+    { ledgerId: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
+
+  const { data: aiInsights } = trpc.ai.getExecutiveInsights.useQuery(
+    { ledgerId: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
+
   const activeJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "IN_PROGRESS") || [];
   const completedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "COMPLETED") || [];
   const quotedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "NEW") || [];
@@ -88,7 +100,7 @@ export default function TradesDashboard() {
       <header className="sticky top-0 z-30 glass shadow-2xl">
         <div className="container py-6 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-white text-black flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] group hover:scale-110 transition-transform">
+            <div className="w-14 h-14 rounded-2xl bg-card text-foreground flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] group hover:scale-110 transition-transform">
                 <Zap size={28} className="fill-current" />
             </div>
             <div>
@@ -103,13 +115,13 @@ export default function TradesDashboard() {
           <div className="flex items-center gap-4">
              <Button 
                 variant="ghost" 
-                className="hidden md:flex font-black uppercase tracking-widest text-[10px] hover:bg-white/5 border border-white/10 rounded-xl px-6 h-12"
+                className="hidden md:flex font-black uppercase tracking-widest text-[10px] hover:bg-card/5 border border-white/10 rounded-xl px-6 h-12"
                 onClick={() => setLedgerSwitcherOpen(true)}
              >
                 Switch Identity
              </Button>
              <Button 
-                className="shadow-[0_15px_30px_rgba(0,0,0,0.3)] bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-[10px] rounded-xl px-8 h-12"
+                className="shadow-[0_15px_30px_rgba(0,0,0,0.3)] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-[10px] rounded-xl px-8 h-12"
                 onClick={() => setLocation("/trades/jobs/new")}
              >
                 <Plus className="w-4 h-4 mr-2" strokeWidth={3} /> Register Job
@@ -120,14 +132,61 @@ export default function TradesDashboard() {
       </header>
 
       <div className="container py-12 space-y-16">
+        {/* AI Executive Insights */}
+        {aiInsights && aiInsights.insights.length > 0 && (
+          <section className="animate-in fade-in slide-in-from-top-4 duration-1000">
+             <div className="glass rounded-[3rem] p-8 border-l-4 border-primary overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-8 opacity-10">
+                   <Zap className="w-48 h-48 text-primary" />
+                </div>
+                <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
+                   <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/20">
+                      <Zap className="w-8 h-8 text-primary fill-current" />
+                   </div>
+                   <div className="flex-1 space-y-4">
+                      <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary">Executive Intelligence Briefing</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         {aiInsights.insights.map((insight: any, idx: number) => (
+                            <div key={idx} className="flex-1 min-w-[300px] flex items-center justify-between gap-6 p-6 rounded-3xl bg-card/5 border border-white/5 group/insight">
+                               <div className="space-y-1 flex-1">
+                                  <div className="flex items-center gap-2">
+                                     <p className="text-sm font-black uppercase italic tracking-tighter text-white">{insight.title}</p>
+                                     {insight.impact === 'high' && <Badge className="bg-red-500 text-white border-none text-[8px] uppercase tracking-widest font-black animate-pulse">Critical Input</Badge>}
+                                  </div>
+                                  <p className="text-xs text-white/50 font-medium leading-relaxed">{insight.description}</p>
+                               </div>
+                               <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-10 rounded-xl font-black text-[9px] uppercase tracking-widest border-white/10 group-hover/insight:bg-primary group-hover/insight:text-white transition-all"
+                                onClick={() => {
+                                    if (insight.type === 'maintenance') {
+                                        toast.info("Initializing Predictive Maintenance Scan...");
+                                        // Logic to navigate or trigger scan
+                                    } else {
+                                        toast.success("Command Executed: Syncing with Accounting Node");
+                                    }
+                                }}
+                               >
+                                   {insight.type === 'maintenance' ? 'Command' : 'Engage'}
+                               </Button>
+                            </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </section>
+        )}
+
         {/* KPI Scorecards */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-                { label: "Active Operations", val: activeJobs.length, icon: Wrench, color: "text-primary", bg: "bg-primary/10", tag: "Live" },
-                { label: "Pending Approval", val: quotedJobs.length, icon: FileText, color: "text-blue-400", bg: "bg-blue-400/10", tag: "Quotes" },
-                { label: "Success Matrix", val: completedJobs.length, icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10", tag: "Ready" }
+                { label: "Active Operations", val: stats?.activeOperations ?? 0, icon: Wrench, color: "text-primary", bg: "bg-primary/10", tag: "Live" },
+                { label: "Pending Approval", val: stats?.pendingQuotes ?? 0, icon: FileText, color: "text-blue-400", bg: "bg-blue-400/10", tag: "Quotes" },
+                { label: "Inventory Alert", val: stats?.lowStockItems ?? 0, icon: Package, color: "text-amber-400", bg: "bg-amber-400/10", tag: "Low Stock" }
             ].map((stat, i) => (
-                <div key={i} className="group relative p-[1px] rounded-[2.5rem] bg-white/5 hover:bg-gradient-to-br from-white/20 to-transparent transition-all duration-500 premium-shadow">
+                <div key={i} className="group relative p-[1px] rounded-[2.5rem] bg-card/5 hover:bg-gradient-to-br from-white/20 to-transparent transition-all duration-500 premium-shadow">
                     <Card className="border-none glass-dark rounded-[2.4rem] overflow-hidden">
                         <CardContent className="p-10">
                             <div className="flex items-center justify-between mb-8">
@@ -146,6 +205,7 @@ export default function TradesDashboard() {
             ))}
         </section>
 
+
         <div className="grid lg:grid-cols-3 gap-16">
           {/* Work Intel Feed */}
           <div className="lg:col-span-2 space-y-8">
@@ -155,19 +215,19 @@ export default function TradesDashboard() {
                     System Feed
                 </h2>
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-white/5"><Search size={18} /></Button>
-                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-white/5"><Filter size={18} /></Button>
+                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-card/5"><Search size={18} /></Button>
+                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-card/5"><Filter size={18} /></Button>
                 </div>
             </div>
 
             {!jobs || jobs.length === 0 ? (
                <div className="py-24 text-center glass rounded-[4rem] border-2 border-dashed border-white/5">
-                    <div className="w-24 h-24 rounded-[2.5rem] bg-white/5 flex items-center justify-center mx-auto mb-8 border border-white/10">
+                    <div className="w-24 h-24 rounded-[2.5rem] bg-card/5 flex items-center justify-center mx-auto mb-8 border border-white/10">
                         <Wrench className="w-10 h-10 text-white/20" />
                     </div>
                     <h3 className="text-3xl font-black tracking-tighter text-white mb-3 italic">System Idle.</h3>
                     <p className="text-muted-foreground font-medium max-w-xs mx-auto mb-10">Initialize your first operational sequence to begin tracking.</p>
-                    <Button onClick={() => setLocation("/trades/jobs/new")} className="h-16 px-12 rounded-full bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">
+                    <Button onClick={() => setLocation("/trades/jobs/new")} className="h-16 px-12 rounded-full bg-card text-foreground font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">
                         Launch Initial Sequence
                     </Button>
                </div>
@@ -188,7 +248,7 @@ export default function TradesDashboard() {
                         return (
                             <div 
                                 key={job.id} 
-                                className="group relative glass hover:bg-white/5 transition-all duration-500 cursor-pointer rounded-[2.5rem] overflow-hidden border-none"
+                                className="group relative glass hover:bg-card/5 transition-all duration-500 cursor-pointer rounded-[2.5rem] overflow-hidden border-none"
                                 onClick={() => setLocation(`/trades/jobs/${job.id}`)}
                             >
                                 <div className="p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-8">
@@ -245,7 +305,7 @@ export default function TradesDashboard() {
                 </div>
                 
                 <Button 
-                    className="w-full h-16 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-primary hover:border-primary transition-all duration-500 text-xs uppercase tracking-widest"
+                    className="w-full h-16 rounded-2xl bg-card/5 border border-white/10 font-bold hover:bg-primary hover:border-primary transition-all duration-500 text-xs uppercase tracking-widest"
                     onClick={() => setLocation("/trades/vehicles/new")}
                 >
                     Register Asset
@@ -262,14 +322,14 @@ export default function TradesDashboard() {
                         <button 
                             key={i}
                             onClick={() => setLocation(btn.path)}
-                            className="flex items-center gap-4 p-5 rounded-[2rem] bg-white/5 hover:bg-primary group transition-all duration-500 text-left"
+                            className="flex items-center gap-4 p-5 rounded-[2rem] bg-card/5 hover:bg-primary group transition-all duration-500 text-left"
                         >
-                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                            <div className="w-12 h-12 rounded-2xl bg-card/5 flex items-center justify-center group-hover:bg-card/20 transition-colors">
                                 <btn.icon size={20} className="text-white group-hover:scale-110 transition-transform" />
                             </div>
                             <div>
                                 <p className="text-sm font-black text-white uppercase tracking-tight">{btn.label}</p>
-                                <p className="text-[9px] text-white/30 uppercase tracking-widest font-bold group-hover:text-black/60">{btn.desc}</p>
+                                <p className="text-[9px] text-white/30 uppercase tracking-widest font-bold group-hover:text-foreground/60">{btn.desc}</p>
                             </div>
                         </button>
                     ))}

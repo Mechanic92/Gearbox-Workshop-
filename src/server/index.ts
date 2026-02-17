@@ -53,7 +53,7 @@ app.post('/api/webhooks/xero', express.raw({ type: 'application/json' }), async 
   }
 });
 
-app.post('/api/public/bookings/ingest', handlePublicIngestion);
+app.post('/api/public/bookings/ingest', express.json(), handlePublicIngestion);
 
 // Regular JSON parsing for other routes
 app.use(express.json());

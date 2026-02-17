@@ -1,30 +1,42 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-export const Badge = React.forwardRef<any, any>(({ className, children, ...props }, ref) => (
-  <div ref={ref} className={cn("inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", className)} {...props}>
-    {children}
-  </div>
-))
-Badge.displayName = "Badge"
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 select-none",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80 shadow-sm",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80 shadow-sm shadow-destructive/20",
+        outline: "text-foreground border-neutral-200 dark:border-neutral-800",
+        success: 
+          "border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20",
+        warning:
+          "border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20",
+        premium:
+          "border-transparent bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 animate-pulse-slow",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-export const BadgeTrigger = Badge
-export const BadgeContent = Badge
-export const BadgeHeader = Badge
-export const BadgeFooter = Badge
-export const BadgeTitle = Badge
-export const BadgeDescription = Badge
-export const BadgeLabel = Badge
-export const BadgeItem = Badge
-export const BadgeSeparator = Badge
-export const BadgeGroup = Badge
-export const BadgeValue = Badge
-export const BadgeList = Badge
-export const BadgePanel = Badge
-export const BadgePortal = Badge
-export const BadgeOverlay = Badge
-export const BadgeAction = Badge
-export const BadgeCancel = Badge
-export const BadgeInput = Badge
-export const BadgeEmpty = Badge
-export const BadgeCheckboxItem = Badge
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
+}
+
+export { Badge, badgeVariants }
+

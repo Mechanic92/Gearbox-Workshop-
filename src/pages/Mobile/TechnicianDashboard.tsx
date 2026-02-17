@@ -117,7 +117,7 @@ export default function TechnicianMobile() {
                           </div>
 
                           <div className="flex gap-2">
-                             <Button className="flex-1 bg-white text-black font-black text-[9px] uppercase tracking-widest h-12 rounded-xl">
+                             <Button className="flex-1 bg-card text-foreground font-black text-[9px] uppercase tracking-widest h-12 rounded-xl">
                                 START TIMER
                              </Button>
                              <Button className="w-12 h-12 bg-neutral-700 text-white rounded-xl flex items-center justify-center p-0 border-none">

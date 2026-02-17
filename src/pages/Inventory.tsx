@@ -15,12 +15,15 @@ import {
   Layers,
   Edit,
   Trash2,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useLedger } from "@/contexts/LedgerContext";
+import { trpc } from "@/lib/trpc";
 
 /**
  * Inventory Management Dashboard
@@ -28,13 +31,23 @@ import { cn } from '@/lib/utils';
  */
 
 export default function InventoryDashboard() {
+  const { activeLedgerId } = useLedger();
   const [activeTab, setActiveTab] = useState<'parts' | 'suppliers' | 'orders' | 'movements'>('parts');
 
+  const { data: parts, isLoading } = trpc.inventory.list.useQuery(
+    { ledgerId: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
+
+  const totalStockValue = parts?.reduce((sum, p) => sum + ((p.stockQuantity || 0) * (p.costPrice || 0)), 0) || 0;
+  const activePartsCount = parts?.length || 0;
+  const lowStockCount = parts?.filter(p => (p.stockQuantity || 0) <= (p.minStockLevel || 0)).length || 0;
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#050505] font-sans antialiased pb-32">
+    <div className="min-h-screen bg-background dark:bg-[#050505] font-sans antialiased pb-32">
       
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-neutral-100 dark:border-neutral-900">
+      <header className="sticky top-0 z-50 bg-card/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-border dark:border-neutral-900">
         <div className="container max-w-[1600px] px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -58,12 +71,12 @@ export default function InventoryDashboard() {
         {/* KPI Cards */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: 'Total Stock Value', value: '$48,250', change: '+8.2%', icon: DollarSign, color: 'blue' },
-            { label: 'Active Parts', value: '342', change: '12 Low Stock', icon: Package, color: 'emerald' },
-            { label: 'Pending Orders', value: '8', change: '$12,400', icon: ShoppingCart, color: 'amber' },
-            { label: 'Stock Turnover', value: '4.2x', change: 'Last 90 days', icon: TrendingUp, color: 'indigo' }
+            { label: 'Total Stock Value', value: `$${totalStockValue.toLocaleString()}`, change: '+0%', icon: DollarSign, color: 'blue' },
+            { label: 'Active Parts', value: activePartsCount.toString(), change: `${lowStockCount} Low Stock`, icon: Package, color: 'emerald' },
+            { label: 'Pending Orders', value: '0', change: '$0.00', icon: ShoppingCart, color: 'amber' },
+            { label: 'Stock Turnover', value: '0.0x', change: 'Last 90 days', icon: TrendingUp, color: 'indigo' }
           ].map((metric, i) => (
-            <Card key={i} className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 p-6 rounded-[32px] group hover:shadow-2xl transition-all">
+            <Card key={i} className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 p-6 rounded-[32px] group hover:shadow-2xl transition-all">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">{metric.label}</p>
@@ -88,7 +101,7 @@ export default function InventoryDashboard() {
         </section>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 p-2 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-xl w-fit">
+        <div className="flex items-center gap-2 bg-card dark:bg-neutral-900 p-2 rounded-3xl border border-border dark:border-neutral-800 shadow-xl w-fit">
           {[
             { id: 'parts', label: 'Parts Catalog', icon: Package },
             { id: 'suppliers', label: 'Suppliers', icon: Box },
@@ -101,8 +114,8 @@ export default function InventoryDashboard() {
               className={cn(
                 "px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
                 activeTab === tab.id 
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-black shadow-lg' 
-                  : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  ? 'bg-neutral-900 dark:bg-card text-white dark:text-foreground shadow-lg' 
+                  : 'text-neutral-400 hover:text-foreground dark:hover:text-white'
               )}
             >
               <tab.icon className="w-4 h-4" />
@@ -116,7 +129,7 @@ export default function InventoryDashboard() {
           <div className="space-y-6">
             {/* Search & Filters */}
             <div className="flex items-center gap-4">
-              <div className="flex-1 flex items-center bg-white dark:bg-neutral-900 rounded-2xl px-5 py-3 border border-neutral-100 dark:border-neutral-800 shadow-lg">
+              <div className="flex-1 flex items-center bg-card dark:bg-neutral-900 rounded-2xl px-5 py-3 border border-border dark:border-neutral-800 shadow-lg">
                 <Search className="w-4 h-4 text-neutral-400 mr-3" />
                 <input 
                   className="bg-transparent border-none text-sm font-bold outline-none w-full" 
@@ -129,26 +142,28 @@ export default function InventoryDashboard() {
             </div>
 
             {/* Low Stock Alert */}
-            <Card className="border-none shadow-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-[32px] p-6 border-l-4 border-amber-500">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-white" />
+            {lowStockCount > 0 && (
+              <Card className="border-none shadow-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-[32px] p-6 border-l-4 border-amber-500 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-black uppercase tracking-tight">{lowStockCount} Parts Below Minimum Stock</h4>
+                    <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 mt-1">Review and create purchase orders to restock</p>
+                  </div>
+                  <Button className="rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black text-[10px] uppercase tracking-widest">
+                    View Low Stock
+                  </Button>
                 </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-black uppercase tracking-tight">12 Parts Below Minimum Stock</h4>
-                  <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 mt-1">Review and create purchase orders to restock</p>
-                </div>
-                <Button className="rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black text-[10px] uppercase tracking-widest">
-                  View Low Stock
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            )}
 
             {/* Parts Table */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
+                  <thead className="bg-card dark:bg-neutral-800 border-b border-border dark:border-neutral-700">
                     <tr>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Part Number</th>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Name</th>
@@ -161,62 +176,75 @@ export default function InventoryDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                    {[
-                      { partNo: 'OIL-5W30-5L', name: 'Castrol Edge 5W-30', category: 'Oils & Fluids', stock: 24, min: 10, cost: 42.50, sell: 75.00 },
-                      { partNo: 'BRK-PAD-FR', name: 'Brake Pads - Front', category: 'Brakes', stock: 8, min: 12, cost: 85.00, sell: 150.00 },
-                      { partNo: 'AIR-FLT-STD', name: 'Air Filter Standard', category: 'Filters', stock: 45, min: 20, cost: 12.00, sell: 28.00 },
-                      { partNo: 'SPARK-PLG-4', name: 'Spark Plugs (Set of 4)', category: 'Ignition', stock: 32, min: 15, cost: 24.00, sell: 55.00 },
-                    ].map((part, i) => {
-                      const margin = ((part.sell - part.cost) / part.sell * 100).toFixed(1);
-                      const isLowStock = part.stock <= part.min;
-                      
-                      return (
-                        <tr key={i} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <Barcode className="w-4 h-4 text-neutral-400" />
-                              <span className="text-sm font-black tracking-tight">{part.partNo}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-sm font-bold">{part.name}</td>
-                          <td className="px-6 py-4">
-                            <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-none text-[9px] font-black uppercase tracking-widest">
-                              {part.category}
-                            </Badge>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <span className={cn(
-                                "text-sm font-black",
-                                isLowStock ? 'text-amber-600' : 'text-emerald-600'
-                              )}>{part.stock}</span>
-                              {isLowStock && <AlertTriangle className="w-4 h-4 text-amber-500" />}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-sm font-bold text-neutral-600">${part.cost.toFixed(2)}</td>
-                          <td className="px-6 py-4 text-sm font-black">${part.sell.toFixed(2)}</td>
-                          <td className="px-6 py-4">
-                            <Badge className="bg-emerald-100 text-emerald-700 border-none text-[9px] font-black">
-                              {margin}%
-                            </Badge>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={8} className="py-20 text-center">
+                          <Loader2 className="w-8 h-8 animate-spin text-neutral-300 mx-auto" />
+                          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mt-4">Accessing Catalog...</p>
+                        </td>
+                      </tr>
+                    ) : !parts || parts.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-20 text-center">
+                          <Package className="w-12 h-12 text-neutral-200 mx-auto mb-4" />
+                          <h4 className="text-sm font-black uppercase tracking-tight text-neutral-400">No Inventory Found</h4>
+                          <p className="text-xs font-bold text-neutral-500 mt-1">Start by adding your first component</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      parts.map((part, i) => {
+                        const margin = (((part.sellPrice || 0) - (part.costPrice || 0)) / (part.sellPrice || 1) * 100).toFixed(1);
+                        const isLowStock = (part.stockQuantity || 0) <= (part.minStockLevel || 0);
+                        
+                        return (
+                          <tr key={i} className="hover:bg-card dark:hover:bg-neutral-800/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <Barcode className="w-4 h-4 text-neutral-400" />
+                                <span className="text-sm font-black tracking-tight">{part.partNumber}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm font-bold">{part.name}</td>
+                            <td className="px-6 py-4">
+                              <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-none text-[9px] font-black uppercase tracking-widest">
+                                {part.description || "General"}
+                              </Badge>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <span className={cn(
+                                  "text-sm font-black",
+                                  isLowStock ? 'text-amber-600' : 'text-emerald-600'
+                                )}>{part.stockQuantity}</span>
+                                {isLowStock && <AlertTriangle className="w-4 h-4 text-amber-500" />}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm font-bold text-neutral-600">${(part.costPrice || 0).toFixed(2)}</td>
+                            <td className="px-6 py-4 text-sm font-black">${(part.sellPrice || 0).toFixed(2)}</td>
+                            <td className="px-6 py-4">
+                              <Badge className="bg-emerald-100 text-emerald-700 border-none text-[9px] font-black">
+                                {margin}%
+                              </Badge>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end gap-2">
+                                <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
+
                 </table>
               </div>
             </Card>

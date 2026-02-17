@@ -633,6 +633,20 @@ export const jobParts = sqliteTable("job_parts", {
   partIdx: index("job_part_part_idx").on(table.partId),
 }));
 
+export const jobTimeLogs = sqliteTable("job_time_logs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jobId: integer("jobId").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+  userId: integer("userId").notNull().references(() => users.id),
+  startTime: integer("startTime", { mode: "timestamp" }).notNull(),
+  endTime: integer("endTime", { mode: "timestamp" }),
+  description: text("description"),
+  isBillable: integer("isBillable", { mode: "boolean" }).default(true).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  jobIdx: index("job_time_job_idx").on(table.jobId),
+  userIdx: index("job_time_user_idx").on(table.userId),
+}));
+
 // ============================================================================
 // RELATIONS
 // ============================================================================
@@ -642,6 +656,7 @@ export const jobsRelations = relations(jobs, ({ one, many }) => ({
   vehicle: one(vehicles, { fields: [jobs.vehicleId], references: [vehicles.id] }),
   costs: many(jobCosts),
   inspections: many(dviInspections),
+  timeLogs: many(jobTimeLogs),
 }));
 
 export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
@@ -680,6 +695,11 @@ export const organizationsRelations = relations(organizations, ({ one, many }) =
 export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
   organization: one(organizations, { fields: [ledgers.organizationId], references: [organizations.id] }),
   access: many(ledgerAccess),
+}));
+
+export const jobTimeLogsRelations = relations(jobTimeLogs, ({ one }) => ({
+  job: one(jobs, { fields: [jobTimeLogs.jobId], references: [jobs.id] }),
+  user: one(users, { fields: [jobTimeLogs.userId], references: [users.id] }),
 }));
 
 // ============================================================================

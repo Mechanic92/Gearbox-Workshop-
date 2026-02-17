@@ -63,13 +63,31 @@ export default function JobDetail() {
       toast.success("Cost deleted");
     },
   });
-
   const updateJobMutation = trpc.job.update.useMutation({
     onSuccess: () => {
       refetch();
       toast.success("Job status updated");
     },
   });
+
+  const clockInMutation = trpc.labor.clockIn.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success("Shift started");
+    }
+  });
+
+  const clockOutMutation = trpc.labor.clockOut.useMutation({
+    onSuccess: () => {
+      refetch();
+      toast.success("Labor segment logged");
+    }
+  });
+
+  const { data: liveStatus } = trpc.labor.getLiveStatus.useQuery(
+    { jobId: jobId! },
+    { enabled: !!jobId, refetchInterval: 5000 }
+  );
 
   const [costForm, setCostForm] = useState({
     type: "labor" as "labor" | "parts" | "overhead",
@@ -109,9 +127,9 @@ export default function JobDetail() {
   const quotedPrice = (job.quotedPrice as any) as number;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
+    <div className="min-h-screen bg-background pb-32">
       {/* Premium Sticky Header */}
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -148,6 +166,26 @@ export default function JobDetail() {
         </div>
       </div>
 
+      {/* Labor Live Tracking Bar (Mini) */}
+      {liveStatus && liveStatus.length > 0 && (
+          <div className="bg-primary/90 backdrop-blur-md text-white py-2">
+              <div className="container flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-card animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-widest italic">Live Labor Sync: {liveStatus[0].user?.name} is active on this job</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-[9px] font-black uppercase tracking-widest text-white hover:bg-card/10"
+                    onClick={() => clockOutMutation.mutate({ logId: liveStatus[0].id })}
+                  >
+                      Halt Work session
+                  </Button>
+              </div>
+          </div>
+      )}
+
       <div className="container py-8 max-w-7xl">
         <div className="grid lg:grid-cols-3 gap-8">
           
@@ -156,10 +194,10 @@ export default function JobDetail() {
             <ProfitSpeedometer 
                 quotedPrice={quotedPrice} 
                 totalCosts={summary.totalCost} 
-                className="border-none shadow-2xl shadow-black/5 bg-white dark:bg-card"
+                className="border-none shadow-2xl shadow-black/5 bg-card"
             />
             
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Execution Status</CardTitle>
@@ -191,7 +229,7 @@ export default function JobDetail() {
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card overflow-hidden">
                 <div className="bg-primary/5 p-4 border-b border-primary/10 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
                         <ClipboardCheck size={16} />
@@ -216,7 +254,45 @@ export default function JobDetail() {
                 </CardContent>
             </Card>
 
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card overflow-hidden">
+                <div className="bg-black text-white p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+                            <Clock size={16} />
+                        </div>
+                        <span className="text-sm font-black opacity-80 uppercase tracking-widest italic">Precision Clock</span>
+                    </div>
+                </div>
+                <CardContent className="p-6 space-y-4">
+                    {liveStatus && liveStatus.length > 0 ? (
+                        <div className="text-center py-4">
+                            <p className="text-3xl font-black tabular-nums tracking-tighter mb-2">ACTIVE</p>
+                            <Button 
+                                variant="destructive" 
+                                className="w-full h-12 rounded-2xl font-black uppercase text-xs"
+                                onClick={() => clockOutMutation.mutate({ logId: liveStatus[0].id })}
+                                disabled={clockOutMutation.isPending}
+                            >
+                                {clockOutMutation.isPending ? <Loader2 className="animate-spin" /> : "Terminate Active session"}
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="text-center py-4">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-4">No active labor detected</p>
+                            <Button 
+                                variant="default" 
+                                className="w-full h-12 rounded-2xl font-black uppercase text-xs shadow-lg shadow-primary/20"
+                                onClick={() => clockInMutation.mutate({ jobId: job.id })}
+                                disabled={clockInMutation.isPending}
+                            >
+                                {clockInMutation.isPending ? <Loader2 className="animate-spin" /> : "Initiate Work session"}
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-xl shadow-black/5 bg-card overflow-hidden">
                 <div className="bg-blue-500/5 p-4 border-b border-blue-500/10 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
@@ -256,21 +332,21 @@ export default function JobDetail() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-6 rounded-3xl bg-white dark:bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
+                <div className="p-6 rounded-3xl bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
                     <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 mb-2">
                         <Clock size={20} />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Labor Value</span>
                     <span className="text-xl font-black tracking-tighter text-blue-600">${summary.laborCost.toFixed(2)}</span>
                 </div>
-                <div className="p-6 rounded-3xl bg-white dark:bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
+                <div className="p-6 rounded-3xl bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
                     <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-600 mb-2">
                         <Package size={20} />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Parts Value</span>
                     <span className="text-xl font-black tracking-tighter text-orange-600">${summary.partsCost.toFixed(2)}</span>
                 </div>
-                <div className="p-6 rounded-3xl bg-white dark:bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
+                <div className="p-6 rounded-3xl bg-card shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
                     <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground mb-2">
                         <Cpu size={20} />
                     </div>
@@ -279,7 +355,7 @@ export default function JobDetail() {
                 </div>
             </div>
 
-            <Card className="border-none shadow-2xl shadow-black/5 bg-white dark:bg-card overflow-hidden">
+            <Card className="border-none shadow-2xl shadow-black/5 bg-card overflow-hidden">
                 <CardContent className="p-0">
                     {costs.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -346,7 +422,7 @@ export default function JobDetail() {
 
       {/* Add Cost Premium Modal */}
       <Dialog open={addCostOpen} onOpenChange={setAddCostOpen}>
-        <DialogContent className="max-w-xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-white dark:bg-card">
+        <DialogContent className="max-w-xl p-0 overflow-hidden border-none shadow-2xl rounded-3xl bg-card dark:bg-card">
           <div className="bg-primary p-8 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10">
                 <Wrench size={100} />

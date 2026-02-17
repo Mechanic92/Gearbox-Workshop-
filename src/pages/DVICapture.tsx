@@ -15,7 +15,8 @@ import {
   Image as ImageIcon,
   Save,
   Send,
-  Loader2
+  Loader2,
+  Mic
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -174,9 +175,9 @@ export default function DVICapture() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 font-sans selection:bg-blue-200">
+    <div className="min-h-screen bg-card dark:bg-neutral-950 font-sans selection:bg-blue-200">
       {/* Cinematic Header */}
-      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 sticky top-0 z-50">
+      <div className="bg-card dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 sticky top-0 z-50">
         <div className="container max-w-7xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => setLocation(`/trades/jobs/${jobId}`)} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
@@ -224,12 +225,12 @@ export default function DVICapture() {
                 "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all",
                 activeCategory === cat 
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" 
-                  : "bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 hover:border-blue-400"
+                  : "bg-card dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 hover:border-blue-400"
               )}
             >
               {cat}
               {items.filter(i => i.category === cat).length > 0 && (
-                <Badge className="bg-white/20 text-white border-none">{items.filter(i => i.category === cat).length}</Badge>
+                <Badge className="bg-card/20 text-white border-none">{items.filter(i => i.category === cat).length}</Badge>
               )}
             </button>
           ))}
@@ -237,7 +238,7 @@ export default function DVICapture() {
 
         {/* Center: Capture Form */}
         <div className="lg:col-span-6 space-y-6">
-          <Card className="border-none shadow-2xl shadow-blue-900/5 bg-white dark:bg-neutral-900 overflow-hidden">
+          <Card className="border-none shadow-2xl shadow-blue-900/5 bg-card dark:bg-neutral-900 overflow-hidden">
             <CardHeader className="p-8 pb-4">
               <CardTitle className="text-2xl font-black tracking-tighter uppercase italic">{activeCategory} Inspection</CardTitle>
               <CardDescription className="text-sm font-medium">Document condition and capture evidence</CardDescription>
@@ -246,7 +247,7 @@ export default function DVICapture() {
               
               {/* Media Capture Area */}
               <div 
-                className="group relative h-48 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-col items-center justify-center gap-3 bg-neutral-50 dark:bg-neutral-950 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all cursor-pointer overflow-hidden"
+                className="group relative h-48 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-col items-center justify-center gap-3 bg-card dark:bg-neutral-950 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all cursor-pointer overflow-hidden"
                 onClick={() => fileInputRef.current?.click()}
               >
                 {newItem.media && newItem.media.length > 0 ? (
@@ -260,7 +261,7 @@ export default function DVICapture() {
                         )}
                       </div>
                     ))}
-                    <div className="w-32 h-32 rounded-lg border-2 border-dashed border-neutral-300 flex items-center justify-center flex-shrink-0 bg-white">
+                    <div className="w-32 h-32 rounded-lg border-2 border-dashed border-neutral-300 flex items-center justify-center flex-shrink-0 bg-card">
                       <Plus className="w-6 h-6 text-neutral-400" />
                     </div>
                   </div>
@@ -270,7 +271,7 @@ export default function DVICapture() {
                       <Camera className="w-6 h-6" />
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-black uppercase tracking-widest text-neutral-900 dark:text-white">Capture Reality</p>
+                      <p className="text-sm font-black uppercase tracking-widest text-foreground dark:text-white">Capture Reality</p>
                       <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Tap to snap photo or record video</p>
                     </div>
                   </>
@@ -290,7 +291,7 @@ export default function DVICapture() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Component</label>
                   <input 
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-foreground dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="e.g. Front Brake Pads"
                     value={newItem.component || ''}
                     onPointerDown={stopFieldEvent}
@@ -312,7 +313,7 @@ export default function DVICapture() {
                               cond === 'fair' ? 'bg-yellow-500 border-yellow-600 text-white shadow-lg shadow-yellow-500/20' :
                               cond === 'poor' ? 'bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/20' :
                               'bg-red-600 border-red-700 text-white shadow-lg shadow-red-500/20'
-                            : 'bg-white border-neutral-200 text-neutral-400'
+                            : 'bg-card border-neutral-200 text-neutral-400'
                         )}
                       >
                         {cond}
@@ -323,11 +324,21 @@ export default function DVICapture() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Findings & Notes</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Findings & Notes</label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 text-[8px] font-black uppercase tracking-widest hover:text-blue-500 gap-1.5 px-2"
+                  >
+                    <Mic className="w-3 h-3" /> AI Dictation
+                  </Button>
+                </div>
                 <textarea 
-                  className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white h-24 focus:ring-2 ring-blue-500 transition-all"
+                  className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-foreground dark:text-white h-24 focus:ring-2 ring-blue-500 transition-all"
                   placeholder="Describe what you see..."
                   value={newItem.notes || ''}
+
                   onPointerDown={stopFieldEvent}
                   onClick={stopFieldEvent}
                   onChange={(e) => setNewItem(prev => ({ ...prev, notes: e.target.value }))}
@@ -338,7 +349,7 @@ export default function DVICapture() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Recommendation</label>
                   <input 
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-foreground dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="e.g. Replace immediately"
                     value={newItem.recommendation || ''}
                     onPointerDown={stopFieldEvent}
@@ -350,7 +361,7 @@ export default function DVICapture() {
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Est. Cost ($)</label>
                   <input 
                     type="number"
-                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-neutral-900 dark:text-white focus:ring-2 ring-blue-500 transition-all"
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-xl px-4 py-3 font-bold text-sm text-foreground dark:text-white focus:ring-2 ring-blue-500 transition-all"
                     placeholder="0.00"
                     value={newItem.estimatedCost || ''}
                     onPointerDown={stopFieldEvent}
@@ -361,7 +372,7 @@ export default function DVICapture() {
               </div>
 
               <Button 
-                className="w-full bg-neutral-900 border-2 border-neutral-900 dark:border-white hover:bg-white hover:text-neutral-900 text-white font-black py-6 rounded-2xl transition-all"
+                className="w-full bg-neutral-900 border-2 border-neutral-900 dark:border-white hover:bg-card hover:text-foreground text-white font-black py-6 rounded-2xl transition-all"
                 onClick={addItemToInspection}
               >
                 ADD TO INSPECTION LIST
@@ -372,19 +383,19 @@ export default function DVICapture() {
 
         {/* Right Sidebar: Summary & Review */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-xl shadow-neutral-900/5">
+          <div className="bg-card dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-xl shadow-neutral-900/5">
             <h3 className="text-lg font-black tracking-tighter uppercase italic mb-6">Inspection Review</h3>
             
             <div className="space-y-4">
               {items.length === 0 ? (
-                <div className="text-center py-12 px-4 border-2 border-dashed border-neutral-100 rounded-2xl">
+                <div className="text-center py-12 px-4 border-2 border-dashed border-border rounded-2xl">
                   <AlertTriangle className="w-8 h-8 text-neutral-200 mx-auto mb-2" />
                   <p className="text-[10px] font-black uppercase tracking-widest text-neutral-300">No items captured yet</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {items.map((item, idx) => (
-                    <div key={idx} className="group relative p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 transition-all">
+                    <div key={idx} className="group relative p-4 rounded-2xl bg-card dark:bg-neutral-800 hover:bg-neutral-100 transition-all">
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="text-[8px] font-black uppercase tracking-widest text-blue-500">{item.category}</p>
@@ -413,7 +424,7 @@ export default function DVICapture() {
             </div>
 
             {items.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-neutral-100">
+              <div className="mt-8 pt-6 border-t border-border">
                 <div className="flex justify-between items-center mb-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Total Upsell Potent.</p>
                   <p className="text-lg font-black tracking-tighter">${items.reduce((acc, i) => acc + i.estimatedCost, 0).toFixed(2)}</p>

@@ -70,8 +70,8 @@ export default function IntegrationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background pb-32">
-      <div className="sticky top-0 z-30 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen bg-background dark:bg-background pb-32">
+      <div className="sticky top-0 z-30 bg-card/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container py-4">
           <div>
             <h1 className="text-xl font-black tracking-tighter">Integrations</h1>
@@ -94,7 +94,7 @@ export default function IntegrationsPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Xero */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden">
               {xeroStatus?.connected && (
                 <div className="absolute top-4 right-4">
                   <Badge className="bg-green-500 text-white font-black text-[9px] uppercase tracking-widest">
@@ -170,7 +170,7 @@ export default function IntegrationsPage() {
             </Card>
 
             {/* MYOB */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden opacity-60">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden opacity-60">
               <div className="absolute top-4 right-4">
                 <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest">
                   Coming Soon
@@ -193,7 +193,7 @@ export default function IntegrationsPage() {
             </Card>
 
             {/* QuickBooks */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden opacity-60">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden opacity-60">
               <div className="absolute top-4 right-4">
                 <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest">
                   Coming Soon
@@ -227,7 +227,7 @@ export default function IntegrationsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden opacity-60">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden opacity-60">
               <div className="absolute top-4 right-4">
                 <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest">
                   Coming Soon
@@ -261,7 +261,7 @@ export default function IntegrationsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden opacity-60">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden opacity-60">
               <div className="absolute top-4 right-4">
                 <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest">
                   Coming Soon
@@ -283,7 +283,7 @@ export default function IntegrationsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-card relative overflow-hidden opacity-60">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-card relative overflow-hidden opacity-60">
               <div className="absolute top-4 right-4">
                 <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest">
                   Coming Soon

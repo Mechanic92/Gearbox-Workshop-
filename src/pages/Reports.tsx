@@ -33,10 +33,10 @@ export default function ReportingDashboard() {
   const [activeTab, setActiveTab] = useState<'financial' | 'operational' | 'customer'>('financial');
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#050505] font-sans antialiased pb-32">
+    <div className="min-h-screen bg-background dark:bg-[#050505] font-sans antialiased pb-32">
       
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-neutral-100 dark:border-neutral-900">
+      <header className="sticky top-0 z-50 bg-card/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-border dark:border-neutral-900">
         <div className="container max-w-[1600px] px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -45,7 +45,7 @@ export default function ReportingDashboard() {
             </div>
             <div className="flex items-center gap-3">
               {/* Time Range Selector */}
-              <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 p-1 rounded-2xl border border-neutral-100 dark:border-neutral-800 shadow-lg">
+              <div className="flex items-center gap-1 bg-card dark:bg-neutral-900 p-1 rounded-2xl border border-border dark:border-neutral-800 shadow-lg">
                 {[
                   { id: '7d', label: '7 Days' },
                   { id: '30d', label: '30 Days' },
@@ -58,8 +58,8 @@ export default function ReportingDashboard() {
                     className={cn(
                       "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
                       timeRange === range.id 
-                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-black shadow-lg' 
-                        : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                        ? 'bg-neutral-900 dark:bg-card text-white dark:text-foreground shadow-lg' 
+                        : 'text-neutral-400 hover:text-foreground dark:hover:text-white'
                     )}
                   >
                     {range.label}
@@ -119,7 +119,7 @@ export default function ReportingDashboard() {
               subtitle: 'vs $447 last'
             }
           ].map((metric, i) => (
-            <Card key={i} className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 p-6 rounded-[32px] group hover:shadow-2xl transition-all relative overflow-hidden">
+            <Card key={i} className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 p-6 rounded-[32px] group hover:shadow-2xl transition-all relative overflow-hidden">
               <div className={cn(
                 "absolute -right-8 -bottom-8 w-32 h-32 rounded-full opacity-5 group-hover:opacity-10 transition-opacity",
                 metric.color === 'blue' ? 'bg-blue-600' :
@@ -159,7 +159,7 @@ export default function ReportingDashboard() {
         </section>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 p-2 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-xl w-fit">
+        <div className="flex items-center gap-2 bg-card dark:bg-neutral-900 p-2 rounded-3xl border border-border dark:border-neutral-800 shadow-xl w-fit">
           {[
             { id: 'financial', label: 'Financial Analytics', icon: DollarSign },
             { id: 'operational', label: 'Operational Metrics', icon: Activity },
@@ -171,8 +171,8 @@ export default function ReportingDashboard() {
               className={cn(
                 "px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
                 activeTab === tab.id 
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-black shadow-lg' 
-                  : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  ? 'bg-neutral-900 dark:bg-card text-white dark:text-foreground shadow-lg' 
+                  : 'text-neutral-400 hover:text-foreground dark:hover:text-white'
               )}
             >
               <tab.icon className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function ReportingDashboard() {
           <div className="space-y-8">
             
             {/* Revenue Trend Chart */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] p-8">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] p-8">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-xl font-black tracking-tighter uppercase italic">Revenue Trend</h3>
@@ -223,7 +223,7 @@ export default function ReportingDashboard() {
 
             {/* Profit Margins by Job Type */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] p-8">
+              <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] p-8">
                 <h3 className="text-lg font-black tracking-tighter uppercase italic mb-6">Profit by Job Type</h3>
                 <div className="space-y-4">
                   {[
@@ -269,7 +269,7 @@ export default function ReportingDashboard() {
               </Card>
 
               {/* Outstanding Invoices */}
-              <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] p-8">
+              <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] p-8">
                 <h3 className="text-lg font-black tracking-tighter uppercase italic mb-6">Outstanding Invoices</h3>
                 <div className="space-y-4">
                   {[
@@ -278,7 +278,7 @@ export default function ReportingDashboard() {
                     { range: '61-90 days', amount: 1800, count: 3, status: 'danger' },
                     { range: '90+ days', amount: 850, count: 2, status: 'critical' }
                   ].map((aging, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700">
+                    <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-card dark:bg-neutral-800 border border-border dark:border-neutral-700">
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "w-10 h-10 rounded-xl flex items-center justify-center",
@@ -317,7 +317,7 @@ export default function ReportingDashboard() {
           <div className="space-y-8">
             
             {/* Bay Utilization */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] p-8">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] p-8">
               <h3 className="text-xl font-black tracking-tighter uppercase italic mb-6">Bay Utilization</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
@@ -369,13 +369,13 @@ export default function ReportingDashboard() {
             </Card>
 
             {/* Technician Performance */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] overflow-hidden">
               <div className="p-8">
                 <h3 className="text-xl font-black tracking-tighter uppercase italic mb-6">Technician Performance</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-neutral-50 dark:bg-neutral-800 border-y border-neutral-100 dark:border-neutral-700">
+                  <thead className="bg-card dark:bg-neutral-800 border-y border-border dark:border-neutral-700">
                     <tr>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Technician</th>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Jobs</th>
@@ -392,7 +392,7 @@ export default function ReportingDashboard() {
                       { name: 'Tom Williams', jobs: 35, avgTime: '2.8h', revenue: 15200, efficiency: 88, rating: 4.7 },
                       { name: 'Lisa Brown', jobs: 31, avgTime: '3.1h', revenue: 13600, efficiency: 82, rating: 4.6 }
                     ].map((tech, i) => (
-                      <tr key={i} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+                      <tr key={i} className="hover:bg-card dark:hover:bg-neutral-800/50 transition-colors">
                         <td className="px-6 py-4 text-sm font-black">{tech.name}</td>
                         <td className="px-6 py-4 text-sm font-bold">{tech.jobs}</td>
                         <td className="px-6 py-4 text-sm font-bold text-neutral-600">{tech.avgTime}</td>
@@ -428,7 +428,7 @@ export default function ReportingDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="border-none shadow-xl shadow-black/5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-[32px] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-card/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
                     <Users className="w-6 h-6" />
                   </div>
                   <div>
@@ -441,7 +441,7 @@ export default function ReportingDashboard() {
 
               <Card className="border-none shadow-xl shadow-black/5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-[32px] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-card/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
                     <TrendingUp className="w-6 h-6" />
                   </div>
                   <div>
@@ -454,7 +454,7 @@ export default function ReportingDashboard() {
 
               <Card className="border-none shadow-xl shadow-black/5 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-[32px] p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-card/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
                     <AlertCircle className="w-6 h-6" />
                   </div>
                   <div>
@@ -467,13 +467,13 @@ export default function ReportingDashboard() {
             </div>
 
             {/* Top Customers */}
-            <Card className="border-none shadow-xl shadow-black/5 bg-white dark:bg-neutral-900 rounded-[32px] overflow-hidden">
+            <Card className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 rounded-[32px] overflow-hidden">
               <div className="p-8">
                 <h3 className="text-xl font-black tracking-tighter uppercase italic mb-6">Top Customers by Revenue</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-neutral-50 dark:bg-neutral-800 border-y border-neutral-100 dark:border-neutral-700">
+                  <thead className="bg-card dark:bg-neutral-800 border-y border-border dark:border-neutral-700">
                     <tr>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Customer</th>
                       <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-neutral-500">Total Spent</th>
@@ -491,7 +491,7 @@ export default function ReportingDashboard() {
                       { name: 'Sarah Johnson', spent: 4900, visits: 6, avg: 817, lastVisit: '2 weeks ago', status: 'active' },
                       { name: 'Tech Solutions Inc', spent: 4200, visits: 9, avg: 467, lastVisit: '5 days ago', status: 'active' }
                     ].map((customer, i) => (
-                      <tr key={i} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+                      <tr key={i} className="hover:bg-card dark:hover:bg-neutral-800/50 transition-colors">
                         <td className="px-6 py-4 text-sm font-black">{customer.name}</td>
                         <td className="px-6 py-4 text-sm font-black text-blue-600">${customer.spent.toLocaleString()}</td>
                         <td className="px-6 py-4 text-sm font-bold">{customer.visits}</td>
