@@ -1,14 +1,14 @@
-import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
-import { db } from '../../lib/db';
-import * as schema from '../../lib/schema';
+import { db } from '../../lib/db.js';
+import * as schema from '../../lib/schema.js';
 import { eq, and } from 'drizzle-orm';
-import { calculateAvailability } from '../../lib/availability';
-import { sendSMS } from '../../lib/notifications/sms';
-import { sendEmail } from '../../lib/notifications/email';
-import { sendMagicLink, validateMagicLink } from '../../lib/auth/magic-link';
-import { createCheckoutSession } from '../../lib/payments';
+import { calculateAvailability } from '../../lib/availability.js';
+import { sendSMS } from '../../lib/notifications/sms.js';
+import { sendEmail } from '../../lib/notifications/email.js';
+import { sendMagicLink, validateMagicLink } from '../../lib/auth/magic-link.js';
+import { createCheckoutSession } from '../../lib/payments.js';
 import { v4 as uuidv4 } from 'uuid';
+import { router, publicProcedure } from '../trpc.js';
 
 /**
  * Public API Router
@@ -20,11 +20,9 @@ import { v4 as uuidv4 } from 'uuid';
  * - Webhook receivers (Xero, Stripe, etc.)
  */
 
-const t = initTRPC.create();
-
-export const publicRouter = t.router({
+export const publicRouter = router({
   // Get workshop info
-  getShopInfo: t.procedure
+  getShopInfo: publicProcedure
     .input(z.object({ shopId: z.string() }))
     .query(async ({ input }) => {
       const ledgerId = parseInt(input.shopId, 10);
@@ -50,7 +48,7 @@ export const publicRouter = t.router({
     }),
 
   // Get available time slots for booking
-  availability: t.procedure
+  availability: publicProcedure
     .input(
       z.object({
         shopId: z.string(),
@@ -80,7 +78,7 @@ export const publicRouter = t.router({
     }),
 
   // Create a new booking from website widget
-  createBooking: t.procedure
+  createBooking: publicProcedure
     .input(
       z.object({
         shopId: z.string(),
@@ -248,7 +246,7 @@ export const publicRouter = t.router({
     }),
 
   // Vehicle Registration Lookup (NZ context)
-  vehicleLookup: t.procedure
+  vehicleLookup: publicProcedure
     .input(z.object({ registration: z.string() }))
     .query(async ({ input }) => {
       // In a real 2026 system, this would call NZTA / MotorWeb / CarJam API
@@ -275,7 +273,7 @@ export const publicRouter = t.router({
 
   // Get DVI details for customer approval (public, token-based)
 
-  getDVI: t.procedure
+  getDVI: publicProcedure
     .input(
       z.object({
         token: z.string().uuid(),
@@ -334,7 +332,7 @@ export const publicRouter = t.router({
     }),
 
   // Submit DVI approval
-  approveDVI: t.procedure
+  approveDVI: publicProcedure
     .input(
       z.object({
         token: z.string().uuid(),
@@ -370,7 +368,7 @@ export const publicRouter = t.router({
     }),
 
   // Request a magic link for login
-  requestMagicLink: t.procedure
+  requestMagicLink: publicProcedure
     .input(z.object({ email: z.string().email().optional(), phone: z.string().optional() }))
     .mutation(async ({ input }) => {
       // Find customer by email or phone
@@ -384,14 +382,14 @@ export const publicRouter = t.router({
     }),
 
   // Validate magic link
-  verifyMagicLink: t.procedure
+  verifyMagicLink: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }) => {
       return await validateMagicLink(input.token);
     }),
 
   // Create payment checkout session
-  createPaymentSession: t.procedure
+  createPaymentSession: publicProcedure
     .input(z.object({ invoiceId: z.number(), customerId: z.number() }))
     .mutation(async ({ input }) => {
       // Get invoice details
@@ -420,7 +418,7 @@ export const publicRouter = t.router({
       });
     }),
   // Signup new workshop
-  signup: t.procedure
+  signup: publicProcedure
     .input(z.object({
       name: z.string().min(2),
       email: z.string().email(),
@@ -481,7 +479,7 @@ export const publicRouter = t.router({
     }),
 
   // Login (Simulated for MVP)
-  login: t.procedure
+  login: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
       const user = await db.query.users.findFirst({

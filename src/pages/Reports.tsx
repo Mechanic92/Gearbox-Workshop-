@@ -11,7 +11,6 @@ import {
   ArrowUp,
   ArrowDown,
   Target,
-  Zap,
   AlertCircle,
   CheckCircle2,
   BarChart3,

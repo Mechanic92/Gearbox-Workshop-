@@ -7,7 +7,7 @@ import {
   getIntegration,
   syncInvoiceToXero,
   disconnectIntegration,
-} from '../../../lib/integrations/xero-client';
+} from '../../../lib/integrations/xero-client.js';
 
 /**
  * Xero Integration Router

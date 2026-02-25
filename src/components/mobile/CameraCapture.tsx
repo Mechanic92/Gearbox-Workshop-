@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, X, Check, RotateCw, Zap } from 'lucide-react';
+import { Camera, X, Check, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 /**

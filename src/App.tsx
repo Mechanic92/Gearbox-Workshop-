@@ -26,6 +26,8 @@ import JobsList from "./pages/JobsList";
 import InvoicesList from "./pages/InvoicesList";
 import QuotesList from "./pages/QuotesList";
 import DVIList from "./pages/DVIList";
+import { AICommandOverlay } from "./components/AICommandOverlay";
+import Inventory from "./pages/Inventory";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
@@ -61,6 +63,7 @@ function ProtectedRoute({ component: Component, path }: { component: any, path: 
 
 function RouterComp() {
   return (
+    <>
     <Switch>
       {/* Public Pages */}
       <Route path="/" component={Home} />
@@ -121,15 +124,20 @@ function RouterComp() {
       <Route path="/trades/customers/:id">
         <ProtectedRoute component={CustomerDetail} path="/trades/customers/:id" />
       </Route>
+      <Route path="/trades/inventory">
+        <ProtectedRoute component={Inventory} path="/trades/inventory" />
+      </Route>
       <Route path="/trades/reports">
         <ProtectedRoute component={Reports} path="/trades/reports" />
       </Route>
       <Route path="/settings">
         <ProtectedRoute component={Settings} path="/settings" />
       </Route>
-      
       <Route component={NotFound} />
     </Switch>
+
+    <AICommandOverlay />
+    </>
   );
 }
 
@@ -140,7 +148,7 @@ function App() {
       transformer: superjson,
       links: [
         httpBatchLink({
-          url: `/api/trpc`,
+          url: `${(import.meta as any).env.VITE_API_URL || ''}/api/trpc`,
           headers() {
             const userId = localStorage.getItem("gearbox_user_id");
             return userId ? { "x-user-id": userId } : {};
@@ -157,8 +165,8 @@ function App() {
           <ThemeProvider defaultTheme="dark">
             <LedgerProvider>
               <TooltipProvider>
-                <Toaster />
-                <RouterComp />
+                <Toaster position="top-center" richColors />
+    <RouterComp />
               </TooltipProvider>
             </LedgerProvider>
           </ThemeProvider>

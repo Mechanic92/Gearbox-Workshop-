@@ -15,7 +15,7 @@ import { trpc } from "@/lib/trpc";
 import { 
   ArrowLeft, Calculator, Loader2, Sparkles, 
   Wrench, User, Phone, Mail, Car, TrendingUp,
-  ChevronRight, ArrowRight, Zap, Target
+  ChevronRight, ArrowRight, Activity, Target
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
@@ -142,7 +142,7 @@ export default function NewJob() {
             onClick={handleSubmit}
             disabled={createJobMutation.isLoading || !jobNumber.trim() || !description.trim()}
           >
-            {createJobMutation.isLoading ? <Loader2 className="animate-spin" /> : <><Zap className="w-4 h-4 mr-2" /> Activate Job</>}
+            {createJobMutation.isLoading ? <Loader2 className="animate-spin" /> : <><Activity className="w-4 h-4 mr-2" /> Activate Job</>}
           </Button>
         </div>
       </div>

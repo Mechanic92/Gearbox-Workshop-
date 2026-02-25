@@ -6,43 +6,66 @@
 
 @layer base {
   :root {
-    /* Spotify / Dark Premium Palette (using oklch for better vibrancy) */
-    /* Standard HSL for maximum compatibility */
-    --background: 220 15% 5%;
+    /* Soft Midnight / Matte Slate - Less oppressive than pure black */
+    --background: 222 20% 12%;
     --foreground: 210 20% 98%;
     
-    --card: 220 15% 8%;
+    --card: 222 18% 18%;
     --card-foreground: 210 20% 98%;
  
-    --popover: 220 15% 8%;
+    --popover: 222 18% 16%;
     --popover-foreground: 210 20% 98%;
  
-    --primary: 150 100% 40%; /* Vibrant Emerald */
-    --primary-foreground: 150 100% 5%;
+    --primary: 199 89% 48%; /* Tech Blue */
+    --primary-foreground: 210 20% 98%;
  
-    --secondary: 220 15% 12%;
+    --secondary: 222 15% 25%;
     --secondary-foreground: 210 20% 98%;
  
-    --muted: 220 15% 15%;
-    --muted-foreground: 215 15% 65%;
+    --muted: 222 15% 22%;
+    --muted-foreground: 217.9 10.6% 70%;
  
-    --accent: 150 100% 40%;
-    --accent-foreground: 150 100% 5%;
+    --accent: 222 15% 25%;
+    --accent-foreground: 210 20% 98%;
  
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
  
-    --border: 220 15% 15%;
-    --input: 220 15% 15%;
-    --ring: 150 100% 40%;
+    --border: 222 15% 25%;
+    --input: 222 15% 25%;
+    --ring: 199 89% 48%;
  
-    --radius: 1.5rem; /* More modern, rounder corners */
+    --radius: 1.25rem; /* Less blobby, more "precision" */
   }
-
+ 
   .dark {
-    --background: 220 15% 5%;
-    --card: 220 15% 8%;
-    --border: 220 15% 15%;
+    --background: 222 20% 12%;
+    --foreground: 210 20% 98%;
+ 
+    --card: 222 18% 18%;
+    --card-foreground: 210 20% 98%;
+ 
+    --popover: 222 18% 16%;
+    --popover-foreground: 210 20% 98%;
+ 
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 20% 98%;
+ 
+    --secondary: 222 15% 25%;
+    --secondary-foreground: 210 20% 98%;
+ 
+    --muted: 222 15% 22%;
+    --muted-foreground: 217.9 10.6% 70%;
+ 
+    --accent: 222 15% 25%;
+    --accent-foreground: 210 20% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+ 
+    --border: 222 15% 25%;
+    --input: 222 15% 25%;
+    --ring: 199 89% 48%;
   }
 }
 

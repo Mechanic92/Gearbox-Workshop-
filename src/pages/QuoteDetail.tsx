@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Copy, Download, Share2, Check, X, Clock, 
-  Eye, ArrowLeft, Zap, FileText, Calendar,
+  Eye, ArrowLeft, Activity, FileText, Calendar,
   DollarSign, Package, Wrench, ChevronRight,
   ShieldCheck, Loader2
 } from "lucide-react";
@@ -136,7 +136,7 @@ export default function QuoteDetail() {
                 <Card className="border-none glass-dark rounded-[2.5rem] p-8 space-y-6 premium-shadow">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-                            <Zap size={24} fill="currentColor" />
+                            <Activity size={24} fill="currentColor" />
                         </div>
                         <div>
                             <h3 className="text-[10px] font-black text-white/30 uppercase tracking-widest">Target Node</h3>
@@ -257,7 +257,7 @@ export default function QuoteDetail() {
                         className="h-20 rounded-[2.5rem] border-primary/40 bg-primary/10 text-primary font-black uppercase tracking-widest text-xs italic"
                         onClick={() => setLocation(`/trades/jobs/${quote.jobId}`)}
                     >
-                        Active Workshop Cycle #{quote.jobId} <Zap size={16} className="ml-3 fill-current" />
+                        Active Workshop Cycle #{quote.jobId} <Activity size={16} className="ml-3 fill-current" />
                     </Button>
                 )}
             </div>

@@ -3,13 +3,15 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { appRouter } from './routers';
-import { createContext } from './trpc';
-import { handleStripeWebhook } from '../lib/payments';
-import { handleSubscriptionWebhook } from '../lib/stripe-subscriptions';
-import { handleXeroWebhook } from '../lib/integrations/xero-client';
-import { initializeDatabase } from '../lib/db-init';
-import { handlePublicIngestion } from './ingestion';
+import { appRouter } from './routers.js';
+import { createContext } from './trpc.js';
+import { handleStripeWebhook } from '../lib/payments.js';
+import { handleSubscriptionWebhook } from '../lib/stripe-subscriptions.js';
+import { handleXeroWebhook } from '../lib/integrations/xero-client.js';
+import { initializeDatabase } from '../lib/db-init.js';
+import { handlePublicIngestion } from './ingestion.js';
+import { initializeAutomations } from './automations.js';
+import { initializeIntelligence } from '../lib/intelligence/collector.js';
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -102,9 +104,11 @@ if (process.env.NODE_ENV === 'production') {
 async function startServer() {
   try {
     await initializeDatabase();
+    initializeAutomations();
+    initializeIntelligence();
     isReady = true;
     app.listen(port, host, () => {
-      console.log(`Server listening at http://localhost:${port}`);
+      console.log(`🚀 [Gearbox OS] Operational at http://${host}:${port}`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);

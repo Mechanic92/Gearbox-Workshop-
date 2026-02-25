@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Zap, Loader2 } from "lucide-react";
+import { Activity, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLedger } from "@/contexts/LedgerContext";
 
@@ -45,7 +45,7 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="text-center mb-8 space-y-2">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-dark text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/20 mb-4">
-                <Zap size={12} className="fill-primary" /> Member Access
+                <Activity size={12} className="fill-primary" /> Member Access
             </div>
             <h1 className="text-4xl font-black tracking-tighter italic">Login</h1>
             <p className="text-white/40">Access your workshop command center.</p>

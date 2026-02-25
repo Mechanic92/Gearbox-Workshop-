@@ -1,6 +1,6 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import * as schema from './schema';
+import * as schema from './schema.js';
 import { eq, and, like, desc, sql } from "drizzle-orm";
 import crypto from "node:crypto";
 
@@ -629,27 +629,42 @@ export async function createSupplier(input: any) {
 }
 
 export async function recordStockMovement(input: any) {
+    const { partId, ledgerId, quantity, movementType, notes, createdBy } = input;
+    
     return await db.transaction(async (tx) => {
-        const movement = await tx.insert(schema.stockMovements).values({
-            ...input,
-            createdAt: new Date()
+        const [movement] = await tx.insert(schema.stockMovements).values({
+            ledgerId,
+            partId,
+            movementType,
+            quantity,
+            notes,
+            createdBy,
         }).returning();
 
-        // Update current stock level
         const part = await tx.query.parts.findFirst({
-            where: eq(schema.parts.id, input.partId)
+            where: eq(schema.parts.id, partId)
         });
 
         if (part) {
-            await tx.update(schema.parts)
-                .set({ 
-                    stockQuantity: (part.stockQuantity || 0) + input.quantity,
-                    updatedAt: new Date()
-                })
-                .where(eq(schema.parts.id, input.partId));
+            await tx.update(schema.parts).set({ 
+                stockQuantity: (part.stockQuantity || 0) + quantity,
+                updatedAt: new Date()
+            }).where(eq(schema.parts.id, partId));
         }
 
-        return movement[0];
+        return movement;
+    });
+}
+
+export async function getStockMovements(ledgerId: number, partId?: number) {
+    const conditions = [eq(schema.stockMovements.ledgerId, ledgerId)];
+    if (partId) {
+        conditions.push(eq(schema.stockMovements.partId, partId));
+    }
+    
+    return db.query.stockMovements.findMany({
+        where: and(...conditions),
+        orderBy: desc(schema.stockMovements.createdAt)
     });
 }
 
@@ -684,4 +699,13 @@ export async function getDashboardStats(ledgerId: number) {
         activeAssets: allParts.length,
     };
 }
+
+export async function getAutonomousActions(ledgerId: number) {
+    return db.query.autonomousActions.findMany({
+        where: eq(schema.autonomousActions.ledgerId, ledgerId),
+        orderBy: desc(schema.autonomousActions.createdAt),
+        limit: 10
+    });
+}
+
 

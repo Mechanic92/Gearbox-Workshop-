@@ -1,5 +1,5 @@
-import { db } from './db';
-import * as schema from './schema';
+import { db } from './db.js';
+import * as schema from './schema.js';
 import { eq, and, lte, gte } from 'drizzle-orm';
 
 /**

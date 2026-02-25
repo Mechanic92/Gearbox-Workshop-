@@ -1,13 +1,13 @@
-import { router, protectedProcedure } from '../trpc';
+import { router, protectedProcedure } from '../trpc.js';
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import {
   createSubscriptionCheckout,
   createBillingPortalSession,
   getSubscriptionStatus,
-} from '../../lib/stripe-subscriptions';
-import { getCurrentUsage, TIER_LIMITS } from '../../lib/feature-gates';
-import * as db from '../../lib/db';
+} from '../../lib/stripe-subscriptions.js';
+import { getCurrentUsage, TIER_LIMITS } from '../../lib/feature-gates.js';
+import * as db from '../../lib/db.js';
 
 /**
  * Billing & Subscription Management Router

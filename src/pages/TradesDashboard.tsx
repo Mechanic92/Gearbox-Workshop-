@@ -6,57 +6,26 @@ import {
   Building2, Car, FileText, Loader2, Plus, Wrench, 
   TrendingUp, Clock, CheckCircle2, AlertCircle, 
   ChevronRight, Calendar, ArrowUpRight, X, Users, BarChart3,
-  Search, Filter, LayoutGrid, Zap, Package
+  Search, Filter, LayoutGrid, Activity, Package, Bot
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { LedgerSwitcher } from "@/components/LedgerSwitcher";
-import { useState } from "react";
+import { toast } from "sonner";
+import React, { useState } from 'react';
 import { useAuth } from "@/_core/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-
 export default function TradesDashboard() {
   const { user } = useAuth();
   const { activeLedgerId, activeLedgerType } = useLedger();
+  const [, setLocation] = useLocation();
+  const [ledgerSwitcherOpen, setLedgerSwitcherOpen] = useState(false);
+
   const { data: ledger } = trpc.ledger.get.useQuery(
     { id: activeLedgerId! },
     { enabled: !!activeLedgerId }
   );
-  const [, setLocation] = useLocation();
-  const [ledgerSwitcherOpen, setLedgerSwitcherOpen] = useState(false);
-
-  const resolveJobStatusKey = (status: unknown) => {
-    const raw = typeof status === "string" ? status : "";
-    const normalized = raw.trim().toUpperCase();
-    if (normalized === "NEW") return "NEW";
-    if (normalized === "IN_PROGRESS" || normalized === "IN PROGRESS") return "IN_PROGRESS";
-    if (normalized === "WAITING_APPROVAL" || normalized === "WAITING APPROVAL") return "WAITING_APPROVAL";
-    if (normalized === "COMPLETED") return "COMPLETED";
-    if (normalized === "CLOSED") return "CLOSED";
-    if (normalized === "CANCELLED" || normalized === "CANCELED") return "CANCELLED";
-    if (normalized === "QUOTED" || normalized === "DRAFT") return "QUOTED";
-    return "NEW";
-  };
-
-  // Wait for ledger context to initialize from localStorage
-  if (activeLedgerId === null || activeLedgerType === null) {
-    // Not loaded yet - show loading
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background space-y-6">
-        <div className="relative">
-          <div className="w-24 h-24 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
-          <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary w-8 h-8 fill-primary" />
-        </div>
-        <p className="text-sm font-black text-muted-foreground animate-pulse tracking-[0.4em] uppercase">Loading Dashboard...</p>
-      </div>
-    );
-  }
-
-  if (activeLedgerType !== "trades") {
-    setLocation("/setup/ledger");
-    return null;
-  }
 
   const { data: jobs, isLoading: jobsLoading } = trpc.job.list.useQuery(
     { ledgerId: activeLedgerId! },
@@ -68,276 +37,219 @@ export default function TradesDashboard() {
     { enabled: !!activeLedgerId }
   );
 
-  const { data: stats } = trpc.analytics.getDashboardStats.useQuery(
+  const { data: aiInsights, isLoading: insightsLoading } = trpc.ai.getExecutiveInsights.useQuery(
+    { ledgerId: activeLedgerId! },
+    { enabled: !!activeLedgerId }
+  );
+  
+  const { data: automationActions } = trpc.automation.getRecentActions.useQuery(
     { ledgerId: activeLedgerId! },
     { enabled: !!activeLedgerId }
   );
 
-  const { data: aiInsights } = trpc.ai.getExecutiveInsights.useQuery(
-    { ledgerId: activeLedgerId! },
-    { enabled: !!activeLedgerId }
-  );
+  const resolveJobStatusKey = (status: unknown) => {
+    const raw = typeof status === "string" ? status.trim().toUpperCase() : "";
+    if (raw === "NEW") return "NEW";
+    if (raw === "IN_PROGRESS" || raw === "IN PROGRESS") return "IN_PROGRESS";
+    if (raw === "WAITING_APPROVAL" || raw === "WAITING APPROVAL") return "WAITING_APPROVAL";
+    if (raw === "COMPLETED") return "COMPLETED";
+    if (raw === "CLOSED") return "CLOSED";
+    if (raw === "CANCELLED" || raw === "CANCELED") return "CANCELLED";
+    return "NEW";
+  };
 
-  const activeJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "IN_PROGRESS") || [];
-  const completedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "COMPLETED") || [];
-  const quotedJobs = jobs?.filter((j) => resolveJobStatusKey((j as any).status) === "NEW") || [];
+  const statusConfig: Record<string, any> = {
+    NEW: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "New" },
+    IN_PROGRESS: { color: "text-primary", bg: "bg-primary/10", icon: Wrench, label: "In Progress" },
+    WAITING_APPROVAL: { color: "text-amber-400", bg: "bg-amber-400/10", icon: Clock, label: "Awaiting Action" },
+    COMPLETED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Completed" },
+    CLOSED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Closed" },
+    CANCELLED: { color: "text-red-400", bg: "bg-red-400/10", icon: X, label: "Cancelled" },
+  };
+
+  if (activeLedgerId === null) {
+     setLocation("/setup/ledger");
+     return null;
+  }
 
   if (jobsLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background space-y-6">
-        <div className="relative">
-          <div className="w-24 h-24 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
-          <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary w-8 h-8 fill-primary" />
-        </div>
-        <p className="text-sm font-black text-muted-foreground animate-pulse tracking-[0.4em] uppercase">Synchronizing Systems...</p>
+        <Activity className="animate-pulse text-primary w-12 h-12" />
+        <p className="text-[10px] font-black text-muted-foreground tracking-[0.4em] uppercase">Synchronizing Systems...</p>
       </div>
     );
   }
 
+  const activeJobs = jobs?.filter((j) => resolveJobStatusKey(j.status) === "IN_PROGRESS") || [];
+
   return (
-    <div className="min-h-screen bg-background text-white pb-32 overflow-x-hidden">
-      {/* Universal Command Header */}
-      <header className="sticky top-0 z-30 glass shadow-2xl">
-        <div className="container py-6 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-card text-foreground flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] group hover:scale-110 transition-transform">
-                <Zap size={28} className="fill-current" />
+    <div className="min-h-screen bg-background text-white pb-32">
+       {/* Background Subtle Gradient */}
+       <div className="fixed inset-0 pointer-events-none opacity-20">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+       </div>
+
+       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 relative z-10">
+          <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-1 bg-primary rounded-full" />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Operational Protocol</p>
+              </div>
+              <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic">
+                Workflow <span className="text-primary">Queue.</span>
+              </h1>
             </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tighter uppercase italic leading-none">{ledger?.name?.toUpperCase() || "COMMAND CENTER"}</h1>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_oklch(var(--primary))]" />
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">GEARBOX 2026 // {user?.name}</p>
+            <div className="flex items-center gap-3">
+               <LedgerSwitcher />
+               <Button 
+                  onClick={() => setLocation("/trades/jobs/new")}
+                  className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20 hover:scale-105 transition-all"
+               >
+                  <Plus size={18} className="mr-2" strokeWidth={3} />
+                  New Job
+               </Button>
+            </div>
+          </header>
+
+          <div className="grid lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-8 space-y-10">
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {[
+                    { label: "Active Revenue", value: `$${(activeJobs.reduce((acc, j) => acc + (parseFloat(j.quotedPrice as any) || 0), 0)).toLocaleString()}`, icon: TrendingUp, color: "text-emerald-400" },
+                    { label: "Workshop Load", value: `${activeJobs.length} Units`, icon: Activity, color: "text-primary" },
+                    { label: "New Auth", value: jobs?.filter(j => j.status === "WAITING_APPROVAL").length || 0, icon: Clock, color: "text-amber-400" },
+                    { label: "Asset Count", value: vehicles?.length || 0, icon: Car, color: "text-blue-400" }
+                 ].map((m, i) => (
+                    <Card key={i} className="bg-card/30 border-white/5 backdrop-blur-xl rounded-[2rem] p-6 hover:bg-card/50 transition-colors">
+                       <m.icon size={20} className={cn("mb-4", m.color)} />
+                       <p className="text-2xl font-black tracking-tighter text-white">{m.value}</p>
+                       <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1">{m.label}</p>
+                    </Card>
+                 ))}
+              </div>
+
+              {/* Workflow Protocol */}
+              <div className="space-y-6">
+                  <div className="flex items-center justify-between px-2">
+                      <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 italic">Primary Workflow Protocol</h2>
+                      <Button variant="link" onClick={() => setLocation("/trades/jobs")} className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary p-0 h-auto">
+                        View Full Ledger
+                      </Button>
+                  </div>
+
+                  <div className="grid gap-4">
+                    {activeJobs.map((job) => {
+                      const status = statusConfig[resolveJobStatusKey(job.status)] || statusConfig.IN_PROGRESS;
+                      const StatusIcon = status.icon;
+
+                      return (
+                        <Card 
+                          key={job.id} 
+                          className="group bg-card/20 border-white/5 backdrop-blur-md hover:bg-card/40 transition-all cursor-pointer rounded-[2rem]"
+                          onClick={() => setLocation(`/trades/jobs/${job.id}`)}
+                        >
+                          <div className="p-6 flex items-center justify-between gap-6">
+                             <div className="flex items-center gap-6 flex-1 min-w-0">
+                                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5", status.bg, status.color)}>
+                                   <StatusIcon size={24} />
+                                </div>
+                                <div className="min-w-0">
+                                   <div className="flex items-center gap-3 mb-1">
+                                      <span className="text-[10px] font-mono font-black text-white/20 uppercase tracking-widest">#{job.jobNumber}</span>
+                                      <span className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border border-current", status.bg, status.color)}>
+                                        {status.label}
+                                      </span>
+                                   </div>
+                                   <h3 className="text-xl font-black text-white truncate group-hover:text-primary transition-colors italic uppercase">{job.description}</h3>
+                                   <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{job.customerName || "Service Walk-in"}</p>
+                                </div>
+                             </div>
+                             <div className="flex items-center gap-10">
+                                <div className="text-right hidden sm:block">
+                                   <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Quoted Value</p>
+                                   <p className="text-2xl font-black text-white italic tracking-tighter">${(parseFloat(job.quotedPrice as any) || 0).toLocaleString()}</p>
+                                </div>
+                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/10 group-hover:bg-primary group-hover:text-black transition-all">
+                                   <ChevronRight size={18} />
+                                </div>
+                             </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                    {activeJobs.length === 0 && (
+                      <div className="py-20 text-center glass rounded-[3rem] border-dashed border-2 border-white/5">
+                         <Wrench size={32} className="mx-auto text-white/5 mb-4" />
+                         <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">No active operational units</p>
+                      </div>
+                    )}
+                  </div>
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-             <Button 
-                variant="ghost" 
-                className="hidden md:flex font-black uppercase tracking-widest text-[10px] hover:bg-card/5 border border-white/10 rounded-xl px-6 h-12"
-                onClick={() => setLedgerSwitcherOpen(true)}
-             >
-                Switch Identity
-             </Button>
-             <Button 
-                className="shadow-[0_15px_30px_rgba(0,0,0,0.3)] bg-card text-foreground hover:bg-primary hover:text-white transition-all duration-500 font-black uppercase tracking-widest text-[10px] rounded-xl px-8 h-12"
-                onClick={() => setLocation("/trades/jobs/new")}
-             >
-                <Plus className="w-4 h-4 mr-2" strokeWidth={3} /> Register Job
-             </Button>
-          </div>
-          <LedgerSwitcher open={ledgerSwitcherOpen} onOpenChange={setLedgerSwitcherOpen} />
-        </div>
-      </header>
 
-      <div className="container py-12 space-y-16">
-        {/* AI Executive Insights */}
-        {aiInsights && aiInsights.insights.length > 0 && (
-          <section className="animate-in fade-in slide-in-from-top-4 duration-1000">
-             <div className="glass rounded-[3rem] p-8 border-l-4 border-primary overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-10">
-                   <Zap className="w-48 h-48 text-primary" />
-                </div>
-                <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
-                   <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                      <Zap className="w-8 h-8 text-primary fill-current" />
-                   </div>
-                   <div className="flex-1 space-y-4">
-                      <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary">Executive Intelligence Briefing</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                         {aiInsights.insights.map((insight: any, idx: number) => (
-                            <div key={idx} className="flex-1 min-w-[300px] flex items-center justify-between gap-6 p-6 rounded-3xl bg-card/5 border border-white/5 group/insight">
-                               <div className="space-y-1 flex-1">
-                                  <div className="flex items-center gap-2">
-                                     <p className="text-sm font-black uppercase italic tracking-tighter text-white">{insight.title}</p>
-                                     {insight.impact === 'high' && <Badge className="bg-red-500 text-white border-none text-[8px] uppercase tracking-widest font-black animate-pulse">Critical Input</Badge>}
-                                  </div>
-                                  <p className="text-xs text-white/50 font-medium leading-relaxed">{insight.description}</p>
-                               </div>
-                               <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-10 rounded-xl font-black text-[9px] uppercase tracking-widest border-white/10 group-hover/insight:bg-primary group-hover/insight:text-white transition-all"
-                                onClick={() => {
-                                    if (insight.type === 'maintenance') {
-                                        toast.info("Initializing Predictive Maintenance Scan...");
-                                        // Logic to navigate or trigger scan
-                                    } else {
-                                        toast.success("Command Executed: Syncing with Accounting Node");
-                                    }
-                                }}
-                               >
-                                   {insight.type === 'maintenance' ? 'Command' : 'Engage'}
-                               </Button>
-                            </div>
-                         ))}
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </section>
-        )}
-
-        {/* KPI Scorecards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-                { label: "Active Operations", val: stats?.activeOperations ?? 0, icon: Wrench, color: "text-primary", bg: "bg-primary/10", tag: "Live" },
-                { label: "Pending Approval", val: stats?.pendingQuotes ?? 0, icon: FileText, color: "text-blue-400", bg: "bg-blue-400/10", tag: "Quotes" },
-                { label: "Inventory Alert", val: stats?.lowStockItems ?? 0, icon: Package, color: "text-amber-400", bg: "bg-amber-400/10", tag: "Low Stock" }
-            ].map((stat, i) => (
-                <div key={i} className="group relative p-[1px] rounded-[2.5rem] bg-card/5 hover:bg-gradient-to-br from-white/20 to-transparent transition-all duration-500 premium-shadow">
-                    <Card className="border-none glass-dark rounded-[2.4rem] overflow-hidden">
-                        <CardContent className="p-10">
-                            <div className="flex items-center justify-between mb-8">
-                                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5", stat.bg, stat.color)}>
-                                    <stat.icon size={28} />
-                                </div>
-                                <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full", stat.bg, stat.color)}>
-                                    {stat.tag}
-                                </span>
-                            </div>
-                            <div className="text-7xl font-black tracking-tighter text-white group-hover:scale-105 transition-transform duration-700 origin-left">{stat.val.toString().padStart(2, '0')}</div>
-                            <p className="text-xs font-black text-white/30 uppercase tracking-[0.2em] mt-4">{stat.label}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-            ))}
-        </section>
-
-
-        <div className="grid lg:grid-cols-3 gap-16">
-          {/* Work Intel Feed */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="flex items-center justify-between px-4">
-                <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white flex items-center gap-3">
-                    <Zap className="w-6 h-6 text-primary fill-primary" />
-                    System Feed
-                </h2>
-                <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-card/5"><Search size={18} /></Button>
-                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-card/5"><Filter size={18} /></Button>
-                </div>
-            </div>
-
-            {!jobs || jobs.length === 0 ? (
-               <div className="py-24 text-center glass rounded-[4rem] border-2 border-dashed border-white/5">
-                    <div className="w-24 h-24 rounded-[2.5rem] bg-card/5 flex items-center justify-center mx-auto mb-8 border border-white/10">
-                        <Wrench className="w-10 h-10 text-white/20" />
+            <div className="lg:col-span-4 space-y-10">
+               {/* AI Intelligence Card */}
+               <Card className="bg-gradient-to-br from-primary/10 to-transparent border-white/5 rounded-[2.5rem] p-8 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-5">
+                    <Bot size={100} />
+                  </div>
+                  <div className="relative space-y-6">
+                    <div className="flex items-center gap-3">
+                       <Bot size={16} className="text-primary" />
+                       <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Neural Insights</h3>
                     </div>
-                    <h3 className="text-3xl font-black tracking-tighter text-white mb-3 italic">System Idle.</h3>
-                    <p className="text-muted-foreground font-medium max-w-xs mx-auto mb-10">Initialize your first operational sequence to begin tracking.</p>
-                    <Button onClick={() => setLocation("/trades/jobs/new")} className="h-16 px-12 rounded-full bg-card text-foreground font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">
-                        Launch Initial Sequence
-                    </Button>
+                    {insightsLoading ? (
+                       <div className="space-y-4">
+                          {[1, 2].map(i => <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />)}
+                       </div>
+                    ) : (
+                       <div className="space-y-6">
+                          {aiInsights?.insights.slice(0, 2).map((insight: any, i: number) => (
+                             <div key={i} className="space-y-2">
+                                <h4 className="text-[11px] font-black text-white uppercase tracking-tight flex items-center gap-2 italic">
+                                   <div className={cn("w-1.5 h-1.5 rounded-full", insight.type === 'opportunity' ? "bg-emerald-500" : "bg-blue-500")} />
+                                   {insight.title}
+                                </h4>
+                                <p className="text-[11px] text-white/50 leading-relaxed font-medium">{insight.description}</p>
+                             </div>
+                          ))}
+                       </div>
+                    )}
+                  </div>
+               </Card>
+
+               {/* Automation Events */}
+               <div className="space-y-6">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 px-2">Operational Events</h3>
+                  <div className="space-y-3">
+                     {automationActions?.slice(0, 3).map((act: any) => (
+                        <div key={act.id} className="p-4 rounded-2xl bg-card/20 border border-white/5 hover:bg-card/40 transition-colors">
+                           <div className="flex justify-between items-center mb-1">
+                              <span className="text-[8px] font-black text-primary uppercase tracking-widest">{act.type}</span>
+                              <span className="text-[8px] font-bold text-white/10 uppercase">Recap</span>
+                           </div>
+                           <p className="text-[11px] font-black text-white uppercase italic tracking-tight">{act.action}</p>
+                           <p className="text-[10px] text-white/30 truncate uppercase tracking-tighter mt-1">{act.result}</p>
+                        </div>
+                     ))}
+                  </div>
                </div>
-            ) : (
-                <div className="grid grid-cols-1 gap-6">
-                    {jobs.slice(0, 8).map((job) => {
-                        const statusConfig = {
-                            NEW: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "New" },
-                            IN_PROGRESS: { color: "text-primary", bg: "bg-primary/10", icon: Wrench, label: "In Progress" },
-                            WAITING_APPROVAL: { color: "text-blue-400", bg: "bg-blue-400/10", icon: FileText, label: "Waiting Approval" },
-                            COMPLETED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Completed" },
-                            CLOSED: { color: "text-emerald-400", bg: "bg-emerald-400/10", icon: CheckCircle2, label: "Closed" },
-                            CANCELLED: { color: "text-red-400", bg: "bg-red-400/10", icon: X, label: "Cancelled" },
-                        };
-                        const statusKey = resolveJobStatusKey((job as any).status) as keyof typeof statusConfig;
-                        const config = statusConfig[statusKey] || statusConfig.IN_PROGRESS;
-                        
-                        return (
-                            <div 
-                                key={job.id} 
-                                className="group relative glass hover:bg-card/5 transition-all duration-500 cursor-pointer rounded-[2.5rem] overflow-hidden border-none"
-                                onClick={() => setLocation(`/trades/jobs/${job.id}`)}
-                            >
-                                <div className="p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-8">
-                                    <div className="flex items-start gap-6">
-                                        <div className={cn("w-16 h-16 rounded-[1.5rem] flex items-center justify-center border border-white/5", config.bg, config.color)}>
-                                            <config.icon size={32} strokeWidth={2.5} />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-black tracking-[0.2em] opacity-30 text-white">#{job.jobNumber}</span>
-                                                <span className={cn("text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full", config.bg, config.color)}>
-                                                    {config.label}
-                                                </span>
-                                            </div>
-                                            <h4 className="text-2xl font-black tracking-tighter text-white group-hover:text-primary transition-colors italic">{job.description}</h4>
-                                            <div className="flex items-center gap-2 text-white/40">
-                                                <Users size={14} className="text-primary" />
-                                                <span className="text-xs font-black uppercase tracking-widest">{job.customerName || "External Node"}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center justify-between sm:flex-col sm:items-end sm:justify-center gap-4 border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0">
-                                        <div className="text-4xl font-black tracking-tighter text-white group-hover:scale-110 transition-transform">
-                                            ${((job.quotedPrice as any) as number).toLocaleString()}
-                                        </div>
-                                        <Button variant="ghost" className="rounded-full w-10 h-10 p-0 hover:bg-primary hover:text-white transition-all">
-                                            <ChevronRight size={20} />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-          </div>
 
-          {/* Right Sidebar */}
-          <div className="space-y-12">
-            <div className="glass rounded-[3rem] p-8 space-y-8 premium-shadow">
-                <header className="flex items-center justify-between px-2">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Fleet Intelligence</h3>
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_oklch(var(--emerald-500))]" />
-                </header>
-                
-                <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-3xl bg-primary text-primary-foreground flex items-center justify-center shadow-2xl shadow-primary/20">
-                        <Car size={40} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <div className="text-5xl font-black tracking-tighter text-white">{(vehicles?.length || 0).toString().padStart(2, '0')}</div>
-                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Active Assets</p>
-                    </div>
-                </div>
-                
-                <Button 
-                    className="w-full h-16 rounded-2xl bg-card/5 border border-white/10 font-bold hover:bg-primary hover:border-primary transition-all duration-500 text-xs uppercase tracking-widest"
-                    onClick={() => setLocation("/trades/vehicles/new")}
-                >
-                    Register Asset
-                </Button>
-            </div>
-
-            <div className="glass rounded-[3rem] p-8 space-y-8">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Quick Access</h3>
-                <div className="grid grid-cols-1 gap-4">
-                    {[
-                        { label: "Revenue Matrix", icon: BarChart3, path: "/trades/reports", desc: "Financial Intelligence" },
-                        { label: "Bookings Hub", icon: Calendar, path: "/bookings", desc: "Operational Schedule" },
-                    ].map((btn, i) => (
-                        <button 
-                            key={i}
-                            onClick={() => setLocation(btn.path)}
-                            className="flex items-center gap-4 p-5 rounded-[2rem] bg-card/5 hover:bg-primary group transition-all duration-500 text-left"
-                        >
-                            <div className="w-12 h-12 rounded-2xl bg-card/5 flex items-center justify-center group-hover:bg-card/20 transition-colors">
-                                <btn.icon size={20} className="text-white group-hover:scale-110 transition-transform" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-black text-white uppercase tracking-tight">{btn.label}</p>
-                                <p className="text-[9px] text-white/30 uppercase tracking-widest font-bold group-hover:text-foreground/60">{btn.desc}</p>
-                            </div>
-                        </button>
-                    ))}
-                </div>
+               {/* Quick Commands */}
+               <div className="grid grid-cols-1 gap-2">
+                  <Button variant="outline" onClick={() => setLocation("/bookings")} className="h-12 rounded-xl bg-card/5 border-white/5 font-black uppercase tracking-widest text-[9px] hover:bg-primary transition-all">
+                    Access Scheduler
+                  </Button>
+                  <Button variant="outline" onClick={() => setLocation("/trades/inventory")} className="h-12 rounded-xl bg-card/5 border-white/5 font-black uppercase tracking-widest text-[9px] hover:bg-primary transition-all">
+                    Review Stock List
+                  </Button>
+               </div>
             </div>
           </div>
-        </div>
-      </div>
+       </div>
     </div>
   );
 }

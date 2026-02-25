@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Phone, Loader2, Calendar as CalendarIcon, Zap } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Phone, Loader2, Calendar as CalendarIcon, Activity } from "lucide-react";
 import { useLedger } from "@/contexts/LedgerContext";
 
 export default function BookingCalendar() {
@@ -172,7 +172,7 @@ export default function BookingCalendar() {
                 <p className="text-[10px] font-black uppercase tracking-widest text-white/30">System Status</p>
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <Zap size={20} fill="currentColor" />
+                        <Activity size={20} fill="currentColor" />
                     </div>
                     <div>
                         <p className="text-sm font-black uppercase italic">Ledger Sync Active</p>
@@ -290,7 +290,7 @@ export default function BookingCalendar() {
                     onClick={handleSubmitBooking}
                     disabled={createBookingMutation.isLoading || !selectedDate || !selectedTime || !serviceType || !customerName || !customerPhone || !customerEmail}
                    >
-                    {createBookingMutation.isLoading ? <Loader2 className="animate-spin" /> : <><Zap size={18} fill="currentColor" className="mr-3" /> Commit Reservation to Ledger</>}
+                    {createBookingMutation.isLoading ? <Loader2 className="animate-spin" /> : <><Activity size={18} fill="currentColor" className="mr-3" /> Commit Reservation to Ledger</>}
                    </Button>
                 </CardContent>
             </Card>

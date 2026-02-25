@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Settings as SettingsIcon, Wrench, ArrowRight, Zap, Shield, Globe } from "lucide-react";
+import { LayoutDashboard, Settings as SettingsIcon, Wrench, ArrowRight, Activity, Shield, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
@@ -34,7 +34,7 @@ export default function Home() {
       <div className="max-w-5xl w-full space-y-20 relative z-10">
         <header className="text-center space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
           <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full glass-dark text-primary text-xs font-black uppercase tracking-[0.3em] border border-primary/20">
-            <Zap size={14} className="fill-primary" /> 2026 Ecosystem Early Access
+            <Activity size={14} className="fill-primary" /> 2026 Ecosystem Early Access
           </div>
           <h1 className="text-6xl sm:text-9xl font-black tracking-tighter text-white italic bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40 leading-none">
             GearBox <br/> <span className="text-primary italic">Fintech OS.</span>

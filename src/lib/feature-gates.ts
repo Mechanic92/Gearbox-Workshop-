@@ -1,5 +1,5 @@
-import { db } from './db';
-import { subscriptionUsage, subscriptions, organizations, subscriptionPlans } from './schema';
+import { db } from './db.js';
+import { subscriptionUsage, subscriptions, organizations, subscriptionPlans } from './schema.js';
 import { eq, and, gte, lte } from 'drizzle-orm';
 
 /**

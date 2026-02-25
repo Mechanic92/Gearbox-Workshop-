@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { QrCode, X, Zap } from 'lucide-react';
+import { QrCode, X, Activity } from 'lucide-react';
 
 /**
  * QR Code Scanner Component
@@ -110,7 +110,7 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
             <div className="text-center space-y-2">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Zap className="w-5 h-5 text-blue-500" />
+                <Activity className="w-5 h-5 text-blue-500" />
                 <p className="text-sm font-black text-white uppercase tracking-widest">Scanning Active</p>
               </div>
               <p className="text-xs font-bold text-white/70">Position QR code within the frame</p>

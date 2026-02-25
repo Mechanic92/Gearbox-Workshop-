@@ -21,10 +21,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ProfitSpeedometer } from "@/components/ProfitSpeedometer";
 import { trpc } from "@/lib/trpc";
+import { AgentControlPanel } from "@/components/AgentControlPanel";
 import { 
   ArrowLeft, Loader2, Plus, Trash2, 
   Wrench, Package, Cpu, ChevronRight, 
-  Receipt, Share2, ClipboardCheck, Clock, TrendingUp
+  Receipt, Share2, ClipboardCheck, Clock, TrendingUp, Activity
 } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
@@ -33,19 +34,43 @@ import { Badge } from "@/components/ui/badge";
 
 export default function JobDetail() {
   const params = useParams<{ id: string }>();
-  const jobId = params.id ? parseInt(params.id, 10) : null;
+  const jobId = params.id ? parseInt(params.id, 10) : NaN;
   const [, setLocation] = useLocation();
   const [addCostOpen, setAddCostOpen] = useState(false);
 
   const { data, isLoading, refetch, error } = trpc.job.getWithCosts.useQuery(
-    { id: jobId! },
-    { enabled: !!jobId }
+    { id: jobId },
+    { enabled: !isNaN(jobId) }
   );
 
+  if (isNaN(jobId)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-12 text-center space-y-6">
+        <XCircle className="w-16 h-16 text-red-400 opacity-20" />
+        <div className="space-y-2">
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">Invalid job ID</h2>
+            <p className="text-white/40 font-medium uppercase text-xs tracking-widest">The operational identifier "{params.id}" is not valid.</p>
+        </div>
+        <Button onClick={() => setLocation("/trades/jobs")} className="rounded-xl h-12 px-8 font-black uppercase tracking-widest text-[10px]">
+            Return to Ledger
+        </Button>
+      </div>
+    );
+  }
+
   if (error) {
-    toast.error("Job not found or access denied");
-    setLocation("/trades/dashboard");
-    return null;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-12 text-center space-y-6">
+        <AlertCircle className="w-16 h-16 text-amber-400 opacity-20" />
+        <div className="space-y-2">
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">Access Protocol Failure</h2>
+            <p className="text-white/40 font-medium uppercase text-xs tracking-widest">{error.message || "Job not found or access denied in this node."}</p>
+        </div>
+        <Button onClick={() => setLocation("/trades/dashboard")} className="rounded-xl h-12 px-8 font-black uppercase tracking-widest text-[10px]">
+            Return to Dashboard
+        </Button>
+      </div>
+    );
   }
 
   const addCostMutation = trpc.jobCost.create.useMutation({
@@ -172,7 +197,7 @@ export default function JobDetail() {
               <div className="container flex items-center justify-between">
                   <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-card animate-pulse" />
-                      <span className="text-[10px] font-black uppercase tracking-widest italic">Live Labor Sync: {liveStatus[0].user?.name} is active on this job</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest italic">Live Labor Sync: {liveStatus[0]?.user?.name ?? "Tech"} is active on this job</span>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -292,8 +317,10 @@ export default function JobDetail() {
                 </CardContent>
             </Card>
 
+            <AgentControlPanel job={job} />
+
             <Card className="border-none shadow-xl shadow-black/5 bg-card overflow-hidden">
-                <div className="bg-blue-500/5 p-4 border-b border-blue-500/10 flex items-center justify-between">
+                <div className="bg-primary/5 p-4 border-b border-primary/10 flex items-center gap-3">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
                             <Cpu size={16} />
@@ -585,3 +612,7 @@ function DVIArea({ jobId }: { jobId: number }) {
         </div>
     );
 }
+
+
+// AgentControlPanel moved to src/components/AgentControlPanel.tsx
+

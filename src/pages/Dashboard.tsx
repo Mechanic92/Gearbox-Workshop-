@@ -17,8 +17,7 @@ import {
   MoreHorizontal,
   LayoutGrid,
   List,
-  Target,
-  Zap,
+  Activity,
   Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-6">
              <div className="flex items-center gap-3">
                 <div className="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/20">
-                   <Zap className="w-6 h-6 text-white" />
+                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-black tracking-tighter leading-none">{ledger?.name?.toUpperCase() || "GEARBOX"} <span className="text-blue-600 italic">2026</span></h1>
@@ -205,7 +204,7 @@ export default function Dashboard() {
                  {/* Efficiency Widget */}
                  <Card className="border-none shadow-2xl shadow-blue-900/5 bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-8 rounded-[40px] overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-12 opacity-10 rotate-12 pointer-events-none">
-                       <Zap className="w-48 h-48" />
+                       <Activity className="w-48 h-48" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-8 flex items-center gap-2">
                        <Target className="w-3 h-3" /> Workshop Velocity
@@ -232,7 +231,7 @@ export default function Dashboard() {
                          { title: 'Payment Received', desc: 'INV-4421 cleared by Chris S.', time: '2m ago', icon: Wallet },
                          { title: 'New Booking', desc: 'Online portal booking for ABC-123', time: '15m ago', icon: Calendar },
                          { title: 'DVI Completed', desc: 'Inspection approved for Audi RS6', time: '1h ago', icon: Wrench },
-                         { title: 'Inventory Alert', desc: 'Castrol 5W-30 low in stock', time: '3h ago', icon: Zap }
+                         { title: 'Inventory Alert', desc: 'Castrol 5W-30 low in stock', time: '3h ago', icon: Activity }
                        ].map((item, id) => (
                          <div key={id} className="relative pl-10 group">
                             <div className="absolute left-0 top-1 w-6 h-6 bg-card dark:bg-neutral-900 border-2 border-border dark:border-neutral-800 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-500">

@@ -1,5 +1,5 @@
 import { eq, and, sql, between } from 'drizzle-orm';
-import * as schema from './schema';
+import * as schema from './schema.js';
 
 /**
  * Booking Availability Calculator

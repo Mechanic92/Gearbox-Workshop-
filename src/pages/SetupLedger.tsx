@@ -15,7 +15,7 @@ import { useLedger } from "@/contexts/LedgerContext";
 import { trpc } from "@/lib/trpc";
 import { 
   ArrowLeft, ArrowRight, Building2, Check, 
-  Loader2, Wrench, Rocket, Zap, Sparkles
+  Loader2, Wrench, Rocket, Activity, Sparkles
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
@@ -277,7 +277,7 @@ export default function SetupLedger() {
                         <h2 className="text-5xl font-black tracking-tighter text-white mb-6">Environment <br/>Initialized.</h2>
                         <p className="text-muted-foreground text-lg mb-12">Universal systems architecture established. Welcome to Gearbox.</p>
                         <Button size="lg" className="h-20 w-full rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-transform" onClick={() => setLocation(ledgerType === "trades" ? "/trades/dashboard" : "/rental/dashboard")}>
-                            Launch Platform <Zap size={20} className="ml-2" />
+                            Launch Platform <Activity size={20} className="ml-2" />
                         </Button>
                      </Card>
                 )}

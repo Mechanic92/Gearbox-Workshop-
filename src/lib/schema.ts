@@ -146,6 +146,7 @@ export const jobs = sqliteTable("jobs", {
   notes: text("notes"),
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+  agentStatus: text("agentStatus", { enum: ["PENDING", "ANALYZING", "QUOTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED", "DISABLED"] }).default("DISABLED"),
 }, (table) => ({
   ledgerIdx: index("job_ledger_idx").on(table.ledgerId),
   jobNumberIdx: index("job_number_idx").on(table.jobNumber),
@@ -702,6 +703,71 @@ export const jobTimeLogsRelations = relations(jobTimeLogs, ({ one }) => ({
   user: one(users, { fields: [jobTimeLogs.userId], references: [users.id] }),
 }));
 
+export const partsRelations = relations(parts, ({ one, many }) => ({
+  ledger: one(ledgers, { fields: [parts.ledgerId], references: [ledgers.id] }),
+  category: one(partCategories, { fields: [parts.categoryId], references: [partCategories.id] }),
+  supplier: one(suppliers, { fields: [parts.supplierId], references: [suppliers.id] }),
+  movements: many(stockMovements),
+  jobParts: many(jobParts),
+}));
+
+export const partCategoriesRelations = relations(partCategories, ({ one, many }) => ({
+  ledger: one(ledgers, { fields: [partCategories.ledgerId], references: [ledgers.id] }),
+  parts: many(parts),
+  parent: one(partCategories, { fields: [partCategories.parentId], references: [partCategories.id], relationName: "subcategories" }),
+  subcategories: many(partCategories, { relationName: "subcategories" }),
+}));
+
+export const suppliersRelations = relations(suppliers, ({ one, many }) => ({
+  ledger: one(ledgers, { fields: [suppliers.ledgerId], references: [ledgers.id] }),
+  parts: many(parts),
+  purchaseOrders: many(purchaseOrders),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  job: one(jobs, { fields: [invoices.jobId], references: [jobs.id] }),
+  extended: one(invoicesExtended, { fields: [invoices.id], references: [invoicesExtended.invoiceId] }),
+}));
+
+export const bookingsRelations = relations(bookings, ({ one, many }) => ({
+  ledger: one(ledgers, { fields: [bookings.ledgerId], references: [ledgers.id] }),
+  customer: one(customers, { fields: [bookings.customerId], references: [customers.id] }),
+  service: one(services, { fields: [bookings.serviceId], references: [services.id] }),
+  quotes: many(quotes),
+}));
+
+export const quotesRelations = relations(quotes, ({ one, many }) => ({
+  ledger: one(ledgers, { fields: [quotes.ledgerId], references: [ledgers.id] }),
+  customer: one(customers, { fields: [quotes.customerId], references: [customers.id] }),
+  booking: one(bookings, { fields: [quotes.bookingId], references: [bookings.id] }),
+  job: one(jobs, { fields: [quotes.jobId], references: [jobs.id] }),
+  items: many(quoteItems),
+}));
+
+export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
+  quote: one(quotes, { fields: [quoteItems.quoteId], references: [quotes.id] }),
+}));
+
+export const jobPartsRelations = relations(jobParts, ({ one }) => ({
+  job: one(jobs, { fields: [jobParts.jobId], references: [jobs.id] }),
+  part: one(parts, { fields: [jobParts.partId], references: [parts.id] }),
+}));
+
+export const stockMovementsRelations = relations(stockMovements, ({ one }) => ({
+  part: one(parts, { fields: [stockMovements.partId], references: [parts.id] }),
+  user: one(users, { fields: [stockMovements.createdBy], references: [users.id] }),
+}));
+
+export const purchaseOrdersRelations = relations(purchaseOrders, ({ one, many }) => ({
+  supplier: one(suppliers, { fields: [purchaseOrders.supplierId], references: [suppliers.id] }),
+  items: many(purchaseOrderItems),
+}));
+
+export const purchaseOrderItemsRelations = relations(purchaseOrderItems, ({ one }) => ({
+  purchaseOrder: one(purchaseOrders, { fields: [purchaseOrderItems.purchaseOrderId], references: [purchaseOrders.id] }),
+  part: one(parts, { fields: [purchaseOrderItems.partId], references: [parts.id] }),
+}));
+
 // ============================================================================
 // SUBSCRIPTION BILLING (SaaS Monetization)
 // ============================================================================
@@ -771,3 +837,180 @@ export const subscriptionPlans = sqliteTable("subscription_plans", {
   createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
 });
+
+export const autonomousActions = sqliteTable("autonomous_actions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  type: text("type").notNull(), // 'comm', 'inventory', 'financial', 'system'
+  action: text("action").notNull(),
+  result: text("result").notNull(),
+  impact: text("impact", { enum: ["low", "medium", "high"] }).default("medium").notNull(),
+  confidence: real("confidence").default(1.0).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  ledgerIdx: index("aa_ledger_idx").on(table.ledgerId),
+}));
+
+
+// ============================================================================
+// AGENTIC WORKFLOW TABLES
+// ============================================================================
+
+export const agentTasks = sqliteTable("agent_tasks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jobId: integer("jobId").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+  status: text("status", { enum: ["PENDING", "ANALYZING", "QUOTING", "AWAITING_APPROVAL", "COMPLETED", "FAILED"] }).default("PENDING").notNull(),
+  currentStep: text("currentStep"), // e.g., "fetching_parts", "calculating_labor"
+  error: text("error"),
+  resultSummary: text("resultSummary"), // JSON string of high-level result
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  jobIdx: index("agent_task_job_idx").on(table.jobId),
+  statusIdx: index("agent_task_status_idx").on(table.status),
+}));
+
+export const standardPriceList = sqliteTable("standard_price_list", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ledgerId: integer("ledgerId").notNull().references(() => ledgers.id),
+  serviceName: text("serviceName").notNull(), // e.g., "Oil Change", "Brake Pad Replacement"
+  description: text("description"),
+  baseLaborHours: real("baseLaborHours").notNull(),
+  hourlyRate: real("hourlyRate").notNull(), // Override default rate if needed, else 0/null to use system rate
+  requiredParts: text("requiredParts"), // JSON array of generic part names e.g. ["Oil Filter", "5W-30 Oil"]
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  ledgerIdx: index("std_price_ledger_idx").on(table.ledgerId),
+  serviceNameIdx: index("std_price_name_idx").on(table.serviceName),
+}));
+
+export const agentDraftQuotes = sqliteTable("agent_draft_quotes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jobId: integer("jobId").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+  taskId: integer("taskId").notNull().references(() => agentTasks.id, { onDelete: "cascade" }),
+  quoteData: text("quoteData").notNull(), // Full JSON of the proposed quote
+  confidenceScore: real("confidenceScore").default(0),
+  agentNotes: text("agentNotes"),
+  status: text("status", { enum: ["DRAFT", "APPROVED", "REJECTED"] }).default("DRAFT").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  jobIdx: index("draft_quote_job_idx").on(table.jobId),
+  taskIdx: index("draft_quote_task_idx").on(table.taskId),
+}));
+
+// ============================================================================
+// ANONYMOUS INTELLIGENCE DATA (The Data Moat)
+// ============================================================================
+// 
+// These tables store ONLY anonymized, aggregated industry data.
+// NO customer names, emails, phones, addresses, VINs, or license plates.
+// Shop identity is a one-way SHA-256 hash — cannot be reversed.
+//
+// This data powers:
+// → Industry benchmark reports
+// → AI pricing recommendations  
+// → Insurance/fleet partnership data APIs
+// → OEM aftermarket intelligence feeds
+// ============================================================================
+
+/** Anonymized job completion signals — pricing, timing, service patterns */
+export const intelligenceJobSignals = sqliteTable("intel_job_signals", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  anonShopId: text("anonShopId").notNull(), // SHA-256 hash, not reversible
+  serviceCategory: text("serviceCategory").notNull(), // "oil_change", "brake_pads", etc.
+  vehicleMake: text("vehicleMake").notNull(), // "Toyota", "Ford" — normalized
+  vehicleModel: text("vehicleModel").notNull(), // "Hilux", "Ranger"
+  vehicleYearBucket: text("vehicleYearBucket").notNull(), // "2020-2024" — 5yr buckets
+  laborCost: real("laborCost").notNull(),
+  partsCost: real("partsCost").notNull(),
+  totalJobValue: real("totalJobValue").notNull(),
+  marginPercent: real("marginPercent").notNull(),
+  jobDurationHours: real("jobDurationHours").notNull(),
+  region: text("region").default("nz").notNull(),
+  quarter: text("quarter").notNull(), // "2026-Q1"
+  dayOfWeek: integer("dayOfWeek").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  shopIdx: index("intel_job_shop_idx").on(table.anonShopId),
+  categoryIdx: index("intel_job_category_idx").on(table.serviceCategory),
+  makeIdx: index("intel_job_make_idx").on(table.vehicleMake),
+  quarterIdx: index("intel_job_quarter_idx").on(table.quarter),
+  regionIdx: index("intel_job_region_idx").on(table.region),
+}));
+
+/** Anonymized parts pricing signals — cost/sell/markup trends */
+export const intelligencePartSignals = sqliteTable("intel_part_signals", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  anonShopId: text("anonShopId").notNull(),
+  partCategory: text("partCategory").notNull(),
+  partType: text("partType").notNull(), // Generic name: "Oil Filter", not specific SKU
+  costPrice: real("costPrice").notNull(),
+  sellPrice: real("sellPrice").notNull(),
+  markupPercent: real("markupPercent").notNull(),
+  vehicleMake: text("vehicleMake").notNull(),
+  vehicleModel: text("vehicleModel").notNull(),
+  quarter: text("quarter").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  shopIdx: index("intel_part_shop_idx").on(table.anonShopId),
+  categoryIdx: index("intel_part_category_idx").on(table.partCategory),
+  quarterIdx: index("intel_part_quarter_idx").on(table.quarter),
+}));
+
+/** Anonymized booking demand signals — when do customers book? */
+export const intelligenceBookingSignals = sqliteTable("intel_booking_signals", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  anonShopId: text("anonShopId").notNull(),
+  serviceType: text("serviceType").notNull(),
+  dayOfWeek: integer("dayOfWeek").notNull(), // 0=Sun, 6=Sat
+  hourOfDay: integer("hourOfDay").notNull(), // 0-23
+  leadTimeDays: integer("leadTimeDays").notNull(), // Days between booking and service
+  quarter: text("quarter").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  shopIdx: index("intel_booking_shop_idx").on(table.anonShopId),
+  quarterIdx: index("intel_booking_quarter_idx").on(table.quarter),
+  dayIdx: index("intel_booking_day_idx").on(table.dayOfWeek),
+}));
+
+/** Anonymized shop health snapshots — operational benchmarks */
+export const intelligenceShopHealth = sqliteTable("intel_shop_health", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  anonShopId: text("anonShopId").notNull(),
+  activeJobCount: integer("activeJobCount").notNull(),
+  avgJobValue: real("avgJobValue").notNull(),
+  avgCycleTimeDays: real("avgCycleTimeDays").notNull(),
+  bookingConversionRate: real("bookingConversionRate").notNull(),
+  quoteConversionRate: real("quoteConversionRate").notNull(),
+  partsPerJob: real("partsPerJob").notNull(),
+  revenuePerBay: real("revenuePerBay").notNull(),
+  utilizationRate: real("utilizationRate").notNull(),
+  quarter: text("quarter").notNull(),
+  month: integer("month").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  shopIdx: index("intel_health_shop_idx").on(table.anonShopId),
+  quarterIdx: index("intel_health_quarter_idx").on(table.quarter),
+}));
+
+/** Aggregated industry benchmarks — pre-computed for API consumers */
+export const intelligenceBenchmarks = sqliteTable("intel_benchmarks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  benchmarkType: text("benchmarkType").notNull(), // "service_pricing", "vehicle_repair_freq", "parts_markup"
+  dimension: text("dimension").notNull(), // The grouping key, e.g., "oil_change", "Toyota:Hilux"
+  region: text("region").default("nz").notNull(),
+  sampleSize: integer("sampleSize").notNull(), // Number of data points
+  p25: real("p25").notNull(), // 25th percentile
+  median: real("median").notNull(), // 50th percentile  
+  p75: real("p75").notNull(), // 75th percentile
+  mean: real("mean").notNull(),
+  stddev: real("stddev"),
+  quarter: text("quarter").notNull(),
+  computedAt: integer("computedAt", { mode: "timestamp" }).default(sql`(cast(strftime('%s', 'now') as integer))`).notNull(),
+}, (table) => ({
+  typeIdx: index("intel_bench_type_idx").on(table.benchmarkType),
+  dimensionIdx: index("intel_bench_dimension_idx").on(table.dimension),
+  quarterIdx: index("intel_bench_quarter_idx").on(table.quarter),
+}));

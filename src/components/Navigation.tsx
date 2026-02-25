@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { 
   Menu, X, Home, Wrench, Users, Calendar, 
   BarChart3, Car, CheckSquare, ChevronRight, LogOut,
-  Zap, Settings as SettingsIcon, LayoutGrid, PanelLeftClose, PanelLeft,
+  Activity, Settings as SettingsIcon, LayoutGrid, PanelLeftClose, PanelLeft,
   FileText, Receipt, Package
 } from "lucide-react";
 
@@ -73,7 +73,7 @@ export default function Navigation() {
       <div className="mb-12 flex flex-col items-start px-4">
         <div className="flex items-center gap-4 group cursor-pointer" onClick={() => navigate("/")}>
           <div className="w-12 h-12 rounded-2xl bg-card text-foreground flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform duration-500">
-            <Zap size={24} fill="currentColor" />
+            <Activity size={24} fill="currentColor" />
           </div>
           {!isCollapsed && (
             <div>
@@ -204,7 +204,7 @@ export default function Navigation() {
             "fixed left-0 top-0 h-screen z-40 transform transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]",
             "lg:translate-x-0",
             isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-            isCollapsed ? "lg:w-24 w-80" : "w-80"
+            isCollapsed ? "lg:w-20 w-64" : "w-64"
         )}
       >
         <SidebarContent />
@@ -213,7 +213,7 @@ export default function Navigation() {
       {/* Spacer for content */}
       <div className={cn(
         "hidden lg:block flex-shrink-0 transition-all duration-700",
-        isCollapsed ? "lg:w-24" : "lg:w-80"
+        isCollapsed ? "lg:w-20" : "lg:w-64"
       )} />
     </>
   );

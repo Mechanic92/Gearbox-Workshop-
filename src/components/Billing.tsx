@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Loader2, CreditCard, TrendingUp, Users, HardDrive, Zap } from 'lucide-react';
+import { Loader2, CreditCard, TrendingUp, Users, HardDrive, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface BillingProps {
@@ -189,19 +189,19 @@ export function Billing({ organizationId }: BillingProps) {
                 </div>
                 <ul className="text-sm space-y-1 text-muted-foreground">
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Unlimited jobs
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Xero integration
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Advanced reporting
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Inventory management
                   </li>
                 </ul>
@@ -226,19 +226,19 @@ export function Billing({ organizationId }: BillingProps) {
                 </div>
                 <ul className="text-sm space-y-1 text-muted-foreground">
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Up to 5 locations
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Unlimited users
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     API access
                   </li>
                   <li className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-primary" />
+                    <Activity className="h-3 w-3 text-primary" />
                     Dedicated support
                   </li>
                 </ul>

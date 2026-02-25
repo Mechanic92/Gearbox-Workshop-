@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { db } from '../lib/db';
-import * as schema from '../lib/schema';
+import { db } from '../lib/db.js';
+import * as schema from '../lib/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
-import { sendEmail } from '../lib/notifications/email';
+import { sendEmail } from '../lib/notifications/email.js';
 
 /**
  * SECTION 2 — PUBLIC INGESTION API

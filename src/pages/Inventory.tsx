@@ -8,12 +8,12 @@ import {
   Filter,
   Download,
   Upload,
-  Barcode,
+  ScanBarcode as Barcode,
   DollarSign,
   ShoppingCart,
   Box,
   Layers,
-  Edit,
+  Pencil as Edit,
   Trash2,
   Eye,
   Loader2
@@ -34,14 +34,96 @@ export default function InventoryDashboard() {
   const { activeLedgerId } = useLedger();
   const [activeTab, setActiveTab] = useState<'parts' | 'suppliers' | 'orders' | 'movements'>('parts');
 
-  const { data: parts, isLoading } = trpc.inventory.list.useQuery(
+  const { data: parts, isLoading: isLoadingParts, refetch: refetchParts } = trpc.inventory.getParts.useQuery(
     { ledgerId: activeLedgerId! },
     { enabled: !!activeLedgerId }
   );
 
-  const totalStockValue = parts?.reduce((sum, p) => sum + ((p.stockQuantity || 0) * (p.costPrice || 0)), 0) || 0;
-  const activePartsCount = parts?.length || 0;
-  const lowStockCount = parts?.filter(p => (p.stockQuantity || 0) <= (p.minStockLevel || 0)).length || 0;
+  // Suppliers Query
+  const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers } = trpc.inventory.getSuppliers.useQuery(
+    { ledgerId: activeLedgerId! },
+    { enabled: !!activeLedgerId && activeTab === 'suppliers' }
+  );
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddSupplierModalOpen, setIsAddSupplierModalOpen] = useState(false);
+  const [newPart, setNewPart] = useState({
+    partNumber: '',
+    name: '',
+    description: '',
+    costPrice: '',
+    sellPrice: '',
+    stockQuantity: '0',
+    minStockLevel: '0'
+  });
+
+  const [selectedPartForAdjustment, setSelectedPartForAdjustment] = useState<any>(null);
+
+  const createPartMutation = trpc.inventory.createPart.useMutation({
+    onSuccess: () => {
+      refetchParts();
+      setIsAddModalOpen(false);
+      setNewPart({
+        partNumber: '',
+        name: '',
+        description: '',
+        costPrice: '',
+        sellPrice: '',
+        stockQuantity: '0',
+        minStockLevel: '0'
+      });
+    }
+  });
+
+  const [newSupplier, setNewSupplier] = useState({
+    name: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
+
+  const createSupplierMutation = trpc.inventory.createSupplier.useMutation({
+    onSuccess: () => {
+      refetchSuppliers();
+      setIsAddSupplierModalOpen(false);
+      setNewSupplier({ name: '', contactPerson: '', email: '', phone: '', address: '' });
+    }
+  });
+
+  const handleCreateSupplier = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeLedgerId) return;
+    createSupplierMutation.mutate({
+      ledgerId: activeLedgerId,
+      ...newSupplier
+    });
+  };
+
+  const handleCreatePart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeLedgerId) return;
+    createPartMutation.mutate({
+      ledgerId: activeLedgerId,
+      partNumber: newPart.partNumber,
+      name: newPart.name,
+      description: newPart.description,
+      costPrice: parseFloat(newPart.costPrice) || 0,
+      sellPrice: parseFloat(newPart.sellPrice) || 0,
+      stockQuantity: parseInt(newPart.stockQuantity) || 0,
+      minStockLevel: parseInt(newPart.minStockLevel) || 0,
+    });
+  };
+
+  const filteredParts = parts?.filter(p => 
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.partNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  const totalStockValue = filteredParts.reduce((sum, p) => sum + ((p.stockQuantity || 0) * (p.costPrice || 0)), 0) || 0;
+  const activePartsCount = filteredParts.length || 0;
+  const lowStockCount = filteredParts.filter(p => (p.stockQuantity || 0) <= (p.minStockLevel || 0)).length || 0;
 
   return (
     <div className="min-h-screen bg-background dark:bg-[#050505] font-sans antialiased pb-32">
@@ -58,9 +140,20 @@ export default function InventoryDashboard() {
               <Button variant="outline" className="rounded-2xl h-11 px-5 font-black text-[10px] uppercase tracking-widest">
                 <Download className="w-3.5 h-3.5 mr-2" /> Export
               </Button>
-              <Button className="rounded-2xl h-11 px-5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20">
+              <Button 
+                onClick={() => setIsAddModalOpen(true)}
+                className="rounded-2xl h-11 px-5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20"
+              >
                 <Plus className="w-3.5 h-3.5 mr-2" /> New Part
               </Button>
+              {activeTab === 'suppliers' && (
+                <Button 
+                    onClick={() => setIsAddSupplierModalOpen(true)}
+                    className="rounded-2xl h-11 px-5 bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-500/20"
+                >
+                    <Plus className="w-3.5 h-3.5 mr-2" /> New Supplier
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -73,7 +166,7 @@ export default function InventoryDashboard() {
           {[
             { label: 'Total Stock Value', value: `$${totalStockValue.toLocaleString()}`, change: '+0%', icon: DollarSign, color: 'blue' },
             { label: 'Active Parts', value: activePartsCount.toString(), change: `${lowStockCount} Low Stock`, icon: Package, color: 'emerald' },
-            { label: 'Pending Orders', value: '0', change: '$0.00', icon: ShoppingCart, color: 'amber' },
+            { label: 'Suppliers', value: (suppliers?.length || 0).toString(), change: 'Active Partners', icon: Box, color: 'amber' },
             { label: 'Stock Turnover', value: '0.0x', change: 'Last 90 days', icon: TrendingUp, color: 'indigo' }
           ].map((metric, i) => (
             <Card key={i} className="border-none shadow-xl shadow-black/5 bg-card dark:bg-neutral-900 p-6 rounded-[32px] group hover:shadow-2xl transition-all">
@@ -134,6 +227,8 @@ export default function InventoryDashboard() {
                 <input 
                   className="bg-transparent border-none text-sm font-bold outline-none w-full" 
                   placeholder="Search parts by name, number, or barcode..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <Button variant="outline" className="rounded-2xl h-12 px-5 font-black text-[10px] uppercase tracking-widest">
@@ -176,7 +271,7 @@ export default function InventoryDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                    {isLoading ? (
+                    {isLoadingParts ? (
                       <tr>
                         <td colSpan={8} className="py-20 text-center">
                           <Loader2 className="w-8 h-8 animate-spin text-neutral-300 mx-auto" />
@@ -192,7 +287,7 @@ export default function InventoryDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      parts.map((part, i) => {
+                      filteredParts.map((part, i) => {
                         const margin = (((part.sellPrice || 0) - (part.costPrice || 0)) / (part.sellPrice || 1) * 100).toFixed(1);
                         const isLowStock = (part.stockQuantity || 0) <= (part.minStockLevel || 0);
                         
@@ -231,7 +326,9 @@ export default function InventoryDashboard() {
                                 <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+                                <button 
+                                  onClick={() => setSelectedPartForAdjustment(part)}
+                                  className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
                                   <Edit className="w-4 h-4" />
                                 </button>
                                 <button className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">
@@ -262,6 +359,217 @@ export default function InventoryDashboard() {
 
       </main>
 
+      {/* New Part Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={() => setIsAddModalOpen(false)} />
+          <Card className="relative w-full max-w-2xl bg-card dark:bg-neutral-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
+            <div className="p-10 space-y-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-black tracking-tighter uppercase italic leading-none">Initialize Part</h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mt-2">Catalog New Component System</p>
+                </div>
+                <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreatePart} className="grid grid-cols-2 gap-6">
+                 {/* Form Fields (kept same as before) */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Part Number</label>
+                  <input 
+                    required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    placeholder="e.g. OIL-5W30-5L"
+                    value={newPart.partNumber}
+                    onChange={(e) => setNewPart({...newPart, partNumber: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Part Name</label>
+                  <input 
+                    required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    placeholder="e.g. Castrol Edge 5W-30"
+                    value={newPart.name}
+                    onChange={(e) => setNewPart({...newPart, name: e.target.value})}
+                  />
+                </div>
+                <div className="col-span-2 space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Description</label>
+                  <textarea 
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none min-h-[100px]"
+                    placeholder="Technical specifications, compatibility notes..."
+                    value={newPart.description}
+                    onChange={(e) => setNewPart({...newPart, description: e.target.value})}
+                  />
+                </div>
+                 <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Cost Price (ex GST)</label>
+                  <input 
+                    type="number" step="0.01" required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    value={newPart.costPrice}
+                    onChange={(e) => setNewPart({...newPart, costPrice: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Retail Price (inc GST)</label>
+                  <input 
+                    type="number" step="0.01" required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    value={newPart.sellPrice}
+                    onChange={(e) => setNewPart({...newPart, sellPrice: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Initial Stock</label>
+                  <input 
+                    type="number" required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    value={newPart.stockQuantity}
+                    onChange={(e) => setNewPart({...newPart, stockQuantity: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Min. Stock Level</label>
+                  <input 
+                    type="number" required
+                    className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                    value={newPart.minStockLevel}
+                    onChange={(e) => setNewPart({...newPart, minStockLevel: e.target.value})}
+                  />
+                </div>
+                <div className="col-span-2 pt-4">
+                  <Button 
+                    type="submit"
+                    disabled={createPartMutation.isLoading}
+                    className="w-full rounded-2xl h-14 bg-blue-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20"
+                  >
+                    {createPartMutation.isLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Commit to Catalog"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <StockAdjustmentModal 
+        isOpen={!!selectedPartForAdjustment}
+        onClose={() => setSelectedPartForAdjustment(null)}
+        part={selectedPartForAdjustment}
+        onSuccess={() => {
+            refetchParts();
+            setSelectedPartForAdjustment(null);
+        }}
+      />
     </div>
   );
+}
+
+const X = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} stroke="currentColor" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+);
+
+function StockAdjustmentModal({ isOpen, onClose, part, onSuccess }: any) {
+    const [quantity, setQuantity] = useState('');
+    const [type, setType] = useState<'adjustment' | 'purchase' | 'return'>('adjustment');
+    const [notes, setNotes] = useState('');
+    
+    const utils = trpc.useContext();
+    const adjustStockMutation = trpc.inventory.adjustStock.useMutation({
+        onSuccess: () => {
+            onSuccess();
+        }
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!part) return;
+
+        const qty = parseInt(quantity);
+        if (isNaN(qty)) return;
+
+        adjustStockMutation.mutate({
+            partId: part.id,
+            quantity: qty,
+            movementType: type,
+            notes
+        });
+    };
+
+    if (!isOpen || !part) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={onClose} />
+            <Card className="relative w-full max-w-md bg-card dark:bg-neutral-900 border-none shadow-2xl rounded-[32px] overflow-hidden">
+                <div className="p-8 space-y-6">
+                    <div>
+                        <h2 className="text-2xl font-black tracking-tighter uppercase italic leading-none">Adjust Stock</h2>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mt-2">{part.partNumber} - {part.name}</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Adjustment Type</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {['adjustment', 'purchase', 'return'].map(t => (
+                                    <button
+                                        key={t}
+                                        type="button"
+                                        onClick={() => setType(t as any)}
+                                        className={cn(
+                                            "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                            type === t ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-foreground'
+                                        )}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Quantity Change</label>
+                            <input 
+                                type="number" required
+                                className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                                placeholder="Positive to add, negative to remove"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                            />
+                            <p className="text-[10px] text-neutral-400 font-bold px-2">
+                                Current Stock: {part.stockQuantity} &rarr; New: {(part.stockQuantity || 0) + (parseInt(quantity) || 0)}
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Reason / Notes</label>
+                            <input 
+                                className="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-2xl p-4 text-sm font-bold focus:ring-2 ring-blue-600 outline-none"
+                                placeholder="Optional notes"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            />
+                        </div>
+
+                        <Button 
+                            type="submit"
+                            disabled={adjustStockMutation.isLoading || !quantity}
+                            className="w-full rounded-2xl h-12 bg-emerald-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 mt-4"
+                        >
+                            {adjustStockMutation.isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Adjustment"}
+                        </Button>
+                    </form>
+                </div>
+            </Card>
+        </div>
+    );
 }

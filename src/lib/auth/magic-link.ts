@@ -1,9 +1,9 @@
-import { db } from '../db';
-import * as schema from '../schema';
+import { db } from '../db.js';
+import * as schema from '../schema.js';
 import { eq, and, lt } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
-import { sendEmail } from '../notifications/email';
-import { sendSMS } from '../notifications/sms';
+import { sendEmail } from '../notifications/email.js';
+import { sendSMS } from '../notifications/sms.js';
 
 /**
  * Magic Link Authentication

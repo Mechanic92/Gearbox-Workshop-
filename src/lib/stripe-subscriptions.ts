@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
-import { db } from './db';
-import { subscriptions, billingHistory, subscriptionUsage, organizations } from './schema';
+import { db } from './db.js';
+import { subscriptions, billingHistory, subscriptionUsage, organizations } from './schema.js';
 import { eq } from 'drizzle-orm';
 
 /**

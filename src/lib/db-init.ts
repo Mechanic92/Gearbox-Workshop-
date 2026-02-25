@@ -12,6 +12,16 @@ export async function initializeDatabase() {
   });
 
   console.log("🔄 Initializing database...");
+  
+  // Helper to check if a column exists
+  const columnExists = async (table: string, column: string) => {
+    try {
+      const info = await client.execute(`PRAGMA table_info(${table})`);
+      return info.rows.some(row => row.name === column);
+    } catch (e) {
+      return false;
+    }
+  };
 
   // Always force reset in development to ensure schema consistency
   if (process.env.DB_FORCE_RESET === 'true') {
@@ -741,6 +751,117 @@ export async function initializeDatabase() {
       createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL,
       updatedAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
     )`,
+    
+    // ========================================================================
+    // autonomous_actions
+    // ========================================================================
+    `CREATE TABLE IF NOT EXISTS autonomous_actions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ledgerId INTEGER NOT NULL REFERENCES ledgers(id),
+      type TEXT NOT NULL,
+      action TEXT NOT NULL,
+      result TEXT NOT NULL,
+      impact TEXT DEFAULT 'medium' NOT NULL,
+      confidence REAL DEFAULT 1.0 NOT NULL,
+      createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    // ========================================================================
+    // ANONYMOUS INTELLIGENCE DATA TABLES (The Data Moat)
+    // These tables contain ZERO PII — only anonymized aggregate signals
+    // ========================================================================
+
+    `CREATE TABLE IF NOT EXISTS intel_job_signals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      anonShopId TEXT NOT NULL,
+      serviceCategory TEXT NOT NULL,
+      vehicleMake TEXT NOT NULL,
+      vehicleModel TEXT NOT NULL,
+      vehicleYearBucket TEXT NOT NULL,
+      laborCost REAL NOT NULL,
+      partsCost REAL NOT NULL,
+      totalJobValue REAL NOT NULL,
+      marginPercent REAL NOT NULL,
+      jobDurationHours REAL NOT NULL,
+      region TEXT DEFAULT 'nz' NOT NULL,
+      quarter TEXT NOT NULL,
+      dayOfWeek INTEGER NOT NULL,
+      createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS intel_part_signals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      anonShopId TEXT NOT NULL,
+      partCategory TEXT NOT NULL,
+      partType TEXT NOT NULL,
+      costPrice REAL NOT NULL,
+      sellPrice REAL NOT NULL,
+      markupPercent REAL NOT NULL,
+      vehicleMake TEXT NOT NULL,
+      vehicleModel TEXT NOT NULL,
+      quarter TEXT NOT NULL,
+      createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS intel_booking_signals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      anonShopId TEXT NOT NULL,
+      serviceType TEXT NOT NULL,
+      dayOfWeek INTEGER NOT NULL,
+      hourOfDay INTEGER NOT NULL,
+      leadTimeDays INTEGER NOT NULL,
+      quarter TEXT NOT NULL,
+      createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS intel_shop_health (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      anonShopId TEXT NOT NULL,
+      activeJobCount INTEGER NOT NULL,
+      avgJobValue REAL NOT NULL,
+      avgCycleTimeDays REAL NOT NULL,
+      bookingConversionRate REAL NOT NULL,
+      quoteConversionRate REAL NOT NULL,
+      partsPerJob REAL NOT NULL,
+      revenuePerBay REAL NOT NULL,
+      utilizationRate REAL NOT NULL,
+      quarter TEXT NOT NULL,
+      month INTEGER NOT NULL,
+      createdAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS intel_benchmarks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      benchmarkType TEXT NOT NULL,
+      dimension TEXT NOT NULL,
+      region TEXT DEFAULT 'nz' NOT NULL,
+      sampleSize INTEGER NOT NULL,
+      p25 REAL NOT NULL,
+      median REAL NOT NULL,
+      p75 REAL NOT NULL,
+      mean REAL NOT NULL,
+      stddev REAL,
+      quarter TEXT NOT NULL,
+      computedAt INTEGER DEFAULT (cast(strftime('%s','now') as integer)) NOT NULL
+    )`,
+
+    // Intelligence table indexes
+    `CREATE INDEX IF NOT EXISTS intel_job_shop_idx ON intel_job_signals(anonShopId)`,
+    `CREATE INDEX IF NOT EXISTS intel_job_category_idx ON intel_job_signals(serviceCategory)`,
+    `CREATE INDEX IF NOT EXISTS intel_job_make_idx ON intel_job_signals(vehicleMake)`,
+    `CREATE INDEX IF NOT EXISTS intel_job_quarter_idx ON intel_job_signals(quarter)`,
+    `CREATE INDEX IF NOT EXISTS intel_job_region_idx ON intel_job_signals(region)`,
+    `CREATE INDEX IF NOT EXISTS intel_part_shop_idx ON intel_part_signals(anonShopId)`,
+    `CREATE INDEX IF NOT EXISTS intel_part_category_idx ON intel_part_signals(partCategory)`,
+    `CREATE INDEX IF NOT EXISTS intel_part_quarter_idx ON intel_part_signals(quarter)`,
+    `CREATE INDEX IF NOT EXISTS intel_booking_shop_idx ON intel_booking_signals(anonShopId)`,
+    `CREATE INDEX IF NOT EXISTS intel_booking_quarter_idx ON intel_booking_signals(quarter)`,
+    `CREATE INDEX IF NOT EXISTS intel_booking_day_idx ON intel_booking_signals(dayOfWeek)`,
+    `CREATE INDEX IF NOT EXISTS intel_health_shop_idx ON intel_shop_health(anonShopId)`,
+    `CREATE INDEX IF NOT EXISTS intel_health_quarter_idx ON intel_shop_health(quarter)`,
+    `CREATE INDEX IF NOT EXISTS intel_bench_type_idx ON intel_benchmarks(benchmarkType)`,
+    `CREATE INDEX IF NOT EXISTS intel_bench_dimension_idx ON intel_benchmarks(dimension)`,
+    `CREATE INDEX IF NOT EXISTS intel_bench_quarter_idx ON intel_benchmarks(quarter)`,
   ];
 
   for (const stmt of statements) {
@@ -752,6 +873,36 @@ export async function initializeDatabase() {
       }
     }
   }
+
+    // Ensure missing columns in invoices (safeguard for existing DBs)
+    const invoiceColumns = [
+        { name: 'invoiceDate', type: 'INTEGER NOT NULL DEFAULT 0' },
+        { name: 'dueDate', type: 'INTEGER NOT NULL DEFAULT 0' },
+        { name: 'subtotal', type: 'REAL NOT NULL DEFAULT 0' },
+        { name: 'gstAmount', type: 'REAL NOT NULL DEFAULT 0' },
+        { name: 'totalAmount', type: 'REAL NOT NULL DEFAULT 0' }
+    ];
+
+    for (const col of invoiceColumns) {
+        if (!(await columnExists('invoices', col.name))) {
+            console.log(`➕ Adding missing column ${col.name} to invoices`);
+            await client.execute(`ALTER TABLE invoices ADD COLUMN ${col.name} ${col.type}`);
+        }
+    }
+
+    // Ensure missing columns in jobs
+    const jobColumns = [
+        { name: 'approvalLinkToken', type: 'TEXT' },
+        { name: 'startedAt', type: 'INTEGER' },
+        { name: 'completedAt', type: 'INTEGER' }
+    ];
+
+    for (const col of jobColumns) {
+        if (!(await columnExists('jobs', col.name))) {
+            console.log(`➕ Adding missing column ${col.name} to jobs`);
+            await client.execute(`ALTER TABLE jobs ADD COLUMN ${col.name} ${col.type}`);
+        }
+    }
 
   console.log("✅ Database initialized successfully");
   return true;

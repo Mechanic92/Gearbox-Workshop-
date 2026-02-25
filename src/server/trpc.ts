@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
 
 import superjson from 'superjson';
-import * as db from '../lib/db';
+import * as db from '../lib/db.js';
 
 export const createContext = async ({ req, res }: CreateExpressContextOptions) => {
   const userId = req.headers['x-user-id'];

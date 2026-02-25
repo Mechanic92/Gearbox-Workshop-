@@ -1,6 +1,6 @@
 import { XeroClient } from 'xero-node';
-import { db } from '../db';
-import * as schema from '../schema';
+import { db } from '../db.js';
+import * as schema from '../schema.js';
 import { eq, and } from 'drizzle-orm';
 import crypto from 'crypto';
 

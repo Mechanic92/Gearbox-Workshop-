@@ -1,5 +1,5 @@
-import { db } from './db';
-import * as schema from './schema';
+import { db } from './db.js';
+import * as schema from './schema.js';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -201,7 +201,7 @@ export async function generateDemoData() {
         vehicleId: createdVehicles[0].id, 
         jobNumber: 'JOB-001', 
         description: 'Full service and oil change', 
-        status: 'completed' as const, 
+        status: 'COMPLETED' as const, 
         quotedPrice: 350.00, 
         finalPrice: 375.00,
         completedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
@@ -211,7 +211,7 @@ export async function generateDemoData() {
         vehicleId: createdVehicles[1].id, 
         jobNumber: 'JOB-002', 
         description: 'Brake pad replacement', 
-        status: 'completed' as const, 
+        status: 'COMPLETED' as const, 
         quotedPrice: 280.00, 
         finalPrice: 295.00,
         completedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
@@ -221,7 +221,7 @@ export async function generateDemoData() {
         vehicleId: createdVehicles[2].id, 
         jobNumber: 'JOB-003', 
         description: 'WoF inspection and minor repairs', 
-        status: 'in_progress' as const, 
+        status: 'IN_PROGRESS' as const, 
         quotedPrice: 185.00,
         startedAt: new Date()
       },
@@ -230,7 +230,7 @@ export async function generateDemoData() {
         vehicleId: createdVehicles[4].id, 
         jobNumber: 'JOB-004', 
         description: 'Diagnostics and wheel alignment', 
-        status: 'quoted' as const, 
+        status: 'NEW' as const, 
         quotedPrice: 215.00
       },
     ];
@@ -240,7 +240,7 @@ export async function generateDemoData() {
       const [j] = (await db.insert(schema.jobs).values({
         ledgerId: ledger.id,
         ...job,
-      }).returning()) as any[];
+      } as any).returning()) as any[];
       createdJobs.push(j);
     }
 
@@ -251,7 +251,7 @@ export async function generateDemoData() {
     
     let invoiceCount = 0;
     for (const job of createdJobs) {
-      if (job.status === 'completed' && job.finalPrice) {
+      if (job.status === 'COMPLETED' && job.finalPrice) {
         const subtotal = job.finalPrice / 1.15; // Remove GST
         const gstAmount = job.finalPrice - subtotal;
         

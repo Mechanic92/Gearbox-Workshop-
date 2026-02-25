@@ -16,7 +16,7 @@ import { trpc } from "@/lib/trpc";
 import { 
   AlertCircle, ArrowLeft, Car, Loader2, Plus, 
   Search, ShieldCheck, Calendar, Info, 
-  ChevronRight, ArrowRight, Activity, Zap
+  ChevronRight, ArrowRight, Activity
 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -178,7 +178,7 @@ export default function Vehicles() {
                     <span className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">{label}</span>
                     <div className="flex items-baseline justify-between">
                         <span className="text-sm font-bold">{days > 0 ? `${days}d Remaining` : "EXPIRED"}</span>
-                        {isCritical && <Zap size={14} className="animate-pulse" />}
+                        {isCritical && <Activity size={14} className="animate-pulse" />}
                     </div>
                   </div>
                 );

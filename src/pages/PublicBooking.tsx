@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Clock, ChevronRight, User, Car, Zap, ShieldCheck, Mail, Loader2, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, ChevronRight, User, Car, Activity, ShieldCheck, Mail, Loader2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function PublicBooking() {
@@ -175,7 +175,7 @@ export default function PublicBooking() {
                                                     : "bg-card/5 border-white/5 text-white/60 hover:border-white/20"
                                             )}
                                         >
-                                            <Zap size={20} className={cn("mb-3", formData.serviceType === s.name ? "text-foreground" : "text-primary")} />
+                                            <Activity size={20} className={cn("mb-3", formData.serviceType === s.name ? "text-foreground" : "text-primary")} />
                                             <p className="text-[10px] font-black uppercase tracking-widest">{s.name}</p>
                                         </button>
                                     ))}
@@ -338,14 +338,14 @@ export default function PublicBooking() {
                     <div className="relative space-y-8">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary">
-                                <Zap size={24} fill="currentColor" />
+                                <Activity size={24} fill="currentColor" />
                             </div>
                                 <h3 className="text-xl font-black tracking-tighter uppercase italic italic">Booking Summary</h3>
                         </div>
 
                         <div className="space-y-6">
                             {[
-                                { label: "Service Type", val: formData.serviceType || "Pending", icon: Zap },
+                                { label: "Service Type", val: formData.serviceType || "Pending", icon: Activity },
                                 { label: "Date", val: selectedDate ? format(selectedDate, "dd MMM yyyy") : "Pending", icon: Calendar },
                                 { label: "Time", val: selectedTime || "Pending", icon: Clock },
                                 { label: "Vehicle Plate", val: formData.rego || "Pending", icon: Car },
