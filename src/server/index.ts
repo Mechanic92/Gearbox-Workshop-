@@ -109,6 +109,7 @@ async function startServer() {
     isReady = true;
     app.listen(port, host, () => {
       console.log(`🚀 [Gearbox OS] Operational at http://${host}:${port}`);
+      console.log(`🤖 [Agent Router] Trigger path initialized`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);
